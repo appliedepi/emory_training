@@ -33,3 +33,10 @@ pacman::p_load(
 - Hello our name is 
   + blabla
   + blabla
+  
+  
+## Visualisation 
+
+Note to selves: 
+I think the way [this presentation](https://www.cedricscherer.com/slides/2019-08-28-intro-ggplot-statsizw#20) 
+breaks down ggplots line by line is probably the way to go! 
