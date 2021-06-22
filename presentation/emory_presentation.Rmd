@@ -1,0 +1,35 @@
+---
+title: "ECRC COVID-19 Training"
+author: "EpiRHandbook Team"
+date: "August 2021"
+output: 
+     powerpoint_presentation: 
+          reference_doc: "template.pptx"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, 
+                      warning = FALSE, 
+                      message = FALSE, 
+                      fig.width = 16, 
+                      fig.height = 10)
+
+
+
+## install and load necessary packages 
+pacman::p_load(
+  rio,        # importing data  
+  here,       # relative file pathways  
+  janitor,    # data cleaning and tables
+  lubridate,  # working with dates
+  tidyverse   # data management and visualization
+)
+
+```
+
+
+## Introduction 
+
+- Hello our name is 
+  + blabla
+  + blabla
