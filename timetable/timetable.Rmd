@@ -1,0 +1,88 @@
+---
+title: |
+    | Emory COVID-19 Response Collaborative 
+    | Online Seminar
+    | August 2021
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+
+## define rmarkdown chunk options 
+knitr::opts_chunk$set(echo = FALSE)
+
+## load necessary packages 
+pacman::p_load(
+     dplyr,     ## pulling table together 
+     stringr,   ## working character strings
+     lubridate, ## work with times 
+     gt         ## formatting table
+)
+
+```
+
+
+
+```{r contents}
+
+## define the course start time
+st <- lubridate::hm("10:00")
+
+
+## define lectures, lengths and authors 
+contents <- tribble(
+      ~duration,         ~session,                              ~author, 
+       10,               "Introduction",                        "Neale", 
+       15,               "Stuff",                               "Alex", 
+       30,               "BREAK",                               "", 
+       10,               "Other stuff",                         "Mathilde", 
+       10,               "Other stuff",                         "Henry"
+      ) 
+
+## add in the first start time (missing because of lag) 
+contents$start <- st
+contents$start[2:nrow(contents)] <- NA
+
+for (i in 2:nrow(contents)) {
+     contents$start[i] <- contents$start[i - 1] + lubridate::minutes(contents$duration[i - 1])
+}
+
+## format to be normal HH:MM 
+contents <- contents %>% 
+     mutate(start = stringr::str_c(
+          lubridate::hour(start), 
+          str_pad(
+               lubridate::minute(start), 
+               2, 
+               pad = "0"
+               ), 
+          sep = ":"
+     ))
+
+## rearrange columns 
+contents <- contents %>% 
+     select(start, 
+            session, 
+            author)
+
+```
+
+
+
+```{r formatting}
+
+contents %>% 
+     ## make in to a gt table 
+     gt() %>% 
+     ## colour in the breaks grey 
+     tab_style(
+          style = list(
+               cell_fill(color = "grey90")
+               ), 
+          locations = cells_body(
+               rows = session == "BREAK" 
+          )
+          )
+
+```
+
