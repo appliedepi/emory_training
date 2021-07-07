@@ -1,0 +1,393 @@
+---
+title: "Emory COVID-19 Response Collaborative"
+subtitle: "Introduction to R training"
+author: '[EpiRhandbook Team](https:://epirhandbook.com) <br><br> `r icons::icon_style(icons::fontawesome("twitter"), fill = "white")` [epiRhandbook](https://twitter.com/epiRhandbook) <br> `r icons::icon_style(icons::fontawesome("paper-plane"), fill = "white")` [epirhandbook@gmail.com](mailto:epirhandbook@gmail.com)'
+date: "August 2021"
+output:
+  xaringan::moon_reader:
+    seal: TRUE
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+    css: xaringan-themer.css
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, 
+                      warning = FALSE, 
+                      message = FALSE, 
+                      fig.retina = 3  ## retina more effective than w/h (according to twitter)
+                      # fig.width = 16, 
+                      # fig.height = 10
+                      )
+
+## I dont know why this is included in the example xaringan slide 
+## but is something to do with background images
+options(htmltools.dir.version = FALSE)
+
+## install and load necessary packages 
+pacman::p_load(
+  rio,        # importing data  
+  here,       # relative file pathways  
+  janitor,    # data cleaning and tables
+  lubridate,  # working with dates
+  tidyverse,  # data management and visualization
+  xaringanthemer  # for styling presentation 
+)
+
+```
+
+
+```{r  xaringan-themer, include = FALSE}
+
+## define presentation colours (theme) using {xaringanthemer} package 
+## https://pkg.garrickadenbuie.com/xaringanthemer/articles/xaringanthemer.html
+
+## epirhandbook logo colours: 
+  ## blue: "#00538c"
+  ## green: "#007732"
+
+## see ?style_mono_accent for all the things can customise
+style_mono_accent(
+  base_color = "#00538c", 
+  link_color = "#007732", 
+  ## add logo to the title page (bit bigger)
+  title_slide_background_image = "https://github.com/appliedepi/epiRhandbook_eng/raw/master/images/epiRhandbook_HexSticker_500x500.png", 
+  title_slide_background_position = "100% 100%", 
+  title_slide_background_size = "25%", 
+  ## add logo to all following slides
+  background_image = "https://github.com/appliedepi/epiRhandbook_eng/raw/master/images/epiRhandbook_HexSticker_500x500.png", 
+  background_size = "10%",
+  background_position = "100% 0%"
+)
+
+```
+
+
+# Header  
+## This is a subheader
+
+
+- Hello our name is 
+  + blabla
+  + blabla
+
+.footnote[
+[1] Something _super_ important to say 
+
+[2] Some **other** stuff 
+
+[3] bla
+]
+
+
+???
+
+- I think these are presenter notes 
+- You can see them in presenter mode 
+  + Keyboard shortcut is 'p' 
+---
+
+# Sequential reveal of bullet points
+
+You can reveal stuff bit by bit using to dashes between sections 
+
+--
+
+- This is my first point 
+
+--
+
+- Then I move on to this fascinating point 
+
+--
+
+- And finish with this blabla
+
+
+---
+class: inverse, center, middle
+
+# This is a section header slide
+
+---
+class: center, middle
+background-image: url(https://github.com/appliedepi/epiRhandbook_eng/raw/master/images/Epi%20R%20Handbook%20Banner%20Beige%201500x500.png)
+background-size: 75%
+background-position: 50% 0%
+
+# Alternative section header slide
+
+### Include epirhandbook banner (see [images slides](#imageslide))
+
+---
+
+# Tables with Knitr 
+
+Tables need to be in HTML format  
+So either Knitter or flextable
+
+```{r knitr_tabble}
+head(mtcars) %>% 
+  knitr::kable(format = 'html')
+```
+
+---
+
+# Tables with Flextable 
+
+You can colour in rows directly with flextable
+
+```{r flextable}
+head(mtcars) %>%
+  flextable::flextable() %>% 
+  flextable::bg(., 
+        i = c(2, 4), 
+        part = "body", 
+        bg = "yellow")
+```
+
+---
+
+
+
+# Table highlighting
+
+- Use  chunk option `highlight.output` to highlight specific lines of the text output. 
+  + For example, `highlight.output = TRUE` means highlighting all lines
+  + `highlight.output = c(1, 3)` means highlighting the first and third line.
+
+
+```{r, highlight.output=c(1, 3), echo=FALSE}
+head(mtcars)
+```
+
+---
+
+## Visualisation 
+
+Note to selves: 
+I think the way [this presentation](https://www.cedricscherer.com/slides/2019-08-28-intro-ggplot-statsizw#20) 
+breaks down ggplots line by line is probably the way to go! 
+
+---
+
+## A ggplot code example
+
+- see [extras slide](#references) for alt side-by-side option in twitter feed
+
+
+.pull-left[
+
+Highlight code lines using #<<
+
+```{r ggplot_code, echo = TRUE, eval = FALSE, tidy = FALSE}
+ggplot(mtcars) + 
+  aes(mpg, disp) + 
+  geom_point() +  #<<
+  geom_smooth()   #<<
+```
+] 
+
+.pull-right[
+```{r ggplot_code_plot}
+ggplot(mtcars) + 
+  aes(mpg, disp) + 
+  geom_point() +
+  geom_smooth() + 
+  ## NB have to fiddle with sizes a bit to make look good on output
+  theme_gray(base_size = 24)
+```
+]
+
+
+
+---
+name: imageslide
+background-image: url(https://github.com/appliedepi/epiRhandbook_eng/raw/master/images/epiRhandbook_HexSticker_500x500.png)
+background-size: 250px
+background-position: 90% 50%
+
+
+# Including images
+
+.pull-left[
+- Text displayed along side an image 
+- May need to fiddle with sizes
+  + position is %accross and %down 
+  + size .... just flip a coin and see what comes out 
+  + can also use % for images (see layout chunk just below YAML) 
+    + i.e. in layout section up top to adds logos to each page (as per the twitter feed in [extras slide](#references))
+- Can also include images with usual Rmarkdown or knitr code (e.g. next slide)
+]
+---
+
+# Including images 2.0 
+
+![](https://github.com/appliedepi/epiRhandbook_eng/raw/master/images/Epi%20R%20Handbook%20Banner%20Beige%201500x500.png)
+
+
+---
+name: references 
+
+# Xaringan extra & fancy stuff 
+
+- You can include fancier code tabs i.e. this [pres](https://xaringan.gallery/examples.html) 
+- Theres other fancy stuff in this [gallery](https://xaringan.gallery/examples.html)
+- There is tips in this [twitter feed](https://twitter.com/apreshill/status/1085659933238976513)
+  + e.g. if you name slides you can link back to them (nb. name needs to be first thing defined on slide)
+  + keyboard shortcuts for presenting 
+  + better side-by-side code example 
+  + title page 
+  + logos (have included this)
+  + background images 
+- Can set theme using [{xaringanthemer}](https://pkg.garrickadenbuie.com/xaringanthemer/articles/xaringanthemer.html) package 
+  + seems easier than messing around with css
+
+
+---
+
+
+class: center
+
+# Keyboard shortcuts when presenting
+
+Press `h` or `?` to see the possible ninjutsu you can use in remark.js.
+
+![](https://upload.wikimedia.org/wikipedia/commons/7/7e/Mudra-Naruto-KageBunshin.svg)
+
+---
+
+class: center, middle
+
+# Thanks!
+
+Slides created via the R package [**xaringan**](https://github.com/yihui/xaringan).
+
+
+
+
+---
+
+# Some Tips
+
+- The title slide is created automatically by **xaringan**, but it is just another remark.js slide added before your other slides.
+
+    The title slide is set to `class: center, middle, inverse, title-slide` by default. You can change the classes applied to the title slide with the `titleSlideClass` option of `nature` (`title-slide` is always applied).
+
+    ```yaml
+    output:
+      xaringan::moon_reader:
+        nature:
+          titleSlideClass: [top, left, inverse]
+    ```
+    
+--
+
+- If you'd like to create your own title slide, disable **xaringan**'s title slide with the `seal = FALSE` option of `moon_reader`.
+
+    ```yaml
+    output:
+      xaringan::moon_reader:
+        seal: false
+    ```
+
+
+---
+
+# Some Tips
+
+- To make slides work offline, you need to download a copy of remark.js in advance, because **xaringan** uses the online version by default (see the help page `?xaringan::moon_reader`).
+
+- You can use `xaringan::summon_remark()` to download the latest or a specified version of remark.js. By default, it is downloaded to `libs/remark-latest.min.js`.
+
+- Then change the `chakra` option in YAML to point to this file, e.g.
+
+    ```yaml
+    output:
+      xaringan::moon_reader:
+        chakra: libs/remark-latest.min.js
+    ```
+
+- If you used Google fonts in slides (the default theme uses _Yanone Kaffeesatz_, _Droid Serif_, and _Source Code Pro_), they won't work offline unless you download or install them locally. The Heroku app [google-webfonts-helper](https://google-webfonts-helper.herokuapp.com/fonts) can help you download fonts and generate the necessary CSS.
+
+
+---
+
+# CSS
+
+Among all options in `xaringan::moon_reader`, the most challenging but perhaps also the most rewarding one is `css`, because it allows you to customize the appearance of your slides using any CSS rules or hacks you know.
+
+You can see the default CSS file [here](https://github.com/yihui/xaringan/blob/master/inst/rmarkdown/templates/xaringan/resources/default.css). You can completely replace it with your own CSS files, or define new rules to override the default. See the help page `?xaringan::moon_reader` for more information.
+
+---
+
+# CSS
+
+For example, suppose you want to change the font for code from the default "Source Code Pro" to "Ubuntu Mono". You can create a CSS file named, say, `ubuntu-mono.css`:
+
+```css
+@import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+
+.remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+```
+
+Then set the `css` option in the YAML metadata:
+
+```yaml
+output:
+  xaringan::moon_reader:
+    css: ["default", "ubuntu-mono.css"]
+```
+
+Here I assume `ubuntu-mono.css` is under the same directory as your Rmd.
+
+See [yihui/xaringan#83](https://github.com/yihui/xaringan/issues/83) for an example of using the [Fira Code](https://github.com/tonsky/FiraCode) font, which supports ligatures in program code.
+
+---
+
+# CSS (with Sass)
+
+**xaringan** also supports Sass support via **rmarkdown**. Suppose you want to use the same color for different elements, e.g., first heading and bold text. You can create a `.scss` file, say `mytheme.scss`, using the [sass](https://sass-lang.com/) syntax with variables:
+
+```scss
+$mycolor: #ff0000; 
+.remark-slide-content > h1 { color: $mycolor; }
+.remark-slide-content strong { color: $mycolor; }
+```
+
+Then set the `css` option in the YAML metadata using this file placed under the same directory as your Rmd:
+
+```yaml
+output:
+  xaringan::moon_reader:
+    css: ["default", "mytheme.scss"]
+```
+
+This requires **rmarkdown** >= 2.8 and the [**sass**](https://rstudio.github.io/sass/) package. You can learn more about **rmarkdown** and **sass** support in [this blog post](https://blog.rstudio.com/2021/04/15/2021-spring-rmd-news/#sass-and-scss-support-for-html-based-output) and in [**sass** overview vignette](https://rstudio.github.io/sass/articles/sass.html).
+
+---
+
+# Themes
+
+Don't want to learn CSS? Okay, you can use some user-contributed themes. A theme typically consists of two CSS files `foo.css` and `foo-fonts.css`, where `foo` is the theme name. Below are some existing themes:
+
+```{r, R.options=list(width = 70)}
+names(xaringan:::list_css())
+```
+
+---
+
+# Themes
+
+To use a theme, you can specify the `css` option as an array of CSS filenames (without the `.css` extensions), e.g.,
+
+```yaml
+output:
+  xaringan::moon_reader:
+    css: [default, metropolis, metropolis-fonts]
+```
+
+If you want to contribute a theme to **xaringan**, please read [this blog post](https://yihui.org/en/2017/10/xaringan-themes).
