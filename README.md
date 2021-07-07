@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-<img src = "https://github.com/appliedepi/epiRhandbook_eng/raw/master/images/Epi%20R%20Handbook%20Banner%20Beige%201500x500.png" width = "600" height="200">
+<img src = "https://github.com/appliedepi/epiRhandbook_eng/raw/master/images/Epi%20R%20Handbook%20Banner%20Beige%201500x500.png" width = "800" height="300">
 
 <img src = "https://emorycovidcollaborative.org/wp-content/uploads/mark_ecrc_color.png" height = "200" align = "right">
 
