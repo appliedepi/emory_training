@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-<img src = "https://epirhandbook.com/images/epiRhandbook_HexSticker_500x500.png" width = "200" height="200">
+<img src = "https://github.com/appliedepi/epiRhandbook_eng/raw/master/images/Epi%20R%20Handbook%20Banner%20Beige%201500x500.png" width = "600" height="200">
 
 <img src = "https://emorycovidcollaborative.org/wp-content/uploads/mark_ecrc_color.png" height = "200" align = "right">
 
@@ -19,11 +19,12 @@ Collaborative](https://emorycovidcollaborative.org/) in August 2021.
 This repo contains all of the materials used for the course which
 includes:
 
--   [Powerpoint
-    presentation](https://github.com/appliedepi/emory_training/raw/master/presentation/emory_presentation.pptx)
+-   [Timetable](https://appliedepi.github.io/emory_training/timetable/timetable.pdf)
+-   [Presentation
+    slides](https://appliedepi.github.io/emory_training/presentation/slides.html)
 -   [R markdown for
-    presentation](https://github.com/appliedepi/emory_training/blob/master/presentation/emory_presentation.Rmd)
--   Datasets used
+    presentation](https://github.com/appliedepi/emory_training/blob/master/presentation/slides.Rmd)
+-   [Datasets used](https://appliedepi.github.io/emory_training/data)
 -   Rmarkdown for demonstration
 
 ## Terms of Use and License
