@@ -38,25 +38,25 @@ st2 <- lubridate::ymd_hm("2021-08-20 10:00", tz = "CET")
 
 ## define lectures, lengths and authors 
 contents <- tribble(
-      ~duration,         ~session,                                ~author,           ~type, 
-       5,                "Introduction to webinar series",        "ECRC Faculty",    "lecture", 
-       5,                "Introduction to EpiRHandbook content",  "Neale",           "lecture",
-       10,               "Transition from SAS to R",              "Wen",             "lecture", 
-       5,                "Case study layout & R projects",        "Alex",            "lecture", 
-       5,                "Parameterisation & Automation",         "Alex",            "lecture", 
-       5,                "Importing data",                        "Henry",           "lecture", 
-       5,                "Case study: importing data",            "Henry",           "demo", 
-       5,                "Merging data",                          "Alex",            "lecture", 
-       5,                "Case study: merging data",              "Alex",            "demo",
-       5,                "Data cleaning",                         "Henry",           "lecture", 
-       5,                "Case study: data cleaning",             "Henry",           "demo", 
-       5,                "BREAK",                                 "",                "", 
-       5,                "Descriptive analysis",                  "Alex",            "lecture", 
-       5,                "Case study: descriptive analysis",      "Alex",            "demo", 
-       5,                "Case study: statistical analysis",      "Alex",            "demo", 
-       5,                "Logistic regression",                   "Henry",           "lecture", 
-       5,                "Case study: logistic regression",       "Henry",           "demo",
-       15,               "Q&A session",                           "Team",            "demo"
+      ~duration,         ~session,                                    ~author,           ~type, 
+       5,                "Introduction to webinar series",            "ECRC Faculty",    "lecture", 
+       5,                "Introduction to EpiRHandbook content",      "Neale",           "lecture",
+       10,               "Transition from SAS to R",                  "Wen",             "lecture", 
+       10,                "Case study layout & Rmarkdown & projects",  "Alex",            "lecture", 
+       5,                "Parameterisation & Automation",             "Alex",            "lecture", 
+       5,                "Importing data",                            "Henry",           "lecture", 
+       5,                "Case study: importing data",                "Henry",           "demo", 
+       5,                "Merging data",                              "Alex",            "lecture", 
+       5,                "Case study: merging data",                  "Alex",            "demo",
+       5,                "Data cleaning",                             "Henry",           "lecture", 
+       5,                "Case study: data cleaning",                 "Henry",           "demo", 
+       5,                "BREAK",                                     "",                "", 
+       5,                "Descriptive analysis",                      "Alex",            "lecture", 
+       5,                "Case study: descriptive analysis",          "Alex",            "demo", 
+       5,                "Case study: statistical analysis",          "Alex",            "demo", 
+       5,                "Logistic regression",                       "Henry",           "lecture", 
+       5,                "Case study: logistic regression",           "Henry",           "demo",
+       15,               "Q&A session",                               "Team",            "demo"
       ) 
 
 ## add in the first start time (missing because of lag) 
