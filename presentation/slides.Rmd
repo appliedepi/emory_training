@@ -48,11 +48,12 @@ pacman::p_load(
 ## epirhandbook logo colours: 
   ## blue: "#00538c"
   ## green: "#007732"
+  ## lighter green: "#48a878"
 
 ## see ?style_mono_accent for all the things can customise
 style_mono_accent(
   base_color = "#00538c", 
-  link_color = "#007732", 
+  link_color = "#48a878", 
   ## add logo to the title page (bit bigger)
   title_slide_background_image = "https://github.com/appliedepi/epiRhandbook_eng/raw/master/images/epiRhandbook_HexSticker_500x500.png", 
   title_slide_background_position = "100% 100%", 
@@ -234,6 +235,7 @@ name: references
 
 # Xaringan extra & fancy stuff 
 
+- This is a good [tutorial](https://presentable-user2021.netlify.app/) from useR conference.
 - You can include fancier code tabs i.e. this [pres](https://xaringan.gallery/examples.html) 
 - Theres other fancy stuff in this [gallery](https://xaringan.gallery/examples.html)
 - There is tips in this [twitter feed](https://twitter.com/apreshill/status/1085659933238976513)
