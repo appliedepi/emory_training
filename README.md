@@ -20,8 +20,10 @@ This repo contains all of the materials used for the course which
 includes:
 
 -   [Timetable](https://appliedepi.github.io/emory_training/timetable/timetable.pdf)
--   [Presentation
+-   [Data workflow presentation
     slides](https://appliedepi.github.io/emory_training/presentation/slides.html)
+-   [Data visualization presentation
+    slides](https://appliedepi.github.io/emory_training/presentation/ggplot_slides.html)
 -   [R markdown for
     presentation](https://github.com/appliedepi/emory_training/blob/master/presentation/slides.Rmd)
 -   [Datasets used](https://appliedepi.github.io/emory_training/data)
