@@ -26,7 +26,10 @@ knitr::opts_chunk$set(echo = FALSE,
 ## I dont know why this is included in the example xaringan slide 
 ## but is something to do with background images
 options(htmltools.dir.version = FALSE)
+```
 
+
+```{r}
 ## install and load necessary packages 
 pacman::p_load(
   rio,        # importing data  
@@ -40,7 +43,7 @@ pacman::p_load(
 ```
 
 
-```{r  xaringan-themer, include = FALSE}
+```{r xaringan-themer, include = FALSE}
 
 ## define presentation colours (theme) using {xaringanthemer} package 
 ## https://pkg.garrickadenbuie.com/xaringanthemer/articles/xaringanthemer.html
@@ -67,34 +70,31 @@ style_mono_accent(
 ```
 
 
-# Applied Epi & The Epi R Handbook
+# About us  
+
+## Support for applied epis  
 
 ![](https://github.com/appliedepi/epiRhandbook_eng/raw/master/images/Epi%20R%20Handbook%20Banner%20Beige%201500x500.png)
 
 * Grassroots collaborative of 50 applied epidemiologists  
-* We wrote the Epi R Handbook which has been used by 40,000 people worldwide
-* Now we want to offer customized training to health departments and NGOs as a non-profit organization
-* Our pricing structure will allow us to offer these trainings in low-resource settings  
+* The (free) Epi R Handbook has been used by 40,000 people worldwide
+* Now we offer customized training to health departments and NGOs  
+
+[1] www.epiRhandbook.com  
 
 ---
 # EDGE  
 
-```{r out.height = "50%", fig.align = "center", echo=F}
-knitr::include_graphics(here::here("presentation", "images", "EDGE flow.png"))
-```
+Today's session will be *explanation* and *demonstration*. It follows from the previous [demonstration on data management and workflow](https://appliedepi.github.io/emory_training/presentation/slides.html).  
 
-The learning process can be summarised into this acronym "EDGE". Today's session is primarily a *demonstration* with question & answer session. We assume that you have read at least some of the relevant pages in the Epi R Handbook prior to this session. We also offer trainings in which we guide you through case studies with hands-on coaching. 
+We assume you have reviewed the Handbook pages on [R Basics](https://epirhandbook.com/r-basics.html) and [ggplot basics](https://epirhandbook.com/ggplot-basics.html).  
 
----
-# Pre-reading  
+![The "EDGE" acronym for learning/teachings](https://github.com/appliedepi/emory_training/blob/master/presentation/images/EDGE%20flow.png?raw=true){height = 40%, width = 75%}
 
-We expect that you have read or at least skimmed the following pages of the Epi R Handbook:  
 
-* R Basics  
-* Transition to R  
-* R projects  
-* Cleaning data and core functions  
 
+???
+- The learning process can be summarised into this acronym "EDGE". Today's session is primarily a *demonstration* with question & answer session. We assume that you have read at least some of the relevant pages in the Epi R Handbook prior to this session. We also offer trainings in which we guide you through case studies with hands-on coaching. 
 
 
 ---
@@ -115,41 +115,257 @@ fs::dir_tree(path = here("presentation"), recurse = FALSE)
 ---
 # Load packages  
 
-```{r}
+**ggplot2** is included within the **tidyverse** mega-package (read more [here]).  
 
+```{r, echo=T}
 pacman::p_load(
-  tidyverse,      # includes ggplot2 and other data management tools
   rio,            # import/export
   here,           # file locator
-  stringr         # working with characters   
-)
-
+  rmarkdown,      # reports
+  tidyverse       # mega-package for data management and visualization
+  )
 ```
 
-
+The **tidyverse** also includes these packages:  
+* **dplyr** (data management)  
+* **stringr** (characters and text)  
+* **forcats** (factors / ordered categories)  
+* and many others...  
 
 ---
 # Import data
 
-Today we will use a *clean* dataset, as we will focus on techniques for data visualization.  
+We use a *clean* dataset, to focus on visualization techniques.  
 
-* Use the `import()` function from **rio** to import an RDS file  
-* Use the `here()` function from **here** to locate the file relative to the R project root
+* Use `import()` function from **rio** to import an RDS file  
+* Use `here()` function from **here** to locate the file relative to the R project root
 
-```{r import_data}
+```{r import_data, echo=T}
 linelist_clean <- import(here("presentation", "data", "linelist_cleaned.rds"))
 ```
+
+[1] A .rds file can store an R data frame and retain column classes  
 
 ---
 # Review data  
 
+Below are the first 25 rows of the linelist:  
+
 ```{r}
-head(linelist_clean, 6) %>% 
-  knitr::kable(format = 'html')
+head(linelist_clean, 25) %>% 
+  DT::datatable(
+    options = list(
+      scrollY = 400,
+      scrollX = 600,
+      pageLength = 25,
+      fontSize = '50%',
+      dom = "ti",
+      ordering = FALSE,
+      rownames = FALSE,
+      options = list(pageLength = 5, scrollX=T),
+      class = 'white-space: nowrap' 
+    )
+  )
+
+  #knitr::kable(format = 'html')
 ```
 
 ---
-# Fundamentals of ggplot2
+# Visualization options in R  
+
+- **base** R  
+  + `plot()`  
+- **ggplot2**  
+  + `geom_bar()`, `geom_col()`, `geom_point()`...  
+- **plotly**  
+  + Interactive plots (e.g. zoom, hover text...)
+
+
+```{r, out.width=c('50%'), fig.show='hold', warning=F, message=F}
+
+# Base plotting example
+#######################
+hist(linelist_clean$age_years)  
+
+# ggplot2 example
+#######################################
+# Sequence of weekly Monday dates for CENTRAL HOSPITAL
+weekly_breaks <- seq.Date(
+  from = floor_date(min(linelist_clean$date_onset, na.rm=T),   "week", week_start = 1), # monday before first case
+  to   = ceiling_date(max(linelist_clean$date_onset, na.rm=T), "week", week_start = 1), # monday after last case
+  by   = "week")
+
+ggplot(linelist_clean) + 
+  
+  # histogram
+  geom_histogram(
+    mapping = aes(x = date_onset),
+    
+    breaks = weekly_breaks,   # pre-defined date vector - see top of ggplot section
+    
+    color = "darkblue",
+    
+    fill = "lightblue") +
+
+  # scales
+  scale_y_continuous(expand = c(0,0))+
+  scale_x_date(
+    expand = c(0,0),                   # remove excess x-axis space below and after case bars
+    date_breaks = "1 month",           # 1st of month
+    date_minor_breaks = "1 month",     # 1st of month
+    date_labels = "%b\n'%y")+          # label format
+  
+  # labels and theme
+  labs(
+    title = "ggplot2 epicurve example",
+    x = "Week of symptom onset",
+    y = "Weekly case indicence")+ 
+  theme_minimal()+
+  
+  # add semi-transparent red rectangle to tentative data
+  annotate(
+    "rect",
+    xmin  = as.Date(max(linelist_clean$date_onset, na.rm = T) - 21), # note must be wrapped in as.Date()
+    xmax  = as.Date(Inf),                                          # note must be wrapped in as.Date()
+    ymin  = 0,
+    ymax  = Inf,
+    alpha = 0.2,          # alpha easy and intuitive to adjust using annotate()
+    fill  = "red")+
+  
+  # add black vertical line on top of other layers
+  annotate(
+    "segment",
+    x     = max(linelist_clean$date_onset, na.rm = T) - 21, # 21 days before last data
+    xend  = max(linelist_clean$date_onset, na.rm = T) - 21, 
+    y     = 0,         # line begins at y = 0
+    yend  = Inf,       # line to top of plot
+    size  = 2,         # line size
+    color = "black",
+    lty   = "solid")+   # linetype e.g. "solid", "dashed"
+
+  # add text in rectangle
+  annotate(
+    "text",
+    x = max(linelist_clean$date_onset, na.rm = T) - 15,
+    y = 15,
+    label = "Subject to reporting delays",
+    angle = 90)
+
+# ploty example
+############################################
+# 
+# plotly_box <- ggplot(data = linelist_clean)+
+#   geom_boxplot(mapping = aes(y = age_years, x = outcome))+
+#   theme_classic()
+# 
+# plotly::ggplotly(plotly_box)
+```
+
+---
+# What do you call it?  
+
+- The **ggplot2** *package* is the most popular data visualization tool in R  
+- Its `ggplot()` *function* is at the core of the package  
+- This whole approach is colloquially known as “ggploting”  
+- Resulting figures are sometimes affectionately called “ggplots”  
+
+**ggplot2** benefits from a wide variety of supplementary R packages that further enhance its functionality  
+- **gganimate**  
+- **ggthemr**  
+- **ggdendro**  
+- **gghighlight**  
+- ...  
+
+[1] The “gg” in these names reflects the “grammar of graphics” used to construct the figures. 
+
+
+
+
+
+
+---
+# Building a ggplot (1)
+## Opening the canvas
+
+ 
+
+.pull-left[
+
+The base panel is formed by the `ggplot()` command  
+
+```{r , echo = TRUE, eval = FALSE, tidy = FALSE}
+ggplot(data = linelist_clean)
+```
+] 
+
+.pull-right[
+```{r }
+ggplot(data = linelist_clean)
+```
+]
+
+
+
+
+
+
+
+
+
+---
+# Building a ggplot (2)
+## Add geoms
+
+Many **ggplot2** functions create “geoms”, including:  
+
+* Histograms - geom_histogram()  
+* Bar charts - geom_bar() or geom_col() (see “Bar plot” section)  
+* Box plots - geom_boxplot()  
+* Points (e.g. scatter plots) - geom_point()  
+* Line graphs - geom_line() or geom_path()  
+* Trend lines - geom_smooth()  
+
+In one plot you can display one or multiple geoms. Each is added to previous ggplot2 commands with a `+`, and they are plotted sequentially such that later geoms are plotted on top of previous ones
+
+
+
+
+
+
+
+
+
+---
+# Building a ggplot (3)
+## Map columns to the data  
+
+.pull-left[
+
+*Map* the column `date_onset` to the x-axis   
+
+```{r , echo = TRUE, eval = FALSE, tidy = FALSE}
+ggplot(data = linelist_clean)+
+  geom_histogram(
+    mapping = aes(x = date_onset) #<<
+    )
+```
+] 
+
+.pull-right[
+```{r }
+ggplot(data = linelist_clean)+
+  geom_histogram(
+    mapping = aes(x = date_onset)
+    )
+```
+]
+
+
+
+
+
+
+
 
 ---
 # Header  
