@@ -23,7 +23,7 @@ includes:
 -   [Data workflow presentation
     slides](https://appliedepi.github.io/emory_training/presentation/slides.html)
 -   [Data visualization presentation
-    slides](https://appliedepi.github.io/emory_training/presentation/ggplot_slides.html)
+    slides](https://raw.githubusercontent.com/appliedepi/emory_training/master/presentation/slides_ggplot.html)
 -   [R markdown for
     presentation](https://github.com/appliedepi/emory_training/blob/master/presentation/slides.Rmd)
 -   [Datasets used](https://appliedepi.github.io/emory_training/data)
