@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Emory COVID-19 Response Collaborative</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="EpiRhandbook Team      epiRhandbook     epirhandbook@gmail.com" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/tabwid/tabwid.css" rel="stylesheet" />
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Emory COVID-19 Response Collaborative
+## Data visualization with ggplot2: an overview and demonstration
+### <a href="https:://epirhandbook.com">EpiRhandbook Team</a> <br><br> <svg viewBox="0 0 512 512" style="height:1em;position:relative;display:inline-block;top:.1em;fill:white;" xmlns="http://www.w3.org/2000/svg"> <path d="M459.37 151.716c.325 4.548.325 9.097.325 13.645 0 138.72-105.583 298.558-298.558 298.558-59.452 0-114.68-17.219-161.137-47.106 8.447.974 16.568 1.299 25.34 1.299 49.055 0 94.213-16.568 130.274-44.832-46.132-.975-84.792-31.188-98.112-72.772 6.498.974 12.995 1.624 19.818 1.624 9.421 0 18.843-1.3 27.614-3.573-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319-28.264-18.843-46.781-51.005-46.781-87.391 0-19.492 5.197-37.36 14.294-52.954 51.655 63.675 129.3 105.258 216.365 109.807-1.624-7.797-2.599-15.918-2.599-24.04 0-57.828 46.782-104.934 104.934-104.934 30.213 0 57.502 12.67 76.67 33.137 23.715-4.548 46.456-13.32 66.599-25.34-7.798 24.366-24.366 44.833-46.132 57.827 21.117-2.273 41.584-8.122 60.426-16.243-14.292 20.791-32.161 39.308-52.628 54.253z"></path></svg> <a href="https://twitter.com/epiRhandbook">epiRhandbook</a> <br> <svg viewBox="0 0 512 512" style="height:1em;position:relative;display:inline-block;top:.1em;fill:white;" xmlns="http://www.w3.org/2000/svg"> <path d="M440 6.5L24 246.4c-34.4 19.9-31.1 70.8 5.7 85.9L144 379.6V464c0 46.4 59.2 65.5 86.6 28.6l43.8-59.1 111.9 46.2c5.9 2.4 12.1 3.6 18.3 3.6 8.2 0 16.3-2.1 23.6-6.2 12.8-7.2 21.6-20 23.9-34.5l59.4-387.2c6.1-40.1-36.9-68.8-71.5-48.9zM192 464v-64.6l36.6 15.1L192 464zm212.6-28.7l-153.8-63.5L391 169.5c10.7-15.5-9.5-33.5-23.7-21.2L155.8 332.6 48 288 464 48l-59.4 387.3z"></path></svg> <a href="mailto:epirhandbook@gmail.com">epirhandbook@gmail.com</a>
+### August 2021
+
+---
+
+
+
+
+
+
+
+
+# Applied Epi &amp; The Epi R Handbook
+
+![](https://github.com/appliedepi/epiRhandbook_eng/raw/master/images/Epi%20R%20Handbook%20Banner%20Beige%201500x500.png)
+
+* Grassroots collaborative of 50 applied epidemiologists  
+* We wrote the Epi R Handbook which has been used by 40,000 people worldwide
+* Now we want to offer customized training to health departments and NGOs as a non-profit organization
+* Our pricing structure will allow us to offer these trainings in low-resource settings  
+
+# EDGE  
+
+&lt;img src="C:/Users/Neale/OneDrive - Neale Batra/Documents/Analytic Software/R/Projects/R handbook/Trainings/Emory Aug 2021/emory_training/presentation/images/EDGE flow.png" width="1652" height="50%" style="display: block; margin: auto;" /&gt;
+
+The learning process can be summarised into this acronym "EDGE". Today's session is primarily a *demonstration* with question &amp; answer session. We assume that you have read at least some of the relevant pages in the Epi R Handbook prior to this session. We also offer trainings in which we guide you through case studies with hands-on coaching. 
+
+
+# Pre-reading  
+
+We expect that you have read or at least skimmed the following pages of the Epi R Handbook:  
+
+* R Basics  
+* Transition to R  
+* R projects  
+* Cleaning data and core functions  
+
+
+
+
+# Talk outline
+
+
+# Setting the scene - directory structure  
+
+Our R work is conducted within an R project - a folder that contains:  
+
+* R markdown script  
+* data folder  
+
+
+```
+## C:/Users/Neale/OneDrive - Neale Batra/Documents/Analytic Software/R/Projects/R handbook/Trainings/Emory Aug 2021/emory_training/presentation
+## +-- data
+## +-- images
+## +-- libs
+## +-- powerpoint_example
+## +-- slides.html
+## +-- slides.Rmd
+## +-- slides_files
+## +-- slides_ggplot.html
+## +-- slides_ggplot.Rmd
+## +-- slides_ggplot_files
+## \-- xaringan-themer.css
+```
+
+
+# Load packages  
+
+
+
+
+
+
+# Import data
+
+Today we will use a *clean* dataset, as we will focus on techniques for data visualization.  
+
+* Use the `import()` function from **rio** to import an RDS file  
+* Use the `here()` function from **here** to locate the file relative to the R project root
+
+
+
+
+# Review data  
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; case_id &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; generation &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; date_infection &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; date_onset &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; date_hospitalisation &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; date_outcome &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; outcome &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; gender &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; age &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; age_unit &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; age_years &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; age_cat &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; age_cat5 &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; hospital &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; lon &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; lat &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; infector &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; source &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; ct_blood &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; fever &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; chills &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; cough &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; aches &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; vomit &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; time_admission &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; days_onset_hosp &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 20b688 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2014-04-15 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2014-05-06 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2014-05-14 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Death &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; m &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; years &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 5-9 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 5-9 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Central Hospital &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -13.23308 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8.460030 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 19 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; yes &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; no &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; yes &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; no &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; no &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 08:33 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 21 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; a3c8b8 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2014-05-07 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2014-05-08 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2014-05-10 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2014-05-14 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Recover &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; m &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 14 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; years &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 14 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 10-14 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 10-14 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Port Hospital &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -13.22319 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8.473251 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2ae019 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; other &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 19 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; yes &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; no &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; yes &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; no &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; no &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 11:57 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 72b905 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2014-05-06 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2014-05-12 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2014-05-13 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Recover &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; m &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 19 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; years &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 19 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 15-19 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 15-19 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Other &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -13.21226 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8.468384 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2ae019 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; other &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 19 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; yes &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; no &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; no &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; yes &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; yes &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 09:27 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 5fe599 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2014-05-08 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2014-05-13 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2014-05-15 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; m &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 25 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; years &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 25 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 20-29 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 25-29 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Other &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -13.21574 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8.468973 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; f547d6 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; other &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 18 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; yes &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; no &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; yes &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; no &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; yes &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 05:18 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 11f8ea &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2014-05-16 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2014-05-18 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2014-05-30 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Recover &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; m &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 27 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; years &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 27 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 20-29 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 25-29 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; St. Mark's Maternity Hospital (SMMH) &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -13.21291 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8.464817 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 19 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; yes &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; no &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; yes &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; no &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; yes &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 11:19 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; f96aa5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2014-05-17 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2014-05-19 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2014-05-20 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2014-05-23 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Recover &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; m &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 12 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; years &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 12 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 10-14 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 10-14 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; St. Mark's Maternity Hospital (SMMH) &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -13.25236 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8.460107 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 11f8ea &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; other &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 18 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 17:20 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+
+# Fundamentals of ggplot2
+
+
+# Header  
+## This is a subheader
+
+
+- Hello our name is 
+  + blabla
+  + blabla
+
+.footnote[
+[1] Something _super_ important to say 
+
+[2] Some **other** stuff 
+
+[3] bla
+]
+
+
+???
+
+- I think these are presenter notes 
+- You can see them in presenter mode 
+  + Keyboard shortcut is 'p' 
+---
+
+# Sequential reveal of bullet points
+
+You can reveal stuff bit by bit using to dashes between sections 
+
+--
+
+- This is my first point 
+
+--
+
+- Then I move on to this fascinating point 
+
+--
+
+- And finish with this blabla
+
+
+---
+class: inverse, center, middle
+
+# This is a section header slide
+
+---
+class: center, middle
+background-image: url(https://github.com/appliedepi/epiRhandbook_eng/raw/master/images/Epi%20R%20Handbook%20Banner%20Beige%201500x500.png)
+background-size: 75%
+background-position: 50% 0%
+
+# Alternative section header slide
+
+### Include epirhandbook banner (see [images slides](#imageslide))
+
+---
+
+# Tables with Knitr 
+
+Tables need to be in HTML format  
+So either Knitter or flextable
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; mpg &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; cyl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; disp &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; hp &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; drat &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; wt &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; qsec &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; vs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; am &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; gear &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; carb &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Mazda RX4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 21.0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 160 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 110 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.90 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2.620 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 16.46 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Mazda RX4 Wag &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 21.0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 160 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 110 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.90 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2.875 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 17.02 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Datsun 710 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 22.8 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 108 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 93 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.85 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2.320 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 18.61 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Hornet 4 Drive &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 21.4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 258 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 110 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.08 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.215 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 19.44 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Hornet Sportabout &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 18.7 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 360 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 175 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.15 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.440 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 17.02 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Valiant &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 18.1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 225 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 105 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2.76 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.460 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 20.22 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+
+# Tables with Flextable 
+
+You can colour in rows directly with flextable
+
+
+&lt;template id="c5c3736f-c753-4b31-8a11-d5c3c0947bc3"&gt;&lt;style&gt;
+.tabwid table{
+  border-collapse:collapse;
+  line-height:1;
+  margin-left:auto;
+  margin-right:auto;
+  border-width: 0;
+  display: table;
+  margin-top: 1.275em;
+  margin-bottom: 1.275em;
+  border-spacing: 0;
+  border-color: transparent;
+}
+.tabwid_left table{
+  margin-left:0;
+}
+.tabwid_right table{
+  margin-right:0;
+}
+.tabwid td {
+    padding: 0;
+}
+.tabwid a {
+  text-decoration: none;
+}
+.tabwid thead {
+    background-color: transparent;
+}
+.tabwid tfoot {
+    background-color: transparent;
+}
+.tabwid table tr {
+background-color: transparent;
+}
+&lt;/style&gt;&lt;div class="tabwid"&gt;&lt;style&gt;.cl-d9bef23a{border-collapse:collapse;}.cl-d9b2520a{font-family:'Arial';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-d9b2520b{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-d9b4b450{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-d9b4b451{width:54pt;background-clip: padding-box;background-color:rgba(255, 255, 0, 1.00);vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-d9b4b452{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-d9b4b453{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 2pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}&lt;/style&gt;&lt;table class='cl-d9bef23a'&gt;&lt;thead&gt;&lt;tr style="overflow-wrap:break-word;"&gt;&lt;td class="cl-d9b4b453"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;mpg&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b453"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;cyl&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b453"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;disp&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b453"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;hp&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b453"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;drat&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b453"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;wt&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b453"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;qsec&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b453"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;vs&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b453"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;am&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b453"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;gear&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b453"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;carb&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;&lt;tr style="overflow-wrap:break-word;"&gt;&lt;td class="cl-d9b4b450"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;21.0&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b450"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;6&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b450"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;160&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b450"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;110&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b450"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;3.90&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b450"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;2.620&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b450"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;16.46&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b450"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;0&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b450"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;1&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b450"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;4&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b450"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;4&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr style="overflow-wrap:break-word;"&gt;&lt;td class="cl-d9b4b451"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;21.0&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b451"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;6&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b451"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;160&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b451"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;110&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b451"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;3.90&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b451"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;2.875&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b451"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;17.02&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b451"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;0&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b451"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;1&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b451"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;4&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b451"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;4&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr style="overflow-wrap:break-word;"&gt;&lt;td class="cl-d9b4b450"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;22.8&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b450"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;4&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b450"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;108&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b450"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;93&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b450"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;3.85&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b450"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;2.320&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b450"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;18.61&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b450"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;1&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b450"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;1&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b450"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;4&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b450"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;1&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr style="overflow-wrap:break-word;"&gt;&lt;td class="cl-d9b4b451"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;21.4&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b451"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;6&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b451"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;258&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b451"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;110&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b451"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;3.08&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b451"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;3.215&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b451"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;19.44&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b451"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;1&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b451"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;0&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b451"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;3&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b451"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;1&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr style="overflow-wrap:break-word;"&gt;&lt;td class="cl-d9b4b450"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;18.7&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b450"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;8&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b450"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;360&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b450"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;175&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b450"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;3.15&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b450"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;3.440&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b450"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;17.02&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b450"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;0&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b450"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;0&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b450"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;3&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b450"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;2&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr style="overflow-wrap:break-word;"&gt;&lt;td class="cl-d9b4b452"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;18.1&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b452"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;6&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b452"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;225&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b452"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;105&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b452"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;2.76&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b452"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;3.460&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b452"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;20.22&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b452"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;1&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b452"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;0&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b452"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;3&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d9b4b452"&gt;&lt;p class="cl-d9b2520b"&gt;&lt;span class="cl-d9b2520a"&gt;1&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/div&gt;&lt;/template&gt;
+&lt;div class="flextable-shadow-host" id="22545b3e-afce-4b14-b4f3-be4d50055076"&gt;&lt;/div&gt;
+&lt;script&gt;
+var dest = document.getElementById("22545b3e-afce-4b14-b4f3-be4d50055076");
+var template = document.getElementById("c5c3736f-c753-4b31-8a11-d5c3c0947bc3");
+var caption = template.content.querySelector("caption");
+if(caption) {
+  caption.style.cssText = "display:block;text-align:center;";
+  var newcapt = document.createElement("p");
+  newcapt.appendChild(caption)
+  dest.parentNode.insertBefore(newcapt, dest.previousSibling);
+}
+var fantome = dest.attachShadow({mode: 'open'});
+var templateContent = template.content;
+fantome.appendChild(templateContent);
+&lt;/script&gt;
+
+---
+
+
+
+# Table highlighting
+
+- Use  chunk option `highlight.output` to highlight specific lines of the text output. 
+  + For example, `highlight.output = TRUE` means highlighting all lines
+  + `highlight.output = c(1, 3)` means highlighting the first and third line.
+
+
+
+```
+*##                    mpg cyl disp  hp drat    wt  qsec vs am gear carb
+## Mazda RX4         21.0   6  160 110 3.90 2.620 16.46  0  1    4    4
+*## Mazda RX4 Wag     21.0   6  160 110 3.90 2.875 17.02  0  1    4    4
+## Datsun 710        22.8   4  108  93 3.85 2.320 18.61  1  1    4    1
+## Hornet 4 Drive    21.4   6  258 110 3.08 3.215 19.44  1  0    3    1
+## Hornet Sportabout 18.7   8  360 175 3.15 3.440 17.02  0  0    3    2
+## Valiant           18.1   6  225 105 2.76 3.460 20.22  1  0    3    1
+```
+
+---
+
+## Visualisation 
+
+Note to selves: 
+I think the way [this presentation](https://www.cedricscherer.com/slides/2019-08-28-intro-ggplot-statsizw#20) 
+breaks down ggplots line by line is probably the way to go! 
+
+---
+
+## A ggplot code example
+
+- see [extras slide](#references) for alt side-by-side option in twitter feed
+
+
+.pull-left[
+
+Highlight code lines using #&lt;&lt;
+
+
+```r
+ggplot(mtcars) + 
+  aes(mpg, disp) + 
+* geom_point() +
+* geom_smooth()
+```
+] 
+
+.pull-right[
+&lt;img src="slides_ggplot_files/figure-html/ggplot_code_plot-1.png" width="504" /&gt;
+]
+
+
+
+---
+name: imageslide
+background-image: url(https://github.com/appliedepi/epiRhandbook_eng/raw/master/images/epiRhandbook_HexSticker_500x500.png)
+background-size: 250px
+background-position: 90% 50%
+
+
+# Including images
+
+.pull-left[
+- Text displayed along side an image 
+- May need to fiddle with sizes
+  + position is %accross and %down 
+  + size .... just flip a coin and see what comes out 
+  + can also use % for images (see layout chunk just below YAML) 
+    + i.e. in layout section up top to adds logos to each page (as per the twitter feed in [extras slide](#references))
+- Can also include images with usual Rmarkdown or knitr code (e.g. next slide)
+]
+---
+
+# Including images 2.0 
+
+![](https://github.com/appliedepi/epiRhandbook_eng/raw/master/images/Epi%20R%20Handbook%20Banner%20Beige%201500x500.png)
+
+
+---
+name: references 
+
+# Xaringan extra &amp; fancy stuff 
+
+- This is a good [tutorial](https://presentable-user2021.netlify.app/) from useR conference.
+- You can include fancier code tabs i.e. this [pres](https://xaringan.gallery/examples.html) 
+- Theres other fancy stuff in this [gallery](https://xaringan.gallery/examples.html)
+- There is tips in this [twitter feed](https://twitter.com/apreshill/status/1085659933238976513)
+  + e.g. if you name slides you can link back to them (nb. name needs to be first thing defined on slide)
+  + keyboard shortcuts for presenting 
+  + better side-by-side code example 
+  + title page 
+  + logos (have included this)
+  + background images 
+- Can set theme using [{xaringanthemer}](https://pkg.garrickadenbuie.com/xaringanthemer/articles/xaringanthemer.html) package 
+  + seems easier than messing around with css
+
+
+---
+
+
+class: center
+
+# Keyboard shortcuts when presenting
+
+Press `h` or `?` to see the possible ninjutsu you can use in remark.js.
+
+![](https://upload.wikimedia.org/wikipedia/commons/7/7e/Mudra-Naruto-KageBunshin.svg)
+
+---
+
+class: center, middle
+
+# Thanks!
+
+Slides created via the R package [**xaringan**](https://github.com/yihui/xaringan).
+
+
+
+
+---
+
+# Some Tips
+
+- The title slide is created automatically by **xaringan**, but it is just another remark.js slide added before your other slides.
+
+    The title slide is set to `class: center, middle, inverse, title-slide` by default. You can change the classes applied to the title slide with the `titleSlideClass` option of `nature` (`title-slide` is always applied).
+
+    ```yaml
+    output:
+      xaringan::moon_reader:
+        nature:
+          titleSlideClass: [top, left, inverse]
+    ```
+    
+--
+
+- If you'd like to create your own title slide, disable **xaringan**'s title slide with the `seal = FALSE` option of `moon_reader`.
+
+    ```yaml
+    output:
+      xaringan::moon_reader:
+        seal: false
+    ```
+
+
+---
+
+# Some Tips
+
+- To make slides work offline, you need to download a copy of remark.js in advance, because **xaringan** uses the online version by default (see the help page `?xaringan::moon_reader`).
+
+- You can use `xaringan::summon_remark()` to download the latest or a specified version of remark.js. By default, it is downloaded to `libs/remark-latest.min.js`.
+
+- Then change the `chakra` option in YAML to point to this file, e.g.
+
+    ```yaml
+    output:
+      xaringan::moon_reader:
+        chakra: libs/remark-latest.min.js
+    ```
+
+- If you used Google fonts in slides (the default theme uses _Yanone Kaffeesatz_, _Droid Serif_, and _Source Code Pro_), they won't work offline unless you download or install them locally. The Heroku app [google-webfonts-helper](https://google-webfonts-helper.herokuapp.com/fonts) can help you download fonts and generate the necessary CSS.
+
+
+---
+
+# CSS
+
+Among all options in `xaringan::moon_reader`, the most challenging but perhaps also the most rewarding one is `css`, because it allows you to customize the appearance of your slides using any CSS rules or hacks you know.
+
+You can see the default CSS file [here](https://github.com/yihui/xaringan/blob/master/inst/rmarkdown/templates/xaringan/resources/default.css). You can completely replace it with your own CSS files, or define new rules to override the default. See the help page `?xaringan::moon_reader` for more information.
+
+---
+
+# CSS
+
+For example, suppose you want to change the font for code from the default "Source Code Pro" to "Ubuntu Mono". You can create a CSS file named, say, `ubuntu-mono.css`:
+
+```css
+@import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+
+.remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+```
+
+Then set the `css` option in the YAML metadata:
+
+```yaml
+output:
+  xaringan::moon_reader:
+    css: ["default", "ubuntu-mono.css"]
+```
+
+Here I assume `ubuntu-mono.css` is under the same directory as your Rmd.
+
+See [yihui/xaringan#83](https://github.com/yihui/xaringan/issues/83) for an example of using the [Fira Code](https://github.com/tonsky/FiraCode) font, which supports ligatures in program code.
+
+---
+
+# CSS (with Sass)
+
+**xaringan** also supports Sass support via **rmarkdown**. Suppose you want to use the same color for different elements, e.g., first heading and bold text. You can create a `.scss` file, say `mytheme.scss`, using the [sass](https://sass-lang.com/) syntax with variables:
+
+```scss
+$mycolor: #ff0000; 
+.remark-slide-content &gt; h1 { color: $mycolor; }
+.remark-slide-content strong { color: $mycolor; }
+```
+
+Then set the `css` option in the YAML metadata using this file placed under the same directory as your Rmd:
+
+```yaml
+output:
+  xaringan::moon_reader:
+    css: ["default", "mytheme.scss"]
+```
+
+This requires **rmarkdown** &gt;= 2.8 and the [**sass**](https://rstudio.github.io/sass/) package. You can learn more about **rmarkdown** and **sass** support in [this blog post](https://blog.rstudio.com/2021/04/15/2021-spring-rmd-news/#sass-and-scss-support-for-html-based-output) and in [**sass** overview vignette](https://rstudio.github.io/sass/articles/sass.html).
+
+---
+
+# Themes
+
+Don't want to learn CSS? Okay, you can use some user-contributed themes. A theme typically consists of two CSS files `foo.css` and `foo-fonts.css`, where `foo` is the theme name. Below are some existing themes:
+
+
+```
+##  [1] "chocolate-fonts"  "chocolate"        "default-fonts"   
+##  [4] "default"          "duke-blue"        "fc-fonts"        
+##  [7] "fc"               "glasgow_template" "hygge-duke"      
+## [10] "hygge"            "ki-fonts"         "ki"              
+## [13] "kunoichi"         "lucy-fonts"       "lucy"            
+## [16] "metropolis-fonts" "metropolis"       "middlebury-fonts"
+## [19] "middlebury"       "nhsr-fonts"       "nhsr"            
+## [22] "ninjutsu"         "rladies-fonts"    "rladies"         
+## [25] "robot-fonts"      "robot"            "rutgers-fonts"   
+## [28] "rutgers"          "shinobi"          "tamu-fonts"      
+## [31] "tamu"             "uio-fonts"        "uio"             
+## [34] "uo-fonts"         "uo"               "uol-fonts"       
+## [37] "uol"              "useR-fonts"       "useR"            
+## [40] "uwm-fonts"        "uwm"
+```
+
+---
+
+# Themes
+
+To use a theme, you can specify the `css` option as an array of CSS filenames (without the `.css` extensions), e.g.,
+
+```yaml
+output:
+  xaringan::moon_reader:
+    css: [default, metropolis, metropolis-fonts]
+```
+
+If you want to contribute a theme to **xaringan**, please read [this blog post](https://yihui.org/en/2017/10/xaringan-themes).
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
