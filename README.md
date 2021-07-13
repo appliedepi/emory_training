@@ -24,10 +24,10 @@ includes:
     slides](https://appliedepi.github.io/emory_training/presentation/slides.html)
 -   [Data visualization presentation
     slides](https://appliedepi.github.io/emory_training/presentation/slides_ggplot.html)
+-   [Case study data and scripts (download
+    zip)](https://minhaskamal.github.io/DownGit/#/home?url=https://github.com/appliedepi/emory_training/tree/master/case_study)
 -   [R markdown for
-    presentation](https://github.com/appliedepi/emory_training/blob/master/presentation/slides.Rmd)
--   [Datasets used](https://appliedepi.github.io/emory_training/data)
--   Rmarkdown for demonstration
+    presentations](https://github.com/appliedepi/emory_training/blob/master/presentation)
 
 ## Terms of Use and License
 
