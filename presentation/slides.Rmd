@@ -1,6 +1,6 @@
 ---
 title: "Emory COVID-19 Response Collaborative"
-subtitle: "Introduction to R training"
+subtitle: "Data workflow with R: an overview and demonstration"
 author: '[EpiRhandbook Team](https:://epirhandbook.com) <br><br> `r icons::icon_style(icons::fontawesome("twitter"), fill = "white")` [epiRhandbook](https://twitter.com/epiRhandbook) <br> `r icons::icon_style(icons::fontawesome("paper-plane"), fill = "white")` [epirhandbook@gmail.com](mailto:epirhandbook@gmail.com)'
 date: "August 2021"
 output:
@@ -67,6 +67,53 @@ style_mono_accent(
 ```
 
 
+# About us  
+
+## Providing R support for applied epis  
+
+![](https://github.com/appliedepi/epiRhandbook_eng/raw/master/images/Epi%20R%20Handbook%20Banner%20Beige%201500x500.png)
+
+* We are a grassroots collaborative of applied epidemiologists  
+* The (free) Epi R Handbook has been used by 40,000 people worldwide
+* Now we offer customized training to health departments and NGOs  
+
+[1] Bookmark www.epiRhandbook.com  
+
+???
+- What makes us different is that we focus on the challenges of applied epi, not academic epi. We emphasize the skills used every day by ground-level epidemiologists. 
+
+---
+# Today's session   
+
+Today is primarily *explanation* and *demonstration*. 
+
+We are going to assume basic understanding of *R* syntax. 
+
+We also assume you have reviewed the Handbook pages on [R Basics](https://epirhandbook.com/r-basics.html), [Cleaning data and core functions](https://epirhandbook.com/cleaning-data-and-core-functions.html), and [Reports with R markdown](https://epirhandbook.com/reports-with-r-markdown.html) 
+
+![](https://github.com/appliedepi/emory_training/blob/master/presentation/images/EDGE.png?raw=true)  
+
+
+
+???
+- The learning process can be summarised into this acronym "EDGE". Today's session is primarily a *demonstration* with question & answer session. We assume that you have read at least some of the relevant pages in the Epi R Handbook prior to this session. We also offer trainings in which we guide you through case studies with hands-on coaching. 
+
+---
+# Outline
+  
+1. Setting the scene (project directory & Rmarkdown)  
+2. Rmarkdown parametrisation  
+3. File paths & importing data  
+4. Merging data  
+5. Data cleaning  
+6. Descriptive analysis  
+7. If time allows:  
+  a. Statistical analysis  
+  b. Logistic regression  
+    
+Prioritised report generation -> simpler code in the Handbook  
+
+---
 # Header  
 ## This is a subheader
 
