@@ -23,7 +23,7 @@ knitr::opts_chunk$set(
 
 **WORK IN PROGRESS**
 
-This is the GitHub repository for the **Applied Epi** online seminar delivered 
+This is the GitHub repository for the [**Applied Epi** online seminar](https://appliedepi.github.io/emory_training) delivered 
 to the [Emory COVID-19 Response Collaborative](https://emorycovidcollaborative.org/) 
 in August 2021. 
 

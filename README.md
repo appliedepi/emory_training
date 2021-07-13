@@ -12,8 +12,9 @@
 
 **WORK IN PROGRESS**
 
-This is the GitHub repository for the **Applied Epi** online seminar
-delivered to the [Emory COVID-19 Response
+This is the GitHub repository for the [**Applied Epi** online
+seminar](https://appliedepi.github.io/emory_training) delivered to the
+[Emory COVID-19 Response
 Collaborative](https://emorycovidcollaborative.org/) in August 2021.
 
 This repo contains all of the materials used for the course which
