@@ -72,24 +72,28 @@ style_mono_accent(
 
 # About us  
 
-## Support for applied epis  
+## Providing R support for applied epis  
 
 ![](https://github.com/appliedepi/epiRhandbook_eng/raw/master/images/Epi%20R%20Handbook%20Banner%20Beige%201500x500.png)
 
-* Grassroots collaborative of 50 applied epidemiologists  
+* We are a grassroots collaborative of applied epidemiologists  
 * The (free) Epi R Handbook has been used by 40,000 people worldwide
 * Now we offer customized training to health departments and NGOs  
 
-[1] www.epiRhandbook.com  
+[1] Bookmark www.epiRhandbook.com  
+
+???
+- What makes us different is that we focus on the challenges of applied epi, not academic epi. We emphasize the skills used every day by ground-level epidemiologists. 
 
 ---
-# EDGE  
+# Today's session   
 
-Today's session will be *explanation* and *demonstration*. It follows from the previous [demonstration on data management and workflow](https://appliedepi.github.io/emory_training/presentation/slides.html).  
+Today is primarily *explanation* and *demonstration*, following from the previous [demonstration on data management and workflow](https://appliedepi.github.io/emory_training/presentation/slides.html).  
 
 We assume you have reviewed the Handbook pages on [R Basics](https://epirhandbook.com/r-basics.html) and [ggplot basics](https://epirhandbook.com/ggplot-basics.html).  
 
-![The "EDGE" acronym for learning/teachings](https://github.com/appliedepi/emory_training/blob/master/presentation/images/EDGE%20flow.png?raw=true){height = 40%, width = 75%}
+![](https://github.com/appliedepi/emory_training/blob/master/presentation/images/EDGE.png?raw=true)  
+
 
 
 
@@ -97,8 +101,55 @@ We assume you have reviewed the Handbook pages on [R Basics](https://epirhandboo
 - The learning process can be summarised into this acronym "EDGE". Today's session is primarily a *demonstration* with question & answer session. We assume that you have read at least some of the relevant pages in the Epi R Handbook prior to this session. We also offer trainings in which we guide you through case studies with hands-on coaching. 
 
 
+
 ---
-# Talk outline
+# Outline
+
+```{r, eval=F, echo=T}
+ggplot(data = this_demonstration)+
+  geom_setscene(directory, packages, and data import)+  
+  geom_fundamentals(building your plot)+  
+  geom_bar(bar charts)+  
+  geom_histogram(epidemic curves and demographic pyramids)+  
+  geom_points(scatter and density plots)+
+  labs(dynamics plot captions)+
+```
+
+
+We've prioritized topics that might be more complex, leaving simple plots for your reading in the Handbook  
+
+
+---
+# Outline
+
+```{r, eval=F, echo=T}
+ggplot(data = this_demonstration)+
+  Setting the scene (directory, packages, and data import)+  
+  Fundamentals (building your plot)+  
+  Bars (bar and column charts, data structure)+  
+  Histograms(epidemic curves and demographic pyramids)+  
+  Points(scatter and density plots)+
+  Label tips (dynamics plot captions)+
+```
+
+
+We've prioritized topics that might be more complex, leaving simple plots for your reading in the Handbook  
+
+
+---
+# Outline
+
+1) Setting the scene (directory, packages, & data import)  
+2) Fundamentals of ggplot  
+3) Bar charts  
+4) Epidemic curves  
+5) Demographic pyramids  
+6) Scatter plots  
+7) Plot captions  
+
+We've prioritized topics that might be more complex, leaving simple plots for your reading in the Handbook  
+
+
 
 ---
 # Setting the scene - directory structure  
@@ -140,8 +191,13 @@ We use a *clean* dataset, to focus on visualization techniques.
 * Use `import()` function from **rio** to import an RDS file  
 * Use `here()` function from **here** to locate the file relative to the R project root
 
-```{r import_data, echo=T}
-linelist_clean <- import(here("presentation", "data", "linelist_cleaned.rds"))
+```{r echo=F, eval=T}
+# This actually runs but is not displayed
+linelist <- import(here("presentation", "data", "linelist_cleaned.rds"))
+```
+
+```{r echo=T, eval=F}
+linelist <- import(here("data", "linelist_cleaned.rds"))
 ```
 
 [1] A .rds file can store an R data frame and retain column classes  
@@ -152,10 +208,10 @@ linelist_clean <- import(here("presentation", "data", "linelist_cleaned.rds"))
 Below are the first 25 rows of the linelist:  
 
 ```{r}
-head(linelist_clean, 25) %>% 
+head(linelist, 25) %>% 
   DT::datatable(
     options = list(
-      scrollY = 400,
+      scrollY = 300,
       scrollX = 600,
       pageLength = 25,
       fontSize = '50%',
@@ -170,137 +226,63 @@ head(linelist_clean, 25) %>%
   #knitr::kable(format = 'html')
 ```
 
+
+
+
 ---
 # Visualization options in R  
 
 - **base** R  
-  + `plot()`  
+  + `plot()`, `boxplot()`, `hist()`  
 - **ggplot2**  
   + `geom_bar()`, `geom_col()`, `geom_point()`...  
 - **plotly**  
   + Interactive plots (e.g. zoom, hover text...)
 
 
-```{r, out.width=c('50%'), fig.show='hold', warning=F, message=F}
+?Plot examples from base R, ggplot, and plotly?
 
-# Base plotting example
-#######################
-hist(linelist_clean$age_years)  
-
-# ggplot2 example
-#######################################
-# Sequence of weekly Monday dates for CENTRAL HOSPITAL
-weekly_breaks <- seq.Date(
-  from = floor_date(min(linelist_clean$date_onset, na.rm=T),   "week", week_start = 1), # monday before first case
-  to   = ceiling_date(max(linelist_clean$date_onset, na.rm=T), "week", week_start = 1), # monday after last case
-  by   = "week")
-
-ggplot(linelist_clean) + 
-  
-  # histogram
-  geom_histogram(
-    mapping = aes(x = date_onset),
-    
-    breaks = weekly_breaks,   # pre-defined date vector - see top of ggplot section
-    
-    color = "darkblue",
-    
-    fill = "lightblue") +
-
-  # scales
-  scale_y_continuous(expand = c(0,0))+
-  scale_x_date(
-    expand = c(0,0),                   # remove excess x-axis space below and after case bars
-    date_breaks = "1 month",           # 1st of month
-    date_minor_breaks = "1 month",     # 1st of month
-    date_labels = "%b\n'%y")+          # label format
-  
-  # labels and theme
-  labs(
-    title = "ggplot2 epicurve example",
-    x = "Week of symptom onset",
-    y = "Weekly case indicence")+ 
-  theme_minimal()+
-  
-  # add semi-transparent red rectangle to tentative data
-  annotate(
-    "rect",
-    xmin  = as.Date(max(linelist_clean$date_onset, na.rm = T) - 21), # note must be wrapped in as.Date()
-    xmax  = as.Date(Inf),                                          # note must be wrapped in as.Date()
-    ymin  = 0,
-    ymax  = Inf,
-    alpha = 0.2,          # alpha easy and intuitive to adjust using annotate()
-    fill  = "red")+
-  
-  # add black vertical line on top of other layers
-  annotate(
-    "segment",
-    x     = max(linelist_clean$date_onset, na.rm = T) - 21, # 21 days before last data
-    xend  = max(linelist_clean$date_onset, na.rm = T) - 21, 
-    y     = 0,         # line begins at y = 0
-    yend  = Inf,       # line to top of plot
-    size  = 2,         # line size
-    color = "black",
-    lty   = "solid")+   # linetype e.g. "solid", "dashed"
-
-  # add text in rectangle
-  annotate(
-    "text",
-    x = max(linelist_clean$date_onset, na.rm = T) - 15,
-    y = 15,
-    label = "Subject to reporting delays",
-    angle = 90)
-
-# ploty example
-############################################
-# 
-# plotly_box <- ggplot(data = linelist_clean)+
-#   geom_boxplot(mapping = aes(y = age_years, x = outcome))+
-#   theme_classic()
-# 
-# plotly::ggplotly(plotly_box)
-```
 
 ---
-# What do you call it?  
+# Fundamentals of ggplot2
+
+
+
+---
+# gg-what?  
 
 - The **ggplot2** *package* is the most popular data visualization tool in R  
 - Its `ggplot()` *function* is at the core of the package  
 - This whole approach is colloquially known as “ggploting”  
 - Resulting figures are sometimes affectionately called “ggplots”  
 
-**ggplot2** benefits from a wide variety of supplementary R packages that further enhance its functionality  
-- **gganimate**  
-- **ggthemr**  
-- **ggdendro**  
-- **gghighlight**  
-- ...  
+**ggplot2** benefits from a wide variety of supplementary R packages that further enhance its functionality, such as **gganimate**, **ggthemr**, **ggdendro**, **gghighlight**...  
 
-[1] The “gg” in these names reflects the “grammar of graphics” used to construct the figures. 
+[1] *Question for the audience: What does the "gg” in these names represent?*
 
+
+???
+- "gg" represents the “grammar of graphics” used to construct the figures 
 
 
 
 
 
 ---
-# Building a ggplot (1)
-## Opening the canvas
-
- 
+# Opening the canvas (1)
 
 .pull-left[
 
 The base panel is formed by the `ggplot()` command  
 
 ```{r , echo = TRUE, eval = FALSE, tidy = FALSE}
-ggplot(data = linelist_clean)
+ggplot(data = linelist)
 ```
 ] 
 
 .pull-right[
 ```{r }
-ggplot(data = linelist_clean)
+ggplot(data = linelist)
 ```
 ]
 
@@ -313,15 +295,16 @@ ggplot(data = linelist_clean)
 
 
 ---
-# Building a ggplot (2)
-## Add geoms
+# Geoms  
+
+Geoms express the data as geometry (lines, points, boxplots, histograms, etc.)
 
 Many **ggplot2** functions create “geoms”, including:  
 
 * Histograms - geom_histogram()  
 * Bar charts - geom_bar() or geom_col() (see “Bar plot” section)  
 * Box plots - geom_boxplot()  
-* Points (e.g. scatter plots) - geom_point()  
+* Points - geom_point()  
 * Line graphs - geom_line() or geom_path()  
 * Trend lines - geom_smooth()  
 
@@ -336,15 +319,14 @@ In one plot you can display one or multiple geoms. Each is added to previous ggp
 
 
 ---
-# Building a ggplot (3)
-## Map columns to the data  
+# Map columns to the data  
 
 .pull-left[
 
 *Map* the column `date_onset` to the x-axis   
 
 ```{r , echo = TRUE, eval = FALSE, tidy = FALSE}
-ggplot(data = linelist_clean)+
+ggplot(data = linelist)+
   geom_histogram(
     mapping = aes(x = date_onset) #<<
     )
@@ -353,14 +335,117 @@ ggplot(data = linelist_clean)+
 
 .pull-right[
 ```{r }
-ggplot(data = linelist_clean)+
+ggplot(data = linelist)+
   geom_histogram(
     mapping = aes(x = date_onset)
     )
 ```
 ]
 
+???
+- Note about the work "aesthetics" and how its ggplot meaning is slightly different than in common English. It does not mean the trappings, but is specifically about the data that is being plotted in geometries (shapes) - not the surrounding background colors etc.
 
+
+
+---
+# Groups in the data  
+
+.pull-left[
+
+The show groups, use
+```{r , echo = TRUE, eval = FALSE, tidy = FALSE}
+ggplot(data = linelist)+
+  geom_histogram(
+    mapping = aes(
+      x = date_onset,
+      fill = hospital #<<
+      ) 
+    )
+```
+] 
+
+.pull-right[
+```{r }
+ggplot(data = linelist)+
+  geom_histogram(
+    mapping = aes(
+      x = date_onset,
+      fill = hospital
+      )
+    )
+```
+]
+
+???
+- Note about the work "aesthetics" and how its ggplot meaning is slightly different than in common English. It does not mean the trappings, but is specifically about the data that is being plotted in geometries (shapes) - not the surrounding background colors etc.
+
+
+
+
+
+---
+
+Where do the arguments go?  
+`data = `
+`mapping = aes()`  
+`x = `  
+`y = `
+`fill = `  
+
+
+
+---
+# Visualizing your data
+
+There is a whole science to properly choosing *how* to visualize your data. We will only briefly touch upon this in the context of **ggplot2**  
+
+---
+# Distribution of one continuous column  
+
+
+---
+# Epidemic curves
+
+
+---
+# Demographic pyramids  
+
+
+---
+# Two continuous columns  
+
+
+---
+# Three continuous columns  
+
+Heatplots, density plots
+
+
+---
+# One categorical column  
+
+Inverted axes  
+
+
+---
+# Two categorical columns  
+
+Heatplots
+
+---
+# Continuous by categorical groups  
+
+
+---
+# Facets/small-multiples
+
+
+---
+# Factors and ordering plots  
+
+
+---
+# Dynamics captions
 
 
 
