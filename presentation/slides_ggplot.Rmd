@@ -344,7 +344,6 @@ This does not produce visible changes, but ggplot will now look for columns with
 
 
 ---
-# Define axes
 # Define mappings
 
 .pull-left[
@@ -391,19 +390,23 @@ ggplot(
 ---
 # Geoms  
 
-Geoms express the data as geometry (lines, points, boxplots, histograms, etc.)
+Geoms express the data as _geometry_ (lines, points, boxplots, histograms, etc.)
 
-Many **ggplot2** functions create “geoms”, including:  
+**ggplot2** propose many classical “geoms”:  
 
-* Histograms - geom_histogram()  
-* Bar charts - geom_bar() or geom_col() (see “Bar plot” section)  
-* Box plots - geom_boxplot()  
-* Points - geom_point()  
-* Line graphs - geom_line() or geom_path()  
-* Trend lines - geom_smooth()  
+* Histograms - `geom_histogram() ` 
+* Bar charts - `geom_bar()` or `geom_col()` (see “Bar plot” section)
+* Box plots - `geom_boxplot()`  
+* Points - `geom_point() ` 
+* Line graphs - `geom_line()` or `geom_path()`  
+* Trend lines - `geom_smooth()`
+*...
 
-In one plot you can display one or multiple geoms. Each is added to previous ggplot2 commands with a `+`, and they are plotted sequentially such that later geoms are plotted on top of previous ones
-
+--
+Multiple geoms on one graph:
+* You can plot several geoms on the same graph. 
+* Each is added to previous ggplot2 commands with a **`+`**
+* Geoms are plotted _sequentially_: later geoms are plotted on top of previous ones
 
 
 
