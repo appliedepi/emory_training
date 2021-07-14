@@ -208,7 +208,7 @@ linelist <- import(here::here("case_study", "data", "linelist_cleaned.rds"))
 linelist <- import(here::here("data", "linelist_cleaned.rds"))
 ```
 
-*Note: A .rds file can store an R data frame and retain column classes*
+*Note: A .rds file can store an R data frame and retain column classes*  
 
 ---
 # Review data  
@@ -235,6 +235,7 @@ head(linelist, 25) %>%
 ```
 
 
+[XXX: I am not sure this is the best visualisation? I like seeng a couple of lines but the columns will only be seen in passing. Should we simplify the dataframe to only keep columns of interest during the rest of the presentation so that we can get a better glimpse? Or also use a `glimpse or str` under your table? Or use a packade like https://www.repidemicsconsortium.org/matchmaker/ ]
 
 
 ---
