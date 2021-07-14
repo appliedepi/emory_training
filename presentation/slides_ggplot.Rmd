@@ -169,14 +169,12 @@ Our R work is conducted within a dedicated directory that contains:
 
 * An R project (optional but advised)
 * Rmarkdown script(s)  
-* a data folder
-
-]
+* a data folder]
 
 ---
 # Load packages  
 
-**ggplot2** is included within the **tidyverse** mega-package (read more [here]).  
+**ggplot2** is included within the **tidyverse** mega-package (read more [here](https://www.tidyverse.org/)).  
 
 ```{r, eval = FALSE, echo=TRUE}
 pacman::p_load(
