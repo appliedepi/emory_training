@@ -242,14 +242,22 @@ head(linelist, 25) %>%
 # Visualization options in R  
 
 - **base** R  
-  + `plot()`, `boxplot()`, `hist()`  
+  + `plot()`, `boxplot()`, `hist()`...  
 - **ggplot2**  
-  + `geom_bar()`, `geom_col()`, `geom_point()`...  
+  + `geom_bar()`, `geom_boxplot()`, `geom_histogram()`...  
+- **lattice**
+  + `dotplot()`, `bwplot()`...
 - **plotly**  
   + Interactive plots (e.g. zoom, hover text...)
 
 
 ?Plot examples from base R, ggplot, and plotly?
+XXX we could. Although I think that if we are short on time this slide can be compressed. Our main point is that there are other options for graphs in R and we focus on one. Maybe it's good to explain why? For me, good reasons are:
+- very good for fast data exploration, especially of mutidimentional data
+- yet can produce very high quality final outputs
+- many packages to extand functionalities
+- a well structure grammar => high consistency
+Do we add that to the slide?
 
 
 ---
