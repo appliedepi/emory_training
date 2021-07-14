@@ -139,7 +139,7 @@ We've prioritized topics that might be more complex, leaving simple plots for yo
 ---
 # Outline
 
-1) Setting the scene (directory, packages, & data import)  
+1) Setting the scene (directory, packages, data import)  
 2) Fundamentals of ggplot  
 3) Bar charts  
 4) Epidemic curves  
@@ -149,7 +149,7 @@ We've prioritized topics that might be more complex, leaving simple plots for yo
 
 We've prioritized topics that might be more complex, leaving simple plots for your reading in the Handbook  
 
-
+[XXX: I find that one more readable (formatted text is always more readable than code to me) even though the other idea is more fun (if it was a written document I would vouch for it)]
 
 ---
 # Setting the scene - directory structure  
