@@ -450,25 +450,44 @@ ggplot(
 
 
 ---
-# Groups in the data  
+# Groups in the data
+
+So far the graph shows the distribution of cases in all hospitals. 
+
+It would make sense to break down the visualization by hospitals.
+
+Quick options:  
+
+* Fill each hospital in different color (stacked histogram)
+* Create multiple plots, each showing a different hospital
+
+You can do either in one line of code.
+
+
+---
+# Add color
 
 .pull-left[
 
-The show groups, use
+To add color to the graph, we need to _map_ the variable `hospital` to the _fill_ aesthetics:  
+
 ```{r , echo = TRUE, eval = FALSE, tidy = FALSE}
-ggplot(data = linelist)+
-  geom_histogram(
-    mapping = aes(
-      x = date_onset,
-      fill = hospital #<<
-      ) 
-    )
+ggplot(data = linelist,
+       mapping = aes(
+         x    = date_onset,
+         fill = hospital #<<
+         )
+       ) +
+  geom_histogram()
 ```
+
+Note: the _fill_ aesthetics control the color filling areas while the _color_ aesthetics control the color of lines and points.
+
 ] 
 
 .pull-right[
 ```{r }
-ggplot(data = linelist)+
+ggplot(data = linelist) +
   geom_histogram(
     mapping = aes(
       x = date_onset,
@@ -478,10 +497,35 @@ ggplot(data = linelist)+
 ```
 ]
 
-???
-- Note about the work "aesthetics" and how its ggplot meaning is slightly different than in common English. It does not mean the trappings, but is specifically about the data that is being plotted in geometries (shapes) - not the surrounding background colors etc.
 
 
+---
+# Facets/small-multiples
+
+.pull-left[
+
+To generate one graph by hospital:  
+
+```{r , echo = TRUE, eval = FALSE, tidy = FALSE}
+ggplot(data = linelist,
+       mapping = aes(x = date_onset)) +
+  geom_histogram() +
+  facet_wrap(~hospital,
+             ncol = 2) #<<
+```
+
+Note: the _fill_ aesthetics control the color filling areas while the _color_ aesthetics control the color of lines and points.
+
+] 
+
+.pull-right[
+```{r }
+ggplot(data = linelist,
+       mapping = aes(x = date_onset)) +
+  geom_histogram() +
+  facet_wrap(~ hospital)
+```
+]
 
 
 
@@ -541,6 +585,7 @@ Heatplots
 ---
 # Facets/small-multiples
 
+I proposed to introduce it sooner, so here we can show other arguments (ncol, nrows, scales) and facet_grid?
 
 ---
 # Factors and ordering plots  
