@@ -208,7 +208,7 @@ linelist <- import(here::here("case_study", "data", "linelist_cleaned.rds"))
 linelist <- import(here::here("data", "linelist_cleaned.rds"))
 ```
 
-[1] A .rds file can store an R data frame and retain column classes  
+*Note: A .rds file can store an R data frame and retain column classes*
 
 ---
 # Review data  
