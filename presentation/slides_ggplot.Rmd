@@ -154,14 +154,24 @@ We've prioritized topics that might be more complex, leaving simple plots for yo
 ---
 # Setting the scene - directory structure  
 
-Our R work is conducted within an R project - a folder that contains:  
+Our R work is conducted within an **R project** - a folder that contains:  
 
-* R markdown script  
-* data folder  
+* R markdown script(s)  
+* a data folder  
 
 ```{r}
 fs::dir_tree(path = here::here("case_study"), recurse = TRUE)
 ```
+
+[XXX: I am not sure I would define an R project as a folder per se. It is more a special file that interacts well with the project structure. Alternate version: 
+
+Our R work is conducted within a dedicated directory that contains:  
+
+* An R project (optional but advised)
+* Rmarkdown script(s)  
+* a data folder
+
+]
 
 ---
 # Load packages  
