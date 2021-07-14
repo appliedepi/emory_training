@@ -343,6 +343,50 @@ ggplot(data = linelist)
 This does not produce visible changes, but ggplot will now look for columns within the _linelist_ dataframe.
 
 
+---
+# Define axes
+# Define mappings
+
+.pull-left[
+
+**Mapping** is telling ggplot which variable goes into which _aesthetics_.
+
+-- 
+Main _aesthetics_ are:  
+* x axis
+* y axis
+* color of lines
+* colors of areas (_fill_)
+* transparency
+* size
+*...
+--
+*Map* the column `date_onset` to the x-axis   
+
+```{r , echo = TRUE, eval = FALSE, tidy = FALSE}
+ggplot(
+  data = linelist,
+  mapping = aes(x = date_onset)  #<<
+  )
+```
+
+
+] 
+
+.pull-right[
+```{r }
+ggplot(
+  data = linelist,
+  mapping = aes(x = date_onset)
+  )
+```
+]
+
+???
+- Note about the work "aesthetics" and how its ggplot meaning is slightly different than in common English. It does not mean the trappings, but is specifically about the data that is being plotted in geometries (shapes) - not the surrounding background colors etc.
+- Mappings essentially tell ggplot which variables go in which aestetics.
+- Now we have defined the x axis, we can tell ggplot to plot actual data. Now you need to think about the type of representation that you want (transition).
+
 
 ---
 # Geoms  
@@ -368,32 +412,6 @@ In one plot you can display one or multiple geoms. Each is added to previous ggp
 
 
 
----
-# Map columns to the data  
-
-.pull-left[
-
-*Map* the column `date_onset` to the x-axis   
-
-```{r , echo = TRUE, eval = FALSE, tidy = FALSE}
-ggplot(data = linelist)+
-  geom_histogram(
-    mapping = aes(x = date_onset) #<<
-    )
-```
-] 
-
-.pull-right[
-```{r }
-ggplot(data = linelist)+
-  geom_histogram(
-    mapping = aes(x = date_onset)
-    )
-```
-]
-
-???
-- Note about the work "aesthetics" and how its ggplot meaning is slightly different than in common English. It does not mean the trappings, but is specifically about the data that is being plotted in geometries (shapes) - not the surrounding background colors etc.
 
 
 
