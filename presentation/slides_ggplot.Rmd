@@ -420,9 +420,19 @@ The `geom_histogram()` function computes the counts on raw data automaticaly.
 ggplot(
   data = linelist,
   mapping = aes(x = date_onset)  
-  ) + #<<
+) + #<<
   geom_histogram() #<<
 ```
+
+--
+Since we have only one geom and one dataframe linked to the plot, we could move the _mapping_ to the `geom_histogram()` call:  
+
+```{r , echo = TRUE, eval = FALSE, tidy = FALSE}
+ggplot() + 
+  geom_histogram(
+    data = linelist,
+    mapping = aes(x = date_onset))
+````
 ] 
 
 .pull-right[
