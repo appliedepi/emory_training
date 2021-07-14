@@ -286,22 +286,27 @@ Do we add that to the slide?
 
 
 ---
-# Opening the canvas (1)
+# Creating an empty canvas
 
 .pull-left[
 
 The base panel is formed by the `ggplot()` command  
 
 ```{r , echo = TRUE, eval = FALSE, tidy = FALSE}
-ggplot(data = linelist)
+ggplot()
 ```
 ] 
 
 .pull-right[
 ```{r }
-ggplot(data = linelist)
+ggplot()
 ```
 ]
+
+???
+...
+As you can see, this is only a blank canvas, we have not defined what should be in the x and y axes, nor linked any data to be plot. It's an empty page waiting for you.
+
 
 
 
