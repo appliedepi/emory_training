@@ -409,10 +409,31 @@ Multiple geoms on one graph:
 * Geoms are plotted _sequentially_: later geoms are plotted on top of previous ones
 
 
+---
+# Make an histogram
 
+.pull-left[
 
+The `geom_histogram()` function computes the counts on raw data automaticaly.  
 
+```{r , echo = TRUE, eval = FALSE, tidy = FALSE}
+ggplot(
+  data = linelist,
+  mapping = aes(x = date_onset)  
+  ) + #<<
+  geom_histogram() #<<
+```
+] 
 
+.pull-right[
+```{r }
+ggplot(
+  data = linelist,
+  mapping = aes(x = date_onset)  
+  ) + 
+  geom_histogram()
+```
+]
 
 
 
