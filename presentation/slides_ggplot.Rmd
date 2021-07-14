@@ -253,7 +253,7 @@ head(linelist, 25) %>%
 
 ?Plot examples from base R, ggplot, and plotly?
 XXX we could. Although I think that if we are short on time this slide can be compressed. Our main point is that there are other options for graphs in R and we focus on one. Maybe it's good to explain why? For me, good reasons are:
-- very good for fast data exploration, especially of mutidimentional data
+- very good for fast data exploration, especially of multidimensional data
 - yet can produce very high quality final outputs
 - many packages to extand functionalities
 - a well structure grammar => high consistency
@@ -273,7 +273,7 @@ Do we add that to the slide?
 - This whole approach is colloquially known as “ggploting”  
 - Resulting figures are sometimes affectionately called “ggplots”  
 
-**ggplot2** benefits from a wide variety of supplementary R packages that further enhance its functionality, such as **gganimate**, **ggthemr**, **ggdendro**, **gghighlight**...  
+**ggplot2** benefits from a wide variety of supplementary R packages that extends its functionalities, such as **gganimate**, **ggthemr**, **ggdendro**, **gghighlight**, **ggforce**...  
 
 [1] *Question for the audience: What does the "gg” in these names represent?*
 
