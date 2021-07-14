@@ -308,11 +308,39 @@ ggplot()
 As you can see, this is only a blank canvas, we have not defined what should be in the x and y axes, nor linked any data to be plot. It's an empty page waiting for you.
 
 
+---
+# Telling ggplot which data to use
+
+.pull-left[
+
+If a single dataframe is used for the plot, one can refer to it in `ggplot()`
+
+```{r , echo = TRUE, eval = FALSE, tidy = FALSE}
+ggplot(
+  data = linelist #<<
+  )
+```
+
+Or alternatively:  
+
+```{r , echo = TRUE, eval = FALSE, tidy = FALSE}
+linelist %>%
+  ggplot()
+```
+
+Notes: if several dataframes are needed, they can be added in their own *geoms* (example later).
+
+] 
+
+.pull-right[
+```{r }
+ggplot(data = linelist)
+```
+]
 
 
-
-
-
+???
+This does not produce visible changes, but ggplot will now look for columns within the _linelist_ dataframe.
 
 
 
