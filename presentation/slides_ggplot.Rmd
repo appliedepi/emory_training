@@ -72,7 +72,7 @@ style_mono_accent(
 
 # About us  
 
-## Providing R support for applied epis  
+## R support for applied epis  
 
 ![](https://github.com/appliedepi/epiRhandbook_eng/raw/master/images/Epi%20R%20Handbook%20Banner%20Beige%201500x500.png)
 
@@ -80,10 +80,16 @@ style_mono_accent(
 * The (free) Epi R Handbook has been used by 40,000 people worldwide
 * Now we offer customized training to health departments and NGOs  
 
-[1] Bookmark www.epiRhandbook.com  
+
+*Bookmark www.epiRhandbook.com*  
+
 
 ???
 - What makes us different is that we focus on the challenges of applied epi, not academic epi. We emphasize the skills used every day by ground-level epidemiologists. 
+
+
+
+
 
 ---
 # Today's session   
@@ -101,41 +107,6 @@ We assume you have reviewed the Handbook pages on [R Basics](https://epirhandboo
 - The learning process can be summarised into this acronym "EDGE". Today's session is primarily a *demonstration* with question & answer session. We assume that you have read at least some of the relevant pages in the Epi R Handbook prior to this session. We also offer trainings in which we guide you through case studies with hands-on coaching. 
 
 
-
----
-# Outline
-
-```{r, eval=FALSE, echo=TRUE}
-ggplot(data = this_demonstration)+
-  geom_setscene(directory, packages, and data import)+  
-  geom_fundamentals(building your plot)+  
-  geom_bar(bar charts)+  
-  geom_histogram(epidemic curves and demographic pyramids)+  
-  geom_points(scatter and density plots)+
-  labs(dynamics plot captions)+
-```
-
-
-We've prioritized topics that might be more complex, leaving simple plots for your reading in the Handbook  
-
-
----
-# Outline
-
-```{r, eval=FALSE, echo=TRUE}
-ggplot(data = this_demonstration)+
-  Setting the scene (directory, packages, and data import)+  
-  Fundamentals (building your plot)+  
-  Bars (bar and column charts, data structure)+  
-  Histograms(epidemic curves and demographic pyramids)+  
-  Points(scatter and density plots)+
-  Label tips (dynamics plot captions)+
-```
-
-
-We've prioritized topics that might be more complex, leaving simple plots for your reading in the Handbook  
-
-
 ---
 # Outline
 
@@ -147,29 +118,54 @@ We've prioritized topics that might be more complex, leaving simple plots for yo
 6) Scatter plots  
 7) Plot captions  
 
-We've prioritized topics that might be more complex, leaving simple plots for your reading in the Handbook  
+The Epi R Handbook contains more examples and more complex plots, for your personal reading  
 
-[XXX: I find that one more readable (formatted text is always more readable than code to me) even though the other idea is more fun (if it was a written document I would vouch for it)]
+
+
+
+
+
+
+---
+# Visualization options in R  
+
+Today we focus on **ggplot2** because:  
+
+* It is good for fast data exploration of multi-dimensional data  
+* It produces very high quality final outputs  
+* Is accompanied by many packages that expand functionality  
+* Has well-structured grammar = consistency  
+
+Other plotting options include **base** R, **lattice**, and **plotly**  
+
+
+
+
+
+
+
+
+
 
 ---
 # Setting the scene - directory structure  
 
-Our R work is conducted within an **R project** - a folder that contains:  
+Our R work is conducted within a dedicated directory that contains:  
 
-* R markdown script(s)  
-* a data folder  
+* An R project (optional but advised)  
+* Rmarkdown script(s)  
+* A data folder  
 
-```{r}
+```{r, echo = F}
 fs::dir_tree(path = here::here("case_study"), recurse = TRUE)
 ```
 
-[XXX: I am not sure I would define an R project as a folder per se. It is more a special file that interacts well with the project structure. Alternate version: 
 
-Our R work is conducted within a dedicated directory that contains:  
 
-* An R project (optional but advised)
-* Rmarkdown script(s)  
-* a data folder]
+
+
+
+
 
 ---
 # Load packages  
@@ -191,24 +187,36 @@ The **tidyverse** also includes these packages:
 * **forcats** (factors / ordered categories)  
 * and many others...  
 
+
+
+
+
+
+
+
 ---
 # Import data
 
 We use a *clean* dataset, to focus on visualization techniques.  
 
-* Use `import()` function from **rio** to import an RDS file  
-* Use `here()` function from **here** to locate the file relative to the R project root
+* Use `import()` from **rio** to import an RDS file  
+* Use `here()` from **here** to locate the file relative to the R project root
 
 ```{r echo=FALSE, eval=TRUE}
 # This actually runs but is not displayed
-linelist <- import(here::here("case_study", "data", "linelist_cleaned.rds"))
+linelist <- import(here::here("case_study", "data", "linelist_cleaned.rds")) %>% 
+  select(case_id, date_onset, outcome, gender, age_years, hospital,
+         ht_cm, wt_kg, lon, lat, time_admission, ct_blood, days_onset_hosp)
 ```
 
 ```{r echo=TRUE, eval=FALSE}
 linelist <- import(here::here("data", "linelist_cleaned.rds"))
 ```
 
+
 *Note: A .rds file can store an R data frame and retain column classes*  
+
+
 
 ---
 # Review data  
@@ -222,7 +230,7 @@ head(linelist, 25) %>%
       scrollY = 300,
       scrollX = 600,
       pageLength = 25,
-      fontSize = '50%',
+      fontSize = '25%',
       dom = "ti",
       ordering = FALSE,
       rownames = FALSE,
@@ -235,29 +243,11 @@ head(linelist, 25) %>%
 ```
 
 
-[XXX: I am not sure this is the best visualisation? I like seeng a couple of lines but the columns will only be seen in passing. Should we simplify the dataframe to only keep columns of interest during the rest of the presentation so that we can get a better glimpse? Or also use a `glimpse or str` under your table? Or use a packade like https://www.repidemicsconsortium.org/matchmaker/ ]
+???
+- I am not sure this is the best visualisation? I like seeng a couple of lines but the columns will only be seen in passing. Should we simplify the dataframe to only keep columns of interest during the rest of the presentation so that we can get a better glimpse? Or also use a `glimpse or str` under your table? Or use a packade like https://www.repidemicsconsortium.org/matchmaker/ ]
 
 
----
-# Visualization options in R  
 
-- **base** R  
-  + `plot()`, `boxplot()`, `hist()`...  
-- **ggplot2**  
-  + `geom_bar()`, `geom_boxplot()`, `geom_histogram()`...  
-- **lattice**
-  + `dotplot()`, `bwplot()`...
-- **plotly**  
-  + Interactive plots (e.g. zoom, hover text...)
-
-
-?Plot examples from base R, ggplot, and plotly?
-XXX we could. Although I think that if we are short on time this slide can be compressed. Our main point is that there are other options for graphs in R and we focus on one. Maybe it's good to explain why? For me, good reasons are:
-- very good for fast data exploration, especially of multidimensional data
-- yet can produce very high quality final outputs
-- many packages to extand functionalities
-- a well structure grammar => high consistency
-Do we add that to the slide?
 
 
 ---
@@ -265,8 +255,10 @@ Do we add that to the slide?
 
 
 
+
+
 ---
-# gg-what?  
+# gg-what??  
 
 - The **ggplot2** *package* is the most popular data visualization tool in R  
 - Its `ggplot()` *function* is at the core of the package  
@@ -275,8 +267,9 @@ Do we add that to the slide?
 
 **ggplot2** benefits from a wide variety of supplementary R packages that extends its functionalities, such as **gganimate**, **ggthemr**, **ggdendro**, **gghighlight**, **ggforce**...  
 
-[1] *Question for the audience: What does the "gg” in these names represent?*
-
+.footnote[
+Question: What does the "gg” in these names represent?
+]
 
 ???
 - "gg" represents the “grammar of graphics” used to construct the figures 
@@ -286,61 +279,740 @@ Do we add that to the slide?
 
 
 ---
-# Creating an empty canvas
+# Syntax overview  
 
-.pull-left[
+* “Add” plot layers and design elements on top of one another  
+* Build a multi-layer plot object that can be saved, modified, printed, exported...  
 
-The base panel is formed by the `ggplot()` command  
+--  
 
-```{r , echo = TRUE, eval = FALSE, tidy = FALSE}
-ggplot()
-```
-] 
+Order of layers will usually look like this:
 
-.pull-right[
-```{r }
-ggplot()
-```
-]
+1) The baseline `ggplot()` command “opens” the plot- typically the dataset is specified here  
+2) Add “geom” layers that visualize data geometrically as shapes  
+3) Add design elements such as axis labels, title, fonts, sizes, color schemes, legends, or axes rotation  
 
-???
-...
-As you can see, this is only a blank canvas, we have not defined what should be in the x and y axes, nor linked any data to be plot. It's an empty page waiting for you.
+
+A simple example follows. We will explain each component.
+
 
 
 ---
-# Telling ggplot which data to use
+# Syntax overview  
 
 .pull-left[
 
-If a single dataframe is used for the plot, one can refer to it in `ggplot()`
+`ggplot()` creates an empty canvas.  
+Assign the data frame `linelist`.  
 
-```{r , echo = TRUE, eval = FALSE, tidy = FALSE}
-ggplot(
-  data = linelist #<<
-  )
+```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
+ggplot(data = linelist)                   
 ```
 
-Or alternatively:  
+Or alternatively use the `%>%` pipe operator to "pipe" the data frame *into* `ggplot()`  
 
 ```{r , echo = TRUE, eval = FALSE, tidy = FALSE}
 linelist %>%
   ggplot()
 ```
 
-Notes: if several dataframes are needed, they can be added in their own *geoms* (example later).
+]
+
+.pull-right[
+
+```{r , echo = FALSE, eval = TRUE, tidy = FALSE}
+ggplot(data = linelist)
+```
+] 
+
+???
+As you can see, this is only a blank canvas, we have not defined what should be in the x and y axes, nor linked any data to be plot. It's an empty page waiting for you. This does not produce visible changes, but ggplot will now look for columns within the *linelist* dataframe.
+Notes: if several data frames are needed, they can be added in their own *geoms* (example later).
+
+
+
+
+
+---
+# Syntax overview  
+
+.pull-left[
+
+Map the `x` and `y` axes to columns in the data
+
+```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
+ggplot(data = linelist,
+*       mapping = aes(
+*         x = ht_cm,
+*         y = wt_kg)
+)
+```
+
+]
+
+.pull-right[
+
+```{r , echo = FALSE, eval = TRUE, tidy = FALSE}
+ggplot(data = linelist,
+       mapping = aes(
+         x = ht_cm,
+         y = wt_kg))
+```
+] 
+
+
+
+
+---
+# Syntax overview  
+
+.pull-left[
+
+Add a "geom" layer to display the data as points
+
+```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
+ggplot(data = linelist,
+       mapping = aes(
+         x = ht_cm,
+         y = wt_kg))+
+*  geom_point()
+```
+
+]
+
+.pull-right[
+
+
+```{r , echo = FALSE, eval = TRUE, tidy = FALSE}
+ggplot(data = linelist,
+       mapping = aes(
+         x = ht_cm,
+         y = wt_kg))+
+  geom_point()
+```
+] 
+
+
+
+---
+# Syntax overview  
+
+.pull-left[
+
+Axes can also be mapped within the geom command
+
+```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
+ggplot(data = linelist,
+*       mapping = aes(
+*         x = ht_cm,
+*         y = wt_kg))+
+  geom_point()
+```
+
+is the same as:  
+
+```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
+ggplot(data = linelist)+
+  geom_point(
+*    mapping = aes(
+*      x = ht_cm,
+*      y = wt_kg))
+```
+
+]
+
+.pull-right[
+
+```{r , echo = FALSE, eval = TRUE, tidy = FALSE}
+ggplot(data = linelist)+
+  geom_point(
+    mapping = aes(
+      x = ht_cm,
+      y = wt_kg)
+    )
+```
+] 
+
+???
+- Explain why you might use one or the other  
+
+
+
+
+
+---
+# Syntax overview  
+
+.pull-left[
+
+Define an aesthetic value as *static* (applying to all data points) by writing it within the geom but outside the `aes()`  
+
+```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
+ggplot(data = linelist)+
+  geom_point(
+    mapping = aes(
+      x = ht_cm,
+      y = wt_kg),
+*   color = "purple")
+```
+
+]
+
+.pull-right[
+
+```{r , echo = FALSE, eval = TRUE, tidy = FALSE}
+ggplot(data = linelist)+
+  geom_point(
+    mapping = aes(
+      x = ht_cm,
+      y = wt_kg),
+   color = "purple")
+```
+] 
+
+
+
+
+
+
+---
+# Syntax overview  
+
+.pull-left[
+
+Define an aesthetic value as *dynamic* (varying for each data point) by writing it within the geom *and within the `aes()`  
+
+```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
+ggplot(data = linelist)+
+  geom_point(
+    mapping = aes(
+      x = ht_cm,
+      y = wt_kg,
+*     color = gender)
+    )
+```
+
+]
+
+.pull-right[
+
+```{r , echo = FALSE, eval = TRUE, tidy = FALSE}
+ggplot(data = linelist)+
+  geom_point(
+    mapping = aes(
+      x = ht_cm,
+      y = wt_kg, 
+      color = gender)
+    )
+```
+]
+
+
+
+
+
+---
+# Syntax overview  
+
+.pull-left[
+
+Here: 
+
+* `color = ` aesthetic is a dynamic value assigned to column `gender`  
+* `alpha = ` transparency aesthetic is a static 30%  
+
+```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
+ggplot(data = linelist)+
+  geom_point(
+    mapping = aes(
+      x = ht_cm,
+      y = wt_kg,
+      color = gender),
+*   alpha = 0.3)
+```
+
+]
+
+.pull-right[
+
+```{r , echo = FALSE, eval = TRUE, tidy = FALSE}
+ggplot(data = linelist)+
+  geom_point(
+    mapping = aes(
+      x = ht_cm,
+      y = wt_kg, 
+      color = gender),
+    alpha = 0.3
+    )
+```
+]
+
+
+
+---
+# Syntax overview  
+
+.pull-left[
+
+Add labels for title, axes, and legend  
+
+```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
+ggplot(data = linelist)+
+  geom_point(
+    mapping = aes(
+      x = ht_cm,
+      y = wt_kg,
+      color = gender),
+    alpha = 0.3)+
+* labs(
+*    title = "Weight, height & gender",
+*    x = "Height (cm)",
+*    y = "Weight (kg)",
+*    caption = "Outbreak A",
+*    color = "Gender"
+)
+```
+
+]
+
+.pull-right[
+
+```{r , echo = FALSE, eval = TRUE, tidy = FALSE}
+ggplot(data = linelist)+
+  geom_point(
+    mapping = aes(
+      x = ht_cm,
+      y = wt_kg, 
+      color = gender),
+    alpha = 0.3)+
+  labs(
+    title = "Weight, height & gender",
+    x = "Height (cm)",
+    y = "Weight (kg)",
+    caption = "Outbreak A",
+    color = "Gender")
+```
+]
+
+
+
+
+---
+# Syntax overview  
+
+.pull-left[
+
+"themes" are non-data plot features  
+
+Pre-defined themes are easy to add  
+
+```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
+ggplot(data = linelist)+
+  geom_point(
+    mapping = aes(
+      x = ht_cm,
+      y = wt_kg,
+      color = gender),
+    alpha = 0.3)+
+  labs(
+    title = "Weight, height & gender",
+    x = "Height (cm)",
+    y = "Weight (kg)",
+    caption = "Outbreak A",
+    color = "Gender"
+  )+
+* theme_minimal()
+```
+
+]
+
+.pull-right[
+
+```{r , echo = FALSE, eval = TRUE, tidy = FALSE}
+ggplot(data = linelist)+
+  geom_point(
+    mapping = aes(
+      x = ht_cm,
+      y = wt_kg, 
+      color = gender),
+    alpha = 0.3)+
+  labs(
+    title = "Weight, height & gender",
+    x = "Height (cm)",
+    y = "Weight (kg)",
+    caption = "Outbreak A",
+    color = "Gender")+
+  theme_minimal()
+```
+]
+
+
+
+---
+# Syntax overview  
+
+.pull-left[
+
+Micro-adjust with `theme()`  
+
+```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
+ggplot(data = linelist)+
+  geom_point(
+    mapping = aes(
+      x = ht_cm,
+      y = wt_kg,
+      color = gender),
+    alpha = 0.3)+
+  labs(
+    title = "Weight, height & gender",
+    x = "Height (cm)",
+    y = "Weight (kg)",
+    caption = "Outbreak A",
+    color = "Gender"
+  )+
+  theme_minimal()+
+* theme(legend.position = "bottom")
+```
+
+]
+
+.pull-right[
+
+```{r , echo = FALSE, eval = TRUE, tidy = FALSE}
+ggplot(data = linelist)+
+  geom_point(
+    mapping = aes(
+      x = ht_cm,
+      y = wt_kg, 
+      color = gender),
+    alpha = 0.3)+
+  labs(
+    title = "Weight, height & gender",
+    x = "Height (cm)",
+    y = "Weight (kg)",
+    caption = "Outbreak A",
+    color = "Gender")+
+  theme_minimal()+
+  theme(legend.position = "bottom")
+```
+]
+
+
+
+
+
+
+
+---
+# *Map* column(s) to the axes  
+
+.pull-left[
+
+Start by mapping the axes.  
+
+Use the `mapping = ` argument and make axes assignments within `aes()`.  
+
+```{r , echo = TRUE, eval = FALSE, tidy = FALSE}
+ggplot(
+  data = linelist,
+  mapping = aes(
+    x = days_onset_hosp, #<<
+    y = ct_blood)        #<<
+  )
+```
 
 ] 
 
 .pull-right[
 ```{r }
-ggplot(data = linelist)
+ggplot(
+  data = linelist,
+  mapping = aes(x = days_onset_hosp, y = ct_blood)
+  )
 ```
 ]
 
+???
+
+
+
+
+
+
+---
+# Geoms  
+
+
+.pull-left[
+Data are visualized using "geom" commands, such as `geom_point()`.  
+
+Many classical “geoms”, including:  
+
+Geometry        |Geom                
+----------------|--------------------
+Histograms      |`geom_histogram()`
+Points          |`geom_point()`  
+Lines           |`geom_line()`  
+Box plots       |`geom_boxplot()`  
+Bar charts      |`geom_bar()` or `geom_col()`  
+Trend lines     |`geom_smooth()`  
+
+Full list [here](https://ggplot2.tidyverse.org/reference/)  
+
+]
+
+
+.pull-right[
+
+```{r, message=F, warning=F}
+
+# Histogram
+histogram <- ggplot(
+    data = linelist,
+    mapping = aes(
+      x = date_onset))+
+  geom_histogram(fill = "purple")+
+  labs(title = "geom_histogram()")+
+  theme_minimal()
+  
+
+points <- ggplot(
+    data = linelist,
+    mapping = aes(
+      x = days_onset_hosp,       
+      y = ct_blood)
+    )+
+  geom_point()+
+  labs(title = "geom_point()")+
+  theme_minimal()
+
+
+smooth <- ggplot(
+    data = linelist,
+    mapping = aes(
+      x = days_onset_hosp,       
+      y = ct_blood)
+    )+
+  geom_smooth()+
+  labs(title = "geom_smooth()")+
+  theme_minimal()
+
+
+
+density <- ggplot(
+    data = linelist,
+    mapping = aes(
+      x = days_onset_hosp,       
+      y = ct_blood)
+    )+
+  geom_density2d_filled()+
+  labs(title = "geom_density()")+
+  theme_minimal()
+
+  
+lines <- linelist %>% 
+  group_by(hospital,
+           week_hospitalisation = lubridate::floor_date(date_onset, "week")) %>% 
+  summarise(n_cases = n()) %>% 
+  ggplot(
+    mapping = aes(
+      x = week_hospitalisation,       
+      y = n_cases,
+      color = hospital),
+    size = 2
+    )+
+  geom_line()+
+  labs(title = "geom_line()")+
+  theme_minimal()
+
+
+
+boxplots <- ggplot(
+    data = linelist,
+    mapping = aes(
+      x = gender,       
+      y = age_years)
+    )+
+  geom_boxplot()+
+  labs(title = "geom_boxplot()")+
+  theme_minimal()
+
+
+
+violins <- ggplot(
+    data = linelist,
+    mapping = aes(
+      x = outcome,       
+      y = ct_blood,
+      fill = outcome)
+    )+
+  geom_violin()+
+  labs(title = "geom_violin()")+
+  theme_minimal()
+
+
+bars <- linelist %>% 
+  ggplot(mapping = aes(
+      y = outcome,
+      fill = outcome))+
+  geom_bar()+
+  labs(title = "geom_bar()")+
+  theme_minimal()+
+  theme(legend.position = "none")
+
+
+
+density <- ggplot(data = linelist)+
+  geom_density(
+    mapping = aes(
+      x = days_onset_hosp,       
+      y = ct_blood))+
+  labs(title = "geom_density()")+
+  theme_minimal()
+
+
+top <- cowplot::plot_grid(histogram, points,
+                          boxplots, bars,
+                          #smooth, density,
+                          
+                          nrow = 2, rel_widths = c(3,2))
+
+cowplot::plot_grid(top, lines, ncol = 1)
+
+```
+
+]
+
+
+---
+# Adding geoms  
+
+
+.pull-left[
+
+"geoms" are *added* with a "`+`" to the `ggplot()`  
+
+```{r, echo=T, eval=F}
+ggplot(
+    data = linelist,
+    mapping = aes(
+      x = days_onset_hosp,       
+      y = ct_blood)
+    )
+```
+
+
+]
+
+.pull-right[
+
+
+```{r, echo = F}
+ggplot(
+    data = linelist,
+    mapping = aes(
+      x = days_onset_hosp,       
+      y = ct_blood)
+    )
+```
+
+]
 
 ???
-This does not produce visible changes, but ggplot will now look for columns within the _linelist_ dataframe.
+
+
+
+
+
+
+---
+# Adding geoms  
+
+
+.pull-left[
+
+"geoms" are *added* with a "`+`" to the `ggplot()`  
+
+```{r, echo=T, eval=F}
+ggplot(
+    data = linelist,
+    mapping = aes(
+      x = days_onset_hosp,       
+      y = ct_blood)
+    )+
+  geom_point()   #<<
+```
+
+
+]
+
+.pull-right[
+
+
+```{r, echo = F}
+ggplot(
+    data = linelist,
+    mapping = aes(
+      x = days_onset_hosp,       
+      y = ct_blood)
+    )+
+  geom_point()   #<<
+```
+
+]
+
+???
+
+
+
+
+
+---
+# Adding geoms  
+
+
+.pull-left[
+
+"geoms" are *added* with a "`+`" to the `ggplot()`  
+
+```{r, echo=T, eval=F}
+ggplot(
+    data = linelist,
+    mapping = aes(
+      x = days_onset_hosp,       
+      y = ct_blood)
+    )+
+  geom_point()+
+  geom_hline(yintercept = 22)   #<<
+```
+
+
+]
+
+.pull-right[
+
+
+```{r, echo = F}
+ggplot(
+    data = linelist,
+    mapping = aes(
+      x = days_onset_hosp,       
+      y = ct_blood)
+    )+
+  geom_point()+
+  geom_hline(yintercept = 22)   #<<
+```
+
+]
+
+???
+Multiple geoms on one graph:
+* You can plot several geoms on the same graph. 
+* Each is added to previous ggplot2 commands with a **`+`**
+* Geoms are plotted _sequentially_: later geoms are plotted on top of previous ones
+
+
+
 
 
 ---
@@ -348,7 +1020,7 @@ This does not produce visible changes, but ggplot will now look for columns with
 
 .pull-left[
 
-**Mapping** is telling ggplot which variable goes into which _aesthetics_.
+Other aesthetics **Mapping** is telling ggplot which variable goes into which _aesthetics_.
 
 -- 
 Main _aesthetics_ are:  
@@ -385,28 +1057,6 @@ ggplot(
 - Note about the work "aesthetics" and how its ggplot meaning is slightly different than in common English. It does not mean the trappings, but is specifically about the data that is being plotted in geometries (shapes) - not the surrounding background colors etc.
 - Mappings essentially tell ggplot which variables go in which aestetics.
 - Now we have defined the x axis, we can tell ggplot to plot actual data. Now you need to think about the type of representation that you want (transition).
-
-
----
-# Geoms  
-
-Geoms express the data as _geometry_ (lines, points, boxplots, histograms, etc.)
-
-**ggplot2** propose many classical “geoms”:  
-
-* Histograms - `geom_histogram() ` 
-* Bar charts - `geom_bar()` or `geom_col()` (see “Bar plot” section)
-* Box plots - `geom_boxplot()`  
-* Points - `geom_point() ` 
-* Line graphs - `geom_line()` or `geom_path()`  
-* Trend lines - `geom_smooth()`
-*...
-
---
-Multiple geoms on one graph:
-* You can plot several geoms on the same graph. 
-* Each is added to previous ggplot2 commands with a **`+`**
-* Geoms are plotted _sequentially_: later geoms are plotted on top of previous ones
 
 
 ---
@@ -462,6 +1112,100 @@ Quick options:
 * Create multiple plots, each showing a different hospital
 
 You can do either in one line of code.
+
+
+
+
+---
+# Common error  
+
+.pull-left[
+
+You have multiple data points per x-value, but forgot to separate out the groups
+
+```{r, eval=F, echo = T}
+linelist %>% 
+  group_by(hospital,
+           week_hospitalisation = lubridate::floor_date(date_onset, "week")) %>% 
+  summarise(n_cases = n()) %>% 
+  ggplot(
+    mapping = aes(
+      x = week_hospitalisation,       
+      y = n_cases)
+    )+
+  geom_line()+
+  labs(title = "geom_line()")
+```
+]
+
+.pull-right[
+
+```{r, eval=T, echo=F}
+linelist %>% 
+  group_by(hospital,
+           week_hospitalisation = lubridate::floor_date(date_onset, "week")) %>% 
+  summarise(n_cases = n()) %>% 
+  ggplot(
+    mapping = aes(
+      x = week_hospitalisation,       
+      y = n_cases)
+    )+
+  geom_line()+
+  labs(title = "Weekly cases, by hospital (?)")
+
+
+```
+]
+
+
+
+---
+# Common error - resolved  
+
+.pull-left[
+
+You have multiple data points per x-value, but forgot to separate out the groups
+
+```{r, eval=F, echo = T}
+linelist %>% 
+  group_by(hospital,
+           week_hospitalisation = lubridate::floor_date(date_onset, "week")) %>% 
+  summarise(n_cases = n()) %>% 
+  ggplot(
+    mapping = aes(
+      x = week_hospitalisation,       
+      y = n_cases,
+      color = hospital)   #<<
+    )+
+  geom_line()+
+  labs(title = "geom_line()")
+```
+]
+
+.pull-right[
+
+```{r, eval=T, echo=F}
+linelist %>% 
+  group_by(hospital,
+           week_hospitalisation = lubridate::floor_date(date_onset, "week")) %>% 
+  summarise(n_cases = n()) %>% 
+  ggplot(
+    mapping = aes(
+      x = week_hospitalisation,       
+      y = n_cases,
+      color = hospital)
+    )+
+  geom_line()+
+  labs(title = "Weekly cases, by hospital (?)")
+
+
+```
+]
+
+
+
+
+
 
 
 ---
@@ -926,3 +1670,44 @@ output:
 ```
 
 If you want to contribute a theme to **xaringan**, please read [this blog post](https://yihui.org/en/2017/10/xaringan-themes).
+
+
+
+
+
+
+
+
+<!-- --- -->
+<!-- # Outline -->
+
+<!-- ```{r, eval=FALSE, echo=TRUE} -->
+<!-- ggplot(data = this_demonstration)+ -->
+<!--   geom_setscene(directory, packages, and data import)+   -->
+<!--   geom_fundamentals(building your plot)+   -->
+<!--   geom_bar(bar charts)+   -->
+<!--   geom_histogram(epidemic curves and demographic pyramids)+   -->
+<!--   geom_points(scatter and density plots)+ -->
+<!--   labs(dynamics plot captions)+ -->
+<!-- ``` -->
+
+
+<!-- We've prioritized topics that might be more complex, leaving simple plots for your reading in the Handbook   -->
+
+
+<!-- --- -->
+<!-- # Outline -->
+
+<!-- ```{r, eval=FALSE, echo=TRUE} -->
+<!-- ggplot(data = this_demonstration)+ -->
+<!--   Setting the scene (directory, packages, and data import)+   -->
+<!--   Fundamentals (building your plot)+   -->
+<!--   Bars (bar and column charts, data structure)+   -->
+<!--   Histograms(epidemic curves and demographic pyramids)+   -->
+<!--   Points(scatter and density plots)+ -->
+<!--   Label tips (dynamics plot captions)+ -->
+<!-- ``` -->
+
+
+<!-- We've prioritized topics that might be more complex, leaving simple plots for your reading in the Handbook   -->
+
