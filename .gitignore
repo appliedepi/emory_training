@@ -2,5 +2,4 @@
 .Rhistory
 .RData
 .Ruserdata
-case_study/data/covid_example_data*
-case_study/data/covid_shapefile/*
+case_study/data/covid_example_data/*
