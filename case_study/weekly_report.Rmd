@@ -193,12 +193,15 @@ https://epirhandbook.com/cleaning-data-and-core-functions.html#column-names
 
 ```{r clean_colnames}
 
+## TODO: CHECK WHICH COLUMNS WERE DROPPED AND IF USEFUL (n=10)
+
 # create a new object called linelist and assign linelist_raw with renamed columns
 linelist <- linelist_raw %>% 
   # use select() to retain columns and rename them 
      # NEW name = OLD name
      # aligned for readability
-  select(                                       
+  select( 
+    pid                 = PID,
     date_report         = reprt_creationdt_FALSE,      
     date_dob            = case_dob_FALSE,              
     age                 = case_age,                    
