@@ -14,6 +14,45 @@ output:
     css: xaringan-themer.css
 ---
 
+```{r, echo=F}
+# You need to run this line once, for the slides to render 
+# icons::download_fontawesome()
+
+```
+
+
+```{css, echo = F}
+/* THIS IS A CSS CHUNK - THIS IS A COMMENT */
+
+/* Size of font in code echo. E.g. 10px or 50% */
+.remark-code {
+  font-size: 70%;
+}
+
+
+/* Size of font in text */
+
+.medium-text {
+  font-size: 75%;     
+}
+
+/* Size of font in tables */
+
+.small-table table {
+  font-size: 6px;     
+}
+
+.medium-table table {
+  font-size: 8px;     
+}
+
+.medium-large-table table {
+  font-size: 10px;     
+}
+
+```
+
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, 
                       warning = FALSE, 
@@ -34,6 +73,7 @@ options(htmltools.dir.version = FALSE)
 pacman::p_load(
   rio,        # importing data  
   here,       # relative file pathways  
+  skimr,      # review data
   janitor,    # data cleaning and tables
   lubridate,  # working with dates
   tidyverse,  # data management and visualization
@@ -177,6 +217,7 @@ pacman::p_load(
   rio,            # import/export
   here,           # file locator
   rmarkdown,      # reports
+  lubridate,      # working with dates
   tidyverse       # mega-package for data management and visualization
   )
 ```
@@ -195,6 +236,9 @@ The **tidyverse** also includes these packages:
 
 
 ---
+
+class: remark-code
+
 # Import data
 
 We use a *clean* dataset, to focus on visualization techniques.  
@@ -204,24 +248,145 @@ We use a *clean* dataset, to focus on visualization techniques.
 
 ```{r echo=FALSE, eval=TRUE}
 # This actually runs but is not displayed
-linelist <- import(here::here("case_study", "data", "linelist_cleaned.rds")) %>% 
-  select(case_id, date_onset, outcome, gender, age_years, hospital,
-         ht_cm, wt_kg, lon, lat, time_admission, ct_blood, days_onset_hosp)
+linelist_raw <- rio::import(here::here("case_study", "data", "covid_example_data", "covid_example_data.xlsx"))
 ```
 
 ```{r echo=TRUE, eval=FALSE}
-linelist <- import(here::here("data", "linelist_cleaned.rds"))
+linelist_raw <- import(here("case_study", "data", "covid_example_data", "covid_example_data.xlsx"))
 ```
 
-
-*Note: A .rds file can store an R data frame and retain column classes*  
+*Note: The `import()` function can import almost any kind of file. A .rds file stores an R data frame and retains column classes*  
 
 
 
 ---
+
+class: remark-code
+
+# Clean data  
+
+Below is the code we use to clean the data. We will not linger here today, but it is available for you to review later.  
+
+```{r, echo=T}
+linelist <- linelist_raw %>% 
+  filter(confirmed_case == "Yes") %>% 
+  
+  select(                                       # use select() to retain columns
+    date_report  = reprt_creationdt_FALSE,      # (it can also be used to re-name)
+    date_dob     = case_dob_FALSE,              # NEW name = OLD name
+    age          = case_age,                    # aligned for readability
+    gender       = case_gender,
+    zip          = case_zip,
+    eth          = case_eth,
+    id           = Contact_id, 
+    date_onset   = sym_startdt_FALSE,
+    sym_fever,
+    sym_cough,
+    sym_headache,
+    sym_losstastesmell,
+    sym_sorethroat,
+    sym_myalgia,
+    contact_hh        = contact_household,
+    hospitalized,
+    date_hospitalized = hosp_admidt_FALSE,
+    date_discharge    = hosp_dischdt_FALSE,
+    died,
+    died_covid,
+    date_died         = died_dt_FALSE,
+    lat               = latitude_JITT,
+    lon               = longitude_JITT) %>% 
+  
+  # convert column classes
+  mutate(age = as.numeric(age)) %>%             # convert class
+  mutate(zip = as_factor(zip)) %>% 
+  mutate(across(contains("date"), ymd)) %>%     # convert all date columns, ymd() from lubridate
+
+  # clean died column
+  mutate(
+    died = fct_explicit_na(died, na_level = "Unknown"),
+    died = fct_relevel(died, "Yes", "No", "Unknown")
+    ) %>% 
+  
+  # remove onset dates prior to 2020
+  mutate(across(
+    .cols = c(date_report, date_onset, date_hospitalized, date_discharge, date_died),
+    .fns  = ~ replace(.x, .x < as.Date("2020-01-01"), NA)
+    ))%>% 
+  
+  # Remove dates after today from all date columns
+  mutate(across(
+    .cols = contains("date"),
+    .fns  =  ~ replace(.x, .x > Sys.Date(), NA)
+    )) %>% 
+  
+  # delay onset to hospitalization
+  mutate(
+    days_onset_hosp = as.numeric(date_hospitalized - date_onset),
+    days_onset_hosp = replace(days_onset_hosp, days_onset_hosp < 0, NA),
+    days_onset_hosp = replace(days_onset_hosp, days_onset_hosp > 30, NA)
+    ) %>% 
+
+  # length hospitalization
+  mutate(
+    date_outcome = coalesce(date_died, date_discharge),
+    days_hosp = as.numeric(date_outcome - date_hospitalized),
+    days_hosp = replace(days_hosp, days_hosp < 0, NA),
+    days_hosp = replace(days_hosp, days_hosp > 60, NA)
+    )
+
+```
+
+
+
+
+
+---
+
+class: small-table
+
 # Review data  
 
-Below are the first 25 rows of the linelist:  
+
+```{r, echo=T}
+# You can use `skim()` from the skimr package.  
+skim(linelist) %>% 
+  filter(skim_type == "character")
+```
+
+---
+
+class: small-table
+
+# Review data  
+
+```{r, echo=T}
+skimr::skim(linelist) %>% 
+  filter(skim_type == "Date")
+```
+
+
+---
+
+class: small-table
+
+# Review data  
+
+```{r, echo=T}
+skimr::skim(linelist) %>% 
+  filter(skim_type == "numeric")
+```
+
+
+
+
+
+---
+
+class: small-table
+
+# Review data  
+
+Below are the first rows of the `linelist` data frame:  
 
 ```{r}
 head(linelist, 25) %>% 
@@ -241,10 +406,6 @@ head(linelist, 25) %>%
 
   #knitr::kable(format = 'html')
 ```
-
-
-???
-- I am not sure this is the best visualisation? I like seeng a couple of lines but the columns will only be seen in passing. Should we simplify the dataframe to only keep columns of interest during the rest of the presentation so that we can get a better glimpse? Or also use a `glimpse or str` under your table? Or use a packade like https://www.repidemicsconsortium.org/matchmaker/ ]
 
 
 
@@ -298,7 +459,7 @@ A simple example follows. We will explain each component.
 
 
 ---
-# Syntax overview  
+# Syntax - open the plot  
 
 .pull-left[
 
@@ -334,7 +495,7 @@ Notes: if several data frames are needed, they can be added in their own *geoms*
 
 
 ---
-# Syntax overview  
+# Syntax - Map columns to axes  
 
 .pull-left[
 
@@ -343,8 +504,8 @@ Map the `x` and `y` axes to columns in the data
 ```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
 ggplot(data = linelist,
 *       mapping = aes(
-*         x = ht_cm,
-*         y = wt_kg)
+*         x = age,
+*         y = days_hosp)
 )
 ```
 
@@ -355,386 +516,10 @@ ggplot(data = linelist,
 ```{r , echo = FALSE, eval = TRUE, tidy = FALSE}
 ggplot(data = linelist,
        mapping = aes(
-         x = ht_cm,
-         y = wt_kg))
+         x = age,
+         y = days_hosp))
 ```
 ] 
-
-
-
-
----
-# Syntax overview  
-
-.pull-left[
-
-Add a "geom" layer to display the data as points
-
-```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
-ggplot(data = linelist,
-       mapping = aes(
-         x = ht_cm,
-         y = wt_kg))+
-*  geom_point()
-```
-
-]
-
-.pull-right[
-
-
-```{r , echo = FALSE, eval = TRUE, tidy = FALSE}
-ggplot(data = linelist,
-       mapping = aes(
-         x = ht_cm,
-         y = wt_kg))+
-  geom_point()
-```
-] 
-
-
-
----
-# Syntax overview  
-
-.pull-left[
-
-Axes can also be mapped within the geom command
-
-```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
-ggplot(data = linelist,
-*       mapping = aes(
-*         x = ht_cm,
-*         y = wt_kg))+
-  geom_point()
-```
-
-is the same as:  
-
-```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
-ggplot(data = linelist)+
-  geom_point(
-*    mapping = aes(
-*      x = ht_cm,
-*      y = wt_kg))
-```
-
-]
-
-.pull-right[
-
-```{r , echo = FALSE, eval = TRUE, tidy = FALSE}
-ggplot(data = linelist)+
-  geom_point(
-    mapping = aes(
-      x = ht_cm,
-      y = wt_kg)
-    )
-```
-] 
-
-???
-- Explain why you might use one or the other  
-
-
-
-
-
----
-# Syntax overview  
-
-.pull-left[
-
-Define an aesthetic value as *static* (applying to all data points) by writing it within the geom but outside the `aes()`  
-
-```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
-ggplot(data = linelist)+
-  geom_point(
-    mapping = aes(
-      x = ht_cm,
-      y = wt_kg),
-*   color = "purple")
-```
-
-]
-
-.pull-right[
-
-```{r , echo = FALSE, eval = TRUE, tidy = FALSE}
-ggplot(data = linelist)+
-  geom_point(
-    mapping = aes(
-      x = ht_cm,
-      y = wt_kg),
-   color = "purple")
-```
-] 
-
-
-
-
-
-
----
-# Syntax overview  
-
-.pull-left[
-
-Define an aesthetic value as *dynamic* (varying for each data point) by writing it within the geom *and within the `aes()`  
-
-```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
-ggplot(data = linelist)+
-  geom_point(
-    mapping = aes(
-      x = ht_cm,
-      y = wt_kg,
-*     color = gender)
-    )
-```
-
-]
-
-.pull-right[
-
-```{r , echo = FALSE, eval = TRUE, tidy = FALSE}
-ggplot(data = linelist)+
-  geom_point(
-    mapping = aes(
-      x = ht_cm,
-      y = wt_kg, 
-      color = gender)
-    )
-```
-]
-
-
-
-
-
----
-# Syntax overview  
-
-.pull-left[
-
-Here: 
-
-* `color = ` aesthetic is a dynamic value assigned to column `gender`  
-* `alpha = ` transparency aesthetic is a static 30%  
-
-```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
-ggplot(data = linelist)+
-  geom_point(
-    mapping = aes(
-      x = ht_cm,
-      y = wt_kg,
-      color = gender),
-*   alpha = 0.3)
-```
-
-]
-
-.pull-right[
-
-```{r , echo = FALSE, eval = TRUE, tidy = FALSE}
-ggplot(data = linelist)+
-  geom_point(
-    mapping = aes(
-      x = ht_cm,
-      y = wt_kg, 
-      color = gender),
-    alpha = 0.3
-    )
-```
-]
-
-
-
----
-# Syntax overview  
-
-.pull-left[
-
-Add labels for title, axes, and legend  
-
-```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
-ggplot(data = linelist)+
-  geom_point(
-    mapping = aes(
-      x = ht_cm,
-      y = wt_kg,
-      color = gender),
-    alpha = 0.3)+
-* labs(
-*    title = "Weight, height & gender",
-*    x = "Height (cm)",
-*    y = "Weight (kg)",
-*    caption = "Outbreak A",
-*    color = "Gender"
-)
-```
-
-]
-
-.pull-right[
-
-```{r , echo = FALSE, eval = TRUE, tidy = FALSE}
-ggplot(data = linelist)+
-  geom_point(
-    mapping = aes(
-      x = ht_cm,
-      y = wt_kg, 
-      color = gender),
-    alpha = 0.3)+
-  labs(
-    title = "Weight, height & gender",
-    x = "Height (cm)",
-    y = "Weight (kg)",
-    caption = "Outbreak A",
-    color = "Gender")
-```
-]
-
-
-
-
----
-# Syntax overview  
-
-.pull-left[
-
-"themes" are non-data plot features  
-
-Pre-defined themes are easy to add  
-
-```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
-ggplot(data = linelist)+
-  geom_point(
-    mapping = aes(
-      x = ht_cm,
-      y = wt_kg,
-      color = gender),
-    alpha = 0.3)+
-  labs(
-    title = "Weight, height & gender",
-    x = "Height (cm)",
-    y = "Weight (kg)",
-    caption = "Outbreak A",
-    color = "Gender"
-  )+
-* theme_minimal()
-```
-
-]
-
-.pull-right[
-
-```{r , echo = FALSE, eval = TRUE, tidy = FALSE}
-ggplot(data = linelist)+
-  geom_point(
-    mapping = aes(
-      x = ht_cm,
-      y = wt_kg, 
-      color = gender),
-    alpha = 0.3)+
-  labs(
-    title = "Weight, height & gender",
-    x = "Height (cm)",
-    y = "Weight (kg)",
-    caption = "Outbreak A",
-    color = "Gender")+
-  theme_minimal()
-```
-]
-
-
-
----
-# Syntax overview  
-
-.pull-left[
-
-Micro-adjust with `theme()`  
-
-```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
-ggplot(data = linelist)+
-  geom_point(
-    mapping = aes(
-      x = ht_cm,
-      y = wt_kg,
-      color = gender),
-    alpha = 0.3)+
-  labs(
-    title = "Weight, height & gender",
-    x = "Height (cm)",
-    y = "Weight (kg)",
-    caption = "Outbreak A",
-    color = "Gender"
-  )+
-  theme_minimal()+
-* theme(legend.position = "bottom")
-```
-
-]
-
-.pull-right[
-
-```{r , echo = FALSE, eval = TRUE, tidy = FALSE}
-ggplot(data = linelist)+
-  geom_point(
-    mapping = aes(
-      x = ht_cm,
-      y = wt_kg, 
-      color = gender),
-    alpha = 0.3)+
-  labs(
-    title = "Weight, height & gender",
-    x = "Height (cm)",
-    y = "Weight (kg)",
-    caption = "Outbreak A",
-    color = "Gender")+
-  theme_minimal()+
-  theme(legend.position = "bottom")
-```
-]
-
-
-
-
-
-
-
----
-# *Map* column(s) to the axes  
-
-.pull-left[
-
-Start by mapping the axes.  
-
-Use the `mapping = ` argument and make axes assignments within `aes()`.  
-
-```{r , echo = TRUE, eval = FALSE, tidy = FALSE}
-ggplot(
-  data = linelist,
-  mapping = aes(
-    x = days_onset_hosp, #<<
-    y = ct_blood)        #<<
-  )
-```
-
-] 
-
-.pull-right[
-```{r }
-ggplot(
-  data = linelist,
-  mapping = aes(x = days_onset_hosp, y = ct_blood)
-  )
-```
-]
-
-???
-
-
 
 
 
@@ -744,6 +529,7 @@ ggplot(
 
 
 .pull-left[
+
 Data are visualized using "geom" commands, such as `geom_point()`.  
 
 Many classical “geoms”, including:  
@@ -771,7 +557,7 @@ histogram <- ggplot(
     data = linelist,
     mapping = aes(
       x = date_onset))+
-  geom_histogram(fill = "purple")+
+  geom_histogram(fill = "darkorange")+
   labs(title = "geom_histogram()")+
   theme_minimal()
   
@@ -779,8 +565,8 @@ histogram <- ggplot(
 points <- ggplot(
     data = linelist,
     mapping = aes(
-      x = days_onset_hosp,       
-      y = ct_blood)
+      x = age,       
+      y = days_hosp)
     )+
   geom_point()+
   labs(title = "geom_point()")+
@@ -790,8 +576,8 @@ points <- ggplot(
 smooth <- ggplot(
     data = linelist,
     mapping = aes(
-      x = days_onset_hosp,       
-      y = ct_blood)
+      x = age,       
+      y = days_onset_hosp)
     )+
   geom_smooth()+
   labs(title = "geom_smooth()")+
@@ -802,24 +588,25 @@ smooth <- ggplot(
 density <- ggplot(
     data = linelist,
     mapping = aes(
-      x = days_onset_hosp,       
-      y = ct_blood)
+      x = age,       
+      y = days_hosp)
     )+
   geom_density2d_filled()+
-  labs(title = "geom_density()")+
+  labs(title = "geom_density2d_filled()")+
   theme_minimal()
 
   
 lines <- linelist %>% 
-  group_by(hospital,
-           week_hospitalisation = lubridate::floor_date(date_onset, "week")) %>% 
+  group_by(eth,
+           week_report = lubridate::floor_date(date_report, "week")) %>% 
   summarise(n_cases = n()) %>% 
+  drop_na(week_report) %>% 
   ggplot(
     mapping = aes(
-      x = week_hospitalisation,       
+      x = week_report,       
       y = n_cases,
-      color = hospital),
-    size = 2
+      color = eth),
+    size = 4
     )+
   geom_line()+
   labs(title = "geom_line()")+
@@ -830,8 +617,8 @@ lines <- linelist %>%
 boxplots <- ggplot(
     data = linelist,
     mapping = aes(
-      x = gender,       
-      y = age_years)
+      x = died,       
+      y = age)
     )+
   geom_boxplot()+
   labs(title = "geom_boxplot()")+
@@ -842,9 +629,9 @@ boxplots <- ggplot(
 violins <- ggplot(
     data = linelist,
     mapping = aes(
-      x = outcome,       
-      y = ct_blood,
-      fill = outcome)
+      x = died,       
+      y = days_hosp,
+      fill = died)
     )+
   geom_violin()+
   labs(title = "geom_violin()")+
@@ -853,29 +640,19 @@ violins <- ggplot(
 
 bars <- linelist %>% 
   ggplot(mapping = aes(
-      y = outcome,
-      fill = outcome))+
+      y = died,
+      fill = died))+
   geom_bar()+
   labs(title = "geom_bar()")+
   theme_minimal()+
   theme(legend.position = "none")
 
 
-
-density <- ggplot(data = linelist)+
-  geom_density(
-    mapping = aes(
-      x = days_onset_hosp,       
-      y = ct_blood))+
-  labs(title = "geom_density()")+
-  theme_minimal()
-
-
 top <- cowplot::plot_grid(histogram, points,
                           boxplots, bars,
                           #smooth, density,
                           
-                          nrow = 2, rel_widths = c(3,2))
+                          nrow = 2, rel_widths = c(2,2))
 
 cowplot::plot_grid(top, lines, ncol = 1)
 
@@ -884,459 +661,76 @@ cowplot::plot_grid(top, lines, ncol = 1)
 ]
 
 
----
-# Adding geoms  
 
+
+
+
+
+---
+# Syntax - "geoms"  
 
 .pull-left[
 
-"geoms" are *added* with a "`+`" to the `ggplot()`  
+Add a `geom_point()` command to display the data as points
 
-```{r, echo=T, eval=F}
-ggplot(
-    data = linelist,
-    mapping = aes(
-      x = days_onset_hosp,       
-      y = ct_blood)
-    )
-```
-
-
-]
-
-.pull-right[
-
-
-```{r, echo = F}
-ggplot(
-    data = linelist,
-    mapping = aes(
-      x = days_onset_hosp,       
-      y = ct_blood)
-    )
-```
-
-]
-
-???
-
-
-
-
-
-
----
-# Adding geoms  
-
-
-.pull-left[
-
-"geoms" are *added* with a "`+`" to the `ggplot()`  
-
-```{r, echo=T, eval=F}
-ggplot(
-    data = linelist,
-    mapping = aes(
-      x = days_onset_hosp,       
-      y = ct_blood)
-    )+
-  geom_point()   #<<
-```
-
-
-]
-
-.pull-right[
-
-
-```{r, echo = F}
-ggplot(
-    data = linelist,
-    mapping = aes(
-      x = days_onset_hosp,       
-      y = ct_blood)
-    )+
-  geom_point()   #<<
-```
-
-]
-
-???
-
-
-
-
-
----
-# Adding geoms  
-
-
-.pull-left[
-
-"geoms" are *added* with a "`+`" to the `ggplot()`  
-
-```{r, echo=T, eval=F}
-ggplot(
-    data = linelist,
-    mapping = aes(
-      x = days_onset_hosp,       
-      y = ct_blood)
-    )+
-  geom_point()+
-  geom_hline(yintercept = 22)   #<<
-```
-
-
-]
-
-.pull-right[
-
-
-```{r, echo = F}
-ggplot(
-    data = linelist,
-    mapping = aes(
-      x = days_onset_hosp,       
-      y = ct_blood)
-    )+
-  geom_point()+
-  geom_hline(yintercept = 22)   #<<
-```
-
-]
-
-???
-Multiple geoms on one graph:
-* You can plot several geoms on the same graph. 
-* Each is added to previous ggplot2 commands with a **`+`**
-* Geoms are plotted _sequentially_: later geoms are plotted on top of previous ones
-
-
-
-
-
----
-# Define mappings
-
-.pull-left[
-
-Other aesthetics **Mapping** is telling ggplot which variable goes into which _aesthetics_.
-
--- 
-Main _aesthetics_ are:  
-* x axis
-* y axis
-* color of lines
-* colors of areas (_fill_)
-* transparency
-* size
-*...
---
-*Map* the column `date_onset` to the x-axis   
-
-```{r , echo = TRUE, eval = FALSE, tidy = FALSE}
-ggplot(
-  data = linelist,
-  mapping = aes(x = date_onset)  #<<
-  )
-```
-
-
-] 
-
-.pull-right[
-```{r }
-ggplot(
-  data = linelist,
-  mapping = aes(x = date_onset)
-  )
-```
-]
-
-???
-- Note about the work "aesthetics" and how its ggplot meaning is slightly different than in common English. It does not mean the trappings, but is specifically about the data that is being plotted in geometries (shapes) - not the surrounding background colors etc.
-- Mappings essentially tell ggplot which variables go in which aestetics.
-- Now we have defined the x axis, we can tell ggplot to plot actual data. Now you need to think about the type of representation that you want (transition).
-
-
----
-# Make an histogram
-
-.pull-left[
-
-The `geom_histogram()` function computes the counts on raw data automaticaly.  
-
-```{r , echo = TRUE, eval = FALSE, tidy = FALSE}
-ggplot(
-  data = linelist,
-  mapping = aes(x = date_onset)  
-) + #<<
-  geom_histogram() #<<
-```
-
---
-Since we have only one geom and one dataframe linked to the plot, we could move the _mapping_ to the `geom_histogram()` call:  
-
-```{r , echo = TRUE, eval = FALSE, tidy = FALSE}
-ggplot() + 
-  geom_histogram(
-    data = linelist,
-    mapping = aes(x = date_onset))
-````
-] 
-
-.pull-right[
-```{r }
-ggplot(
-  data = linelist,
-  mapping = aes(x = date_onset)  
-  ) + 
-  geom_histogram()
-```
-]
-
-
-
-
-
----
-# Groups in the data
-
-So far the graph shows the distribution of cases in all hospitals. 
-
-It would make sense to break down the visualization by hospitals.
-
-Quick options:  
-
-* Fill each hospital in different color (stacked histogram)
-* Create multiple plots, each showing a different hospital
-
-You can do either in one line of code.
-
-
-
-
----
-# Common error  
-
-.pull-left[
-
-You have multiple data points per x-value, but forgot to separate out the groups
-
-```{r, eval=F, echo = T}
-linelist %>% 
-  group_by(hospital,
-           week_hospitalisation = lubridate::floor_date(date_onset, "week")) %>% 
-  summarise(n_cases = n()) %>% 
-  ggplot(
-    mapping = aes(
-      x = week_hospitalisation,       
-      y = n_cases)
-    )+
-  geom_line()+
-  labs(title = "geom_line()")
-```
-]
-
-.pull-right[
-
-```{r, eval=T, echo=F}
-linelist %>% 
-  group_by(hospital,
-           week_hospitalisation = lubridate::floor_date(date_onset, "week")) %>% 
-  summarise(n_cases = n()) %>% 
-  ggplot(
-    mapping = aes(
-      x = week_hospitalisation,       
-      y = n_cases)
-    )+
-  geom_line()+
-  labs(title = "Weekly cases, by hospital (?)")
-
-
-```
-]
-
-
-
----
-# Common error - resolved  
-
-.pull-left[
-
-You have multiple data points per x-value, but forgot to separate out the groups
-
-```{r, eval=F, echo = T}
-linelist %>% 
-  group_by(hospital,
-           week_hospitalisation = lubridate::floor_date(date_onset, "week")) %>% 
-  summarise(n_cases = n()) %>% 
-  ggplot(
-    mapping = aes(
-      x = week_hospitalisation,       
-      y = n_cases,
-      color = hospital)   #<<
-    )+
-  geom_line()+
-  labs(title = "geom_line()")
-```
-]
-
-.pull-right[
-
-```{r, eval=T, echo=F}
-linelist %>% 
-  group_by(hospital,
-           week_hospitalisation = lubridate::floor_date(date_onset, "week")) %>% 
-  summarise(n_cases = n()) %>% 
-  ggplot(
-    mapping = aes(
-      x = week_hospitalisation,       
-      y = n_cases,
-      color = hospital)
-    )+
-  geom_line()+
-  labs(title = "Weekly cases, by hospital (?)")
-
-
-```
-]
-
-
-
-
-
-
-
----
-# Add color
-
-.pull-left[
-
-To add color to the graph, we need to _map_ the variable `hospital` to the _fill_ aesthetics:  
-
-```{r , echo = TRUE, eval = FALSE, tidy = FALSE}
+```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
 ggplot(data = linelist,
        mapping = aes(
-         x    = date_onset,
-         fill = hospital #<<
-         )
-       ) +
-  geom_histogram()
+         x = age,
+         y = onset_hosp))
 ```
 
-Note: the _fill_ aesthetics control the color filling areas while the _color_ aesthetics control the color of lines and points.
-
-] 
+]
 
 .pull-right[
-```{r }
-ggplot(data = linelist) +
-  geom_histogram(
-    mapping = aes(
-      x = date_onset,
-      fill = hospital
-      )
-    )
+
+```{r , echo = FALSE, eval = TRUE, tidy = FALSE}
+ggplot(data = linelist,
+       mapping = aes(
+         x = age,
+         y = days_hosp))
 ```
-]
+] 
+
+
+
+
+
+
+
 
 
 
 ---
-# Facets/small-multiples
+# Syntax - "geoms"  
 
 .pull-left[
 
-To generate one graph by hospital:  
+Add (`+`) a `geom_point()` command to display the data as points
 
-```{r , echo = TRUE, eval = FALSE, tidy = FALSE}
+```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
 ggplot(data = linelist,
-       mapping = aes(x = date_onset)) +
-  geom_histogram() +
-  facet_wrap(~hospital,
-             ncol = 2) #<<
+       mapping = aes(
+         x = age,
+         y = onset_hosp))+
+*  geom_point()
 ```
 
-Note: the _fill_ aesthetics control the color filling areas while the _color_ aesthetics control the color of lines and points.
-
-] 
+]
 
 .pull-right[
-```{r }
+
+
+```{r , echo = FALSE, eval = TRUE, tidy = FALSE}
 ggplot(data = linelist,
-       mapping = aes(x = date_onset)) +
-  geom_histogram() +
-  facet_wrap(~ hospital)
+       mapping = aes(
+         x = age,
+         y = days_hosp))+
+  geom_point()
 ```
-]
+] 
 
 
-
----
-
-Where do the arguments go?  
-`data = `
-`mapping = aes()`  
-`x = `  
-`y = `
-`fill = `  
-
-
-
----
-# Visualizing your data
-
-There is a whole science to properly choosing *how* to visualize your data. We will only briefly touch upon this in the context of **ggplot2**  
-
----
-# Distribution of one continuous column  
-
-
----
-# Epidemic curves
-
-
----
-# Demographic pyramids  
-
-
----
-# Two continuous columns  
-
-
----
-# Three continuous columns  
-
-Heatplots, density plots
-
-
----
-# One categorical column  
-
-Inverted axes  
-
-
----
-# Two categorical columns  
-
-Heatplots
-
----
-# Continuous by categorical groups  
-
-
----
-# Facets/small-multiples
-
-I proposed to introduce it sooner, so here we can show other arguments (ncol, nrows, scales) and facet_grid?
-
----
-# Factors and ordering plots  
-
-
----
-# Dynamics captions
 
 
 
@@ -1344,370 +738,571 @@ I proposed to introduce it sooner, so here we can show other arguments (ncol, nr
 
 
 ---
-# Header  
-## This is a subheader
+# Syntax - mapping placement  
 
+* If mappings are written in `ggplot()` they apply to all geoms (e.g. axes).  
+* If mappings are written within a geom, they apply only to it.  
 
-- Hello our name is 
-  + blabla
-  + blabla
+```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
+ggplot(                     # open the plot 
+  data = linelist,            # set dataset 
+* mapping = aes(              # map axes to columns
+*   x = age,
+*   y = days_hosp))+
+  geom_point()              # plot points
+```
 
-.footnote[
-[1] Something _super_ important to say 
+is the same as:  
 
-[2] Some **other** stuff 
+```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
+ggplot(data = linelist)+    # open plot and set dataset
+  geom_point(               # plot points
+*    mapping = aes(           # map axes to columns
+*      x = age,
+*      y = days_hosp))
+```
 
-[3] bla
-]
+(but only because there is only one geom)  
 
 
 ???
+- Explain why you might use one or the other  
 
-- I think these are presenter notes 
-- You can see them in presenter mode 
-  + Keyboard shortcut is 'p' 
----
 
-# Sequential reveal of bullet points
 
-You can reveal stuff bit by bit using to dashes between sections 
 
---
-
-- This is my first point 
-
---
-
-- Then I move on to this fascinating point 
-
---
-
-- And finish with this blabla
 
 
 ---
-class: inverse, center, middle
+# Syntax - Indentations  
 
-# This is a section header slide
+Indentations, spaces, and newlines do not matter for code execution, and can improve readability.  
 
----
-class: center, middle
-background-image: url(https://github.com/appliedepi/epiRhandbook_eng/raw/master/images/Epi%20R%20Handbook%20Banner%20Beige%201500x500.png)
-background-size: 75%
-background-position: 50% 0%
-
-# Alternative section header slide
-
-### Include epirhandbook banner (see [images slides](#imageslide))
-
----
-
-# Tables with Knitr 
-
-Tables need to be in HTML format  
-So either Knitter or flextable
-
-```{r knitr_tabble}
-head(mtcars) %>% 
-  knitr::kable(format = 'html')
+```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
+ggplot(data = linelist, mapping = aes(x = age, y = days_hosp))+
+  geom_point()
 ```
 
----
+is the same as:  
 
-# Tables with Flextable 
-
-You can colour in rows directly with flextable
-
-```{r flextable}
-head(mtcars) %>%
-  flextable::flextable() %>% 
-  flextable::bg(., 
-        i = c(2, 4), 
-        part = "body", 
-        bg = "yellow")
+```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
+ggplot(data = linelist,
+       mapping = aes(
+         x = age,
+         y = days_hosp))+
+  geom_point()
 ```
 
----
+is the same as:  
 
-
-
-# Table highlighting
-
-- Use  chunk option `highlight.output` to highlight specific lines of the text output. 
-  + For example, `highlight.output = TRUE` means highlighting all lines
-  + `highlight.output = c(1, 3)` means highlighting the first and third line.
-
-
-```{r, highlight.output=c(1, 3), echo=FALSE}
-head(mtcars)
+```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
+ggplot(
+  data = linelist,
+  mapping = aes(
+    x = age,
+    y = days_hosp))+
+  geom_point()
 ```
 
+
+
+???
+- Explain why you might use one or the other  
+
+
+
+
+
+
+
 ---
-
-## Visualisation 
-
-Note to selves: 
-I think the way [this presentation](https://www.cedricscherer.com/slides/2019-08-28-intro-ggplot-statsizw#20) 
-breaks down ggplots line by line is probably the way to go! 
-
----
-
-## A ggplot code example
-
-- see [extras slide](#references) for alt side-by-side option in twitter feed
-
+# Syntax overview  
 
 .pull-left[
 
-Highlight code lines using #<<
+Add additional geoms with `+`
 
-```{r ggplot_code, echo = TRUE, eval = FALSE, tidy = FALSE}
-ggplot(mtcars) + 
-  aes(mpg, disp) + 
-  geom_point() +  #<<
-  geom_smooth()   #<<
+```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
+ggplot(data = linelist,
+       mapping = aes(
+         x = age,
+         y = days_hosp))+
+  geom_point()+
+* geom_smooth()
+```
+
+]
+
+.pull-right[
+
+```{r , echo = FALSE, eval = TRUE, tidy = FALSE}
+ggplot(
+  data = linelist,
+  mapping = aes(
+    x = age,
+    y = days_hosp))+
+  geom_point()+
+  geom_smooth()
 ```
 ] 
 
-.pull-right[
-```{r ggplot_code_plot}
-ggplot(mtcars) + 
-  aes(mpg, disp) + 
-  geom_point() +
-  geom_smooth() + 
-  ## NB have to fiddle with sizes a bit to make look good on output
-  theme_gray(base_size = 24)
-```
-]
+???
+- Explain why you might use one or the other  
+
+
+
 
 
 
 ---
-name: imageslide
-background-image: url(https://github.com/appliedepi/epiRhandbook_eng/raw/master/images/epiRhandbook_HexSticker_500x500.png)
-background-size: 250px
-background-position: 90% 50%
+
+class: medium-large-table
+
+# Syntax - other aesthetics  
 
 
-# Including images
 
 .pull-left[
-- Text displayed along side an image 
-- May need to fiddle with sizes
-  + position is %accross and %down 
-  + size .... just flip a coin and see what comes out 
-  + can also use % for images (see layout chunk just below YAML) 
-    + i.e. in layout section up top to adds logos to each page (as per the twitter feed in [extras slide](#references))
-- Can also include images with usual Rmarkdown or knitr code (e.g. next slide)
+Aside from axes, other common "aesthetics" to specify include: 
+
+Geometry        |Geom                
+----------------|--------------------
+`shape = `      |Display point as dot, star, triangle, square...
+`fill =  `      |The *interior* color (e.g of bar or boxplot)  
+`color = `      |The *exterior* or bar, boxplot - OR point color  
+`size = `       |Line thickness, point size...
+`alpha = `      |Transparency (1 = opaque, 0 = invisible)
+`width = `      |Width of "bar plot" bars
+`linetype = `   |Either solid, dashed, dotted, etc.  
+`binwidth = `   |Width of histogram bins  
+  
+
 ]
----
-
-# Including images 2.0 
-
-![](https://github.com/appliedepi/epiRhandbook_eng/raw/master/images/Epi%20R%20Handbook%20Banner%20Beige%201500x500.png)
 
 
----
-name: references 
+.pull-right[
 
-# Xaringan extra & fancy stuff 
+```{r, message=F, warning=F}
 
-- This is a good [tutorial](https://presentable-user2021.netlify.app/) from useR conference.
-- You can include fancier code tabs i.e. this [pres](https://xaringan.gallery/examples.html) 
-- Theres other fancy stuff in this [gallery](https://xaringan.gallery/examples.html)
-- There is tips in this [twitter feed](https://twitter.com/apreshill/status/1085659933238976513)
-  + e.g. if you name slides you can link back to them (nb. name needs to be first thing defined on slide)
-  + keyboard shortcuts for presenting 
-  + better side-by-side code example 
-  + title page 
-  + logos (have included this)
-  + background images 
-- Can set theme using [{xaringanthemer}](https://pkg.garrickadenbuie.com/xaringanthemer/articles/xaringanthemer.html) package 
-  + seems easier than messing around with css
+shape_3 <- ggplot(data = linelist, aes(x = age, y = days_hosp))+
+  geom_point(shape = 3)+
+  theme_minimal()+
+  labs(title = "shape = 3")
 
+shape_died <- ggplot(data = linelist, aes(x = age, y = days_hosp))+
+  geom_point(aes(shape = died))+
+  theme_minimal()+
+  labs(title = "aes(shape = died)")
 
----
+###
 
-
-class: center
-
-# Keyboard shortcuts when presenting
-
-Press `h` or `?` to see the possible ninjutsu you can use in remark.js.
-
-![](https://upload.wikimedia.org/wikipedia/commons/7/7e/Mudra-Naruto-KageBunshin.svg)
-
----
-
-class: center, middle
-
-# Thanks!
-
-Slides created via the R package [**xaringan**](https://github.com/yihui/xaringan).
+fill_purple <- ggplot(data = linelist, aes(x = date_onset))+
+  geom_histogram(fill = "purple")+
+  theme_minimal()+
+  labs(title = "fill = 'purple'")
 
 
+fill_died <- ggplot(data = linelist, aes(x = date_onset))+
+  geom_histogram(aes(fill = died))+
+    theme_minimal()+
+  labs(title = "aes(fill = died)")
+
+###
+
+col <- ggplot(data = linelist %>% count(died), aes(x = died, y = n))+
+  geom_col(fill = "lightgreen", color = "purple")+
+  theme_minimal()+
+  labs(title = "fill = 'lightgreen', color = 'purple'")
 
 
----
-
-# Some Tips
-
-- The title slide is created automatically by **xaringan**, but it is just another remark.js slide added before your other slides.
-
-    The title slide is set to `class: center, middle, inverse, title-slide` by default. You can change the classes applied to the title slide with the `titleSlideClass` option of `nature` (`title-slide` is always applied).
-
-    ```yaml
-    output:
-      xaringan::moon_reader:
-        nature:
-          titleSlideClass: [top, left, inverse]
-    ```
-    
---
-
-- If you'd like to create your own title slide, disable **xaringan**'s title slide with the `seal = FALSE` option of `moon_reader`.
-
-    ```yaml
-    output:
-      xaringan::moon_reader:
-        seal: false
-    ```
+col_died <- ggplot(data = linelist %>% count(died), aes(x = died, y = n))+
+  geom_col(aes(fill = died), color = "black")+
+  theme_minimal()+
+  labs(title = "aes(fill = died), color = 'black'")
 
 
----
-
-# Some Tips
-
-- To make slides work offline, you need to download a copy of remark.js in advance, because **xaringan** uses the online version by default (see the help page `?xaringan::moon_reader`).
-
-- You can use `xaringan::summon_remark()` to download the latest or a specified version of remark.js. By default, it is downloaded to `libs/remark-latest.min.js`.
-
-- Then change the `chakra` option in YAML to point to this file, e.g.
-
-    ```yaml
-    output:
-      xaringan::moon_reader:
-        chakra: libs/remark-latest.min.js
-    ```
-
-- If you used Google fonts in slides (the default theme uses _Yanone Kaffeesatz_, _Droid Serif_, and _Source Code Pro_), they won't work offline unless you download or install them locally. The Heroku app [google-webfonts-helper](https://google-webfonts-helper.herokuapp.com/fonts) can help you download fonts and generate the necessary CSS.
+cowplot::plot_grid(shape_3, shape_died,
+                  fill_purple, fill_died,
+                   col, col_died,
+                   ncol = 2, rel_widths = c(2,2))
 
 
----
-
-# CSS
-
-Among all options in `xaringan::moon_reader`, the most challenging but perhaps also the most rewarding one is `css`, because it allows you to customize the appearance of your slides using any CSS rules or hacks you know.
-
-You can see the default CSS file [here](https://github.com/yihui/xaringan/blob/master/inst/rmarkdown/templates/xaringan/resources/default.css). You can completely replace it with your own CSS files, or define new rules to override the default. See the help page `?xaringan::moon_reader` for more information.
-
----
-
-# CSS
-
-For example, suppose you want to change the font for code from the default "Source Code Pro" to "Ubuntu Mono". You can create a CSS file named, say, `ubuntu-mono.css`:
-
-```css
-@import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
-
-.remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
 ```
 
-Then set the `css` option in the YAML metadata:
+]
 
-```yaml
-output:
-  xaringan::moon_reader:
-    css: ["default", "ubuntu-mono.css"]
+
+
+??? 
+- In ggplot terminology a plot “aesthetic” has a specific meaning. It refers to a visual property of plotted data. Note that “aesthetic” here refers to the data being plotted in geoms/shapes - not the surrounding display such as titles, axis labels, background color, that you might associate with the word “aesthetics” in common English. In ggplot those details are called “themes” and are adjusted within a theme() command
+
+
+
+
+
+
+
+
+
+---
+
+class: medium-text
+
+# Syntax - other aesthetics  
+
+
+
+.pull-left[
+
+These aesthetics can be assigned to either:  
+
+* Static values (`alpha = 0.3`)  
+  - Assign *outside* a `mapping = aes()`  
+* A data column (`aes(fill = died)`)  
+  - Assign *inside* a `mapping = aes()`  
+
+If together, a command might look like:  
+
+```{r, echo=F, eval=F}
+ggplot(data = linelist)+
+  geom_point(aes(x = age, y = days_hosp, shape = died), color = "yellow")
 ```
 
-Here I assume `ubuntu-mono.css` is under the same directory as your Rmd.
+This later option creates "groups" in the display of the data.  
 
-See [yihui/xaringan#83](https://github.com/yihui/xaringan/issues/83) for an example of using the [Fira Code](https://github.com/tonsky/FiraCode) font, which supports ligatures in program code.
+]
+
+
+.pull-right[
+
+```{r, message=F, warning=F}
+
+shape_3 <- ggplot(data = linelist, aes(x = age, y = days_hosp))+
+  geom_point(shape = 3)+
+  theme_minimal()+
+  labs(title = "shape = 3")
+
+shape_died <- ggplot(data = linelist, aes(x = age, y = days_hosp))+
+  geom_point(aes(shape = died))+
+  theme_minimal()+
+  labs(title = "aes(shape = died)")
+
+###
+
+fill_purple <- ggplot(data = linelist, aes(x = date_onset))+
+  geom_histogram(fill = "purple")+
+  theme_minimal()+
+  labs(title = "fill = 'purple'")
+
+
+fill_died <- ggplot(data = linelist, aes(x = date_onset))+
+  geom_histogram(aes(fill = died))+
+    theme_minimal()+
+  labs(title = "aes(fill = died)")
+
+###
+
+col <- ggplot(data = linelist %>% count(died), aes(x = died, y = n))+
+  geom_col(fill = "lightgreen", color = "purple")+
+  theme_minimal()+
+  labs(title = "fill = 'lightgreen', color = 'purple'")
+
+
+col_died <- ggplot(data = linelist %>% count(died), aes(x = died, y = n))+
+  geom_col(aes(fill = died), color = "black")+
+  theme_minimal()+
+  labs(title = "aes(fill = died), color = 'black'")
+
+
+cowplot::plot_grid(shape_3, shape_died,
+                  fill_purple, fill_died,
+                   col, col_died,
+                   ncol = 2, rel_widths = c(2,2))
+
+
+```
+
+]
+
+
+
+
+
+
 
 ---
+# Syntax - other aesthetics  
 
-# CSS (with Sass)
+.pull-left[
 
-**xaringan** also supports Sass support via **rmarkdown**. Suppose you want to use the same color for different elements, e.g., first heading and bold text. You can create a `.scss` file, say `mytheme.scss`, using the [sass](https://sass-lang.com/) syntax with variables:
+Define an aesthetic value as *static* (applying to all data points) by writing it within the geom but outside the `aes()`  
 
-```scss
-$mycolor: #ff0000; 
-.remark-slide-content > h1 { color: $mycolor; }
-.remark-slide-content strong { color: $mycolor; }
+```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
+ggplot(data = linelist,
+       mapping = aes(
+         x = age,
+         y = days_hosp),
+*      color = "seagreen")+ # outside aes()
+  geom_point()
 ```
 
-Then set the `css` option in the YAML metadata using this file placed under the same directory as your Rmd:
+]
 
-```yaml
-output:
-  xaringan::moon_reader:
-    css: ["default", "mytheme.scss"]
+.pull-right[
+
+```{r , echo = FALSE, eval = TRUE, tidy = FALSE}
+ggplot(data = linelist,
+       mapping = aes(
+         x = age,
+         y = days_hosp))+
+  geom_point(color = "seagreen")
+
 ```
+] 
 
-This requires **rmarkdown** >= 2.8 and the [**sass**](https://rstudio.github.io/sass/) package. You can learn more about **rmarkdown** and **sass** support in [this blog post](https://blog.rstudio.com/2021/04/15/2021-spring-rmd-news/#sass-and-scss-support-for-html-based-output) and in [**sass** overview vignette](https://rstudio.github.io/sass/articles/sass.html).
+
+
+
+
 
 ---
+# Syntax - other aesthetics   
 
-# Themes
+.pull-left[
 
-Don't want to learn CSS? Okay, you can use some user-contributed themes. A theme typically consists of two CSS files `foo.css` and `foo-fonts.css`, where `foo` is the theme name. Below are some existing themes:
+Define an aesthetic value as *dynamic* (varying for each data point) by writing it within the geom *and within the `aes()`  
 
-```{r, R.options=list(width = 70)}
-names(xaringan:::list_css())
+```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
+ggplot(data = linelist,
+       mapping = aes(
+         x = age,
+         y = days_hosp,
+*        color = died))+   # inside aes() for dynamic
+  geom_point()
 ```
+
+]
+
+.pull-right[
+
+```{r , echo = FALSE, eval = TRUE, tidy = FALSE}
+ggplot(data = linelist,
+       mapping = aes(
+         x = age,
+         y = days_hosp,
+         color = died))+   # inside aes() for dynamic
+  geom_point()
+```
+]
+
+
+
+
 
 ---
+# Syntax - other aesthetics  
 
-# Themes
+.pull-left[
 
-To use a theme, you can specify the `css` option as an array of CSS filenames (without the `.css` extensions), e.g.,
+Another example: 
 
-```yaml
-output:
-  xaringan::moon_reader:
-    css: [default, metropolis, metropolis-fonts]
+* `color` is set to vary by the value in column `died`  
+* `alpha` (transparency) is set at 30% for all points  
+
+```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
+ggplot(data = linelist,
+       mapping = aes(
+         x = age,
+         y = days_hosp,
+         color = died),    # inside aes() for dynamic
+*      alpha = 0.3)+       # outside aes() for static
+  geom_point() 
+
 ```
 
-If you want to contribute a theme to **xaringan**, please read [this blog post](https://yihui.org/en/2017/10/xaringan-themes).
+Written a different (equivalent) way:  
+
+```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
+ggplot(data = linelist)+
+  geom_point(mapping = aes(x = age, y = days_hosp, color = died), alpha = 0.3)
+```
+
+
+]
+
+.pull-right[
+
+```{r , echo = FALSE, eval = TRUE, tidy = FALSE}
+ggplot(data = linelist,
+       mapping = aes(
+         x = age,
+         y = days_hosp,
+         color = died),    
+       alpha = 0.3)+
+  geom_point()        
+```
+]
+
+
+
+---
+# Syntax - labels  
+
+.pull-left[
+
+Add labels for title, axes, and legend  
+
+```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
+ggplot(data = linelist,
+       mapping = aes(
+         x = age,
+         y = days_hosp,
+         color = died),    
+       alpha = 0.3)+
+  geom_point()+
+* labs(
+*    title = "Duration of admission among hospitalized COVID-19 patients",
+*    x = "Age (years)",
+*    y = "Duration (days)",
+*    caption = "Fictional COVID-19 data",
+*    color = "Deceased"
+)
+```
+
+]
+
+.pull-right[
+
+```{r , echo = FALSE, eval = TRUE, tidy = FALSE}
+ggplot(data = linelist,
+       mapping = aes(
+         x = age,
+         y = days_hosp,
+         color = died),    
+       alpha = 0.3)+
+  geom_point()+
+  labs(
+    title = "Duration of admission among hospitalized COVID-19 patients",
+    x = "Age (years)",
+    y = "Duration (days)",
+    caption = "Fictional COVID-19 data",
+    color = "Deceased")
+```
+]
+
+
+
+
+---
+# Syntax - theme  
+
+.pull-left[
+
+`theme()` adjusts non-data plot features. Pre-defined themes are easy to add.  
+
+```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
+ggplot(data = linelist,
+       mapping = aes(
+         x = age,
+         y = days_hosp,
+         color = died),    
+       alpha = 0.3)+
+  geom_point()+
+  labs(
+     title = "Duration of admission among hospitalized COVID-19 patients",
+     x = "Age (years)",
+     y = "Duration (days)",
+     caption = "Fictional COVID-19 data",
+     color = "Deceased")+
+* theme_minimal(base_size = 14)
+```
+
+]
+
+.pull-right[
+
+```{r , echo = FALSE, eval = TRUE, tidy = FALSE}
+ggplot(data = linelist,
+       mapping = aes(
+         x = age,
+         y = days_hosp,
+         color = died),    
+       alpha = 0.3)+
+  geom_point()+
+  labs(
+    title = "Duration of admission among hospitalized COVID-19 patients",
+    x = "Age (years)",
+    y = "Duration (days)",
+    caption = "Fictional COVID-19 data",
+    color = "Deceased")+
+  theme_minimal(base_size = 14)
+```
+]
+
+
+
+---
+# Syntax - theme  
+
+.pull-left[
+
+Micro-adjust with `theme()` (micro commands for each small feature)  
+
+See the [complete list](https://ggplot2.tidyverse.org/reference/theme.html)  
+
+```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
+ggplot(data = linelist,
+       mapping = aes(
+         x = age,
+         y = days_hosp,
+         color = died),    
+       alpha = 0.3)+
+  geom_point()+
+  labs(
+     title = "Duration of admission among hospitalized COVID-19 patients",
+     x = "Age (years)",
+     y = "Duration (days)",
+     caption = "Fictional COVID-19 data",
+     color = "Deceased")+
+  theme_minimal()+
+* theme(legend.position = "bottom")
+```
+
+]
+
+.pull-right[
+
+```{r , echo = FALSE, eval = TRUE, tidy = FALSE}
+ggplot(data = linelist,
+       mapping = aes(
+         x = age,
+         y = days_hosp,
+         color = died),    
+       alpha = 0.3)+
+  geom_point()+
+  labs(
+    title = "Duration of admission among hospitalized COVID-19 patients",
+    x = "Age (years)",
+    y = "Duration (days)",
+    caption = "Fictional COVID-19 data",
+    color = "Deceased")+
+  theme_minimal()+
+  theme(legend.position = "bottom")
+```
+]
 
 
 
 
 
+---  
+
+# Labeling  
+
+Aggregate zip codes into number of cases and number of deaths
 
 
+---  
 
-<!-- --- -->
-<!-- # Outline -->
-
-<!-- ```{r, eval=FALSE, echo=TRUE} -->
-<!-- ggplot(data = this_demonstration)+ -->
-<!--   geom_setscene(directory, packages, and data import)+   -->
-<!--   geom_fundamentals(building your plot)+   -->
-<!--   geom_bar(bar charts)+   -->
-<!--   geom_histogram(epidemic curves and demographic pyramids)+   -->
-<!--   geom_points(scatter and density plots)+ -->
-<!--   labs(dynamics plot captions)+ -->
-<!-- ``` -->
-
-
-<!-- We've prioritized topics that might be more complex, leaving simple plots for your reading in the Handbook   -->
-
-
-<!-- --- -->
-<!-- # Outline -->
-
-<!-- ```{r, eval=FALSE, echo=TRUE} -->
-<!-- ggplot(data = this_demonstration)+ -->
-<!--   Setting the scene (directory, packages, and data import)+   -->
-<!--   Fundamentals (building your plot)+   -->
-<!--   Bars (bar and column charts, data structure)+   -->
-<!--   Histograms(epidemic curves and demographic pyramids)+   -->
-<!--   Points(scatter and density plots)+ -->
-<!--   Label tips (dynamics plot captions)+ -->
-<!-- ``` -->
-
-
-<!-- We've prioritized topics that might be more complex, leaving simple plots for your reading in the Handbook   -->
+# Final slide
 
