@@ -204,7 +204,7 @@ We use a *clean* dataset, to focus on visualization techniques.
 
 ```{r echo=FALSE, eval=TRUE}
 #This actually runs but is not displayed
-linelist <- import(here::here("case_study", "data", "linelist_cleaned.rds")) %>%
+linelist <- import(here::here("case_study", "data", "ebola_example_data", "linelist_cleaned.rds")) %>%
 select(case_id, date_onset, outcome, gender, age_years, hospital,
        ht_cm, wt_kg, lon, lat, time_admission, ct_blood, days_onset_hosp)
 
@@ -212,7 +212,7 @@ select(case_id, date_onset, outcome, gender, age_years, hospital,
 ```
 
 ```{r echo=TRUE, eval=FALSE}
-linelist <- import(here::here("data", "linelist_cleaned.rds"))
+linelist <- import(here::here("data", "ebola_example_data", "linelist_cleaned.rds"))
 ```
 
 
