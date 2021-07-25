@@ -278,7 +278,7 @@ linelist <- linelist_raw %>%
     gender       = case_gender,
     zip          = case_zip,
     eth          = case_eth,
-    id           = Contact_id, 
+    Contact_id, 
     date_onset   = sym_startdt_FALSE,
     sym_fever,
     sym_cough,
