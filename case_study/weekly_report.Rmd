@@ -6,7 +6,7 @@ output:
      word_document: 
           keep_md: TRUE
 params: 
-     report_date: 2021-06-30
+     surveillance_date: 2021-06-30
 ---
 
 
@@ -93,11 +93,11 @@ releases their reports (but you can choose any other day of the week too).
 ```{r define_current_week}
 
 # create a date object from the parameter
-report_date <- as.Date(params$report_date)
+surveillance_date <- as.Date(params$surveillance_date)
 
 # create an epiweek object from the date 
 # floor_date rounds to the closest week here
-report_week <- floor_date(report_date,
+surveillance_week <- floor_date(surveillance_date,
                           # round by weeks
                           unit = "week", 
                           # define week to start on Wednesday
@@ -193,8 +193,6 @@ https://epirhandbook.com/cleaning-data-and-core-functions.html#column-names
 
 ```{r clean_colnames}
 
-## TODO: CHECK WHICH COLUMNS WERE DROPPED AND IF USEFUL (n=10)
-
 # create a new object called linelist and assign linelist_raw with renamed columns
 linelist <- linelist_raw %>% 
   # use select() to retain columns and rename them 
@@ -206,16 +204,23 @@ linelist <- linelist_raw %>%
     date_dob            = case_dob_FALSE,              
     age                 = case_age,                    
     gender              = case_gender,
-    zip                 = case_zip,
+    race                = case_race,
     eth                 = case_eth,
+    zip                 = case_zip,
+    county              = case_county,
+    district            = case_district,
+    state               = case_state,
     contact_id          = Contact_id, 
     date_onset          = sym_startdt_FALSE,
     sym_fever,
-    sym_cough,
-    sym_headache,
+    sym_subjfever,
+    sym_myalgia,
     sym_losstastesmell,
     sym_sorethroat,
-    sym_myalgia,
+    sym_cough,
+    sym_headache,
+    sym_resolved,
+    date_recovery       = sym_resolveddt_FALSE, 
     contact_hh          = contact_household,
     hospitalized,  
     date_hospitalized   = hosp_admidt_FALSE,
@@ -223,10 +228,12 @@ linelist <- linelist_raw %>%
     died,  
     died_covid,  
     date_died           = died_dt_FALSE,
+    confirmed_case, 
+    covid_dx, 
+    date_positive       = pos_sampledt_FALSE,
     lat                 = latitude_JITT,
     lon                 = longitude_JITT
     )
-
 
 ```
 
@@ -262,10 +269,10 @@ linelist <- linelist %>%
     .fns  = ~replace(.x, .x < as.Date("2020-01-01"), NA)
     )) %>% 
 
-  # remove dates after today from all date columns
+  # remove dates after the surveillance_date (for this report) from all date columns
   mutate(across(
     .cols = contains("date"),
-    .fns  =  ~replace(.x, .x > Sys.Date(), NA)
+    .fns  =  ~replace(.x, .x > surveillance_date, NA)
     )) %>%
      
   # create an epiweek object from the report date 
@@ -342,6 +349,7 @@ linelist <- linelist %>%
 
 ```
 
+
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 /// clean_categories \\\
 --------------------------------------------------------------------------------
@@ -351,39 +359,96 @@ the age_categories() function from {epikit}. It is also possible to create
 age groups using the {dplyr} case_when() function - but is more involved. 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
-
 ```{r clean_categories}
 
-## CHECK ALL THE STUFF THAT NEEDS FIXING 
-
-for (i in names(linelist)) {
-    print(i)
-    print(table(linelist[[i]]))}
-   
+linelist <- linelist %>% 
      
-     
-      # create age group variable
-    age_group = age_categories(age,
+     # create age group variable
+     mutate(
+     age_group = age_categories(age,
       # define break points
       c(0, 10, 20, 30, 40, 50, 60, 70),
       # whether last break should be highest category
       ceiling = FALSE
-    )
+     )) %>% 
+     
+     # replace one category and leave the rest as they are 
+     mutate(died_covid = if_else(died_covid == "Under Review", 
+                                 "Unknown", died_covid), 
+            confirmed_case = if_else(confirmed_case == "Pending", 
+                                     "Unknown", confirmed_case), 
+            sym_myalgia = if_else(sym_myalgia == "YES", "Yes", sym_myalgia)
+            ) %>% 
+     
+     #replace one category and leave rest over multiple variables 
+     mutate(across(c(contact_hh, contains("sym_")),
+                   ~if_else(.x == "Unk", "Unknown", .x) 
+                   )) %>% 
+
+     # create a composite category from race and ethnicitiy  
+          #  (nb. this sets those that are non-specified in eth to non-hispanic)
+     mutate(eth_race = case_when(
+          eth == "HISPANIC/LATINO"                            ~ "Hispanic, all races", 
+          race == "ASIAN" & 
+               eth != "HISPANIC/LATINO"                       ~ "Asian, NH", 
+          race == "BLACK" & 
+               eth != "HISPANIC/LATINO"                       ~ "Black, NH",
+          race == "WHITE" & 
+               eth != "HISPANIC/LATINO"                       ~ "White, NH",
+          race == "AMERICAN INDIAN/ALASKA NATIVE" |
+               race == "NATIVE HAWAIIAN/PACIFIC ISLANDER" |
+               race == "OTHER" & 
+               eth != "HISPANIC/LATINO"                       ~ "Other, NH", 
+          TRUE                                                ~ "Unknown"
+     )) %>% 
+     
+     # change from upper-case to lower case (with leading capital)
+     mutate(across(c(county, state), str_to_title)) %>% 
+     
+     # remove text from a string (everything after the dash)  
+     mutate(contact_id = str_remove(linelist$contact_id, "-.*")) %>% 
+     
+     # recode with searching for string patterns 
+     mutate(sym_resolved = case_when(
+          str_detect(sym_resolved, "Yes")     ~ "Yes", 
+          str_detect(sym_resolved, "No")      ~ "No", 
+          str_detect(sym_resolved, "Unknown") ~ "Unknown", 
+          TRUE                                ~ "Unknown"
+     )) %>% 
+     
+     
+     # create a factor 
+     mutate(zip = as_factor(zip)) %>% 
+     
   
-  # convert column classes
-              # convert class
-  mutate(zip = as_factor(zip)) %>% 
-
-
-  # clean died column
-  mutate(
-    died = fct_explicit_na(died, na_level = "Unknown"),
-    died = fct_relevel(died, "Yes", "No", "Unknown")
-    )
-  
-
+     # replace missing with "Unknown" where relevant 
+     mutate(across(.cols = c(gender, race, eth, zip, 
+                             county, contact_id, contact_hh, 
+                             hospitalized, died, died_covid, confirmed_case,
+                             contains("sym_")),
+          ~fct_explicit_na(.x, na_level = "Unknown"))) %>% 
+    
+     # set levels of a factor (define order)
+     mutate(gender      = fct_relevel(gender, "Female", "Male", "Unknown"), 
+            eth_race    = fct_relevel(eth_race, 
+                                   "Asian, NH", "Black, NH", "White, NH", 
+                                   "Hispanic, all races", "Other, NH", "Unknown")
+         ) %>% 
+     
+     # set levels of all factors that are yes/no/unknown 
+     mutate(across(
+          c(contact_id, contact_hh, hospitalized, died, died_covid, confirmed_case, 
+            contains("sym_")), 
+          ~fct_relevel(.x, "Yes", "No", "Unknown")
+          ))
 ```
 
+
+```{r vector_vars}
+
+## define a list of variables for looping over 
+
+```
 
 
 ```{r duplicated}
