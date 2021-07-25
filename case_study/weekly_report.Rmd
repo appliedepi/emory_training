@@ -15,16 +15,20 @@ params:
 This is a an example R-markdown script which demonstrates how to create an 
 automated outbreak situation report for COVID-19 in Fulton county, USA.  
 
-- We demonstrate how to import, clean and analyse your data. 
-- Analysis is organised by time, place and person. 
-- Text within <! > will not show in your final document. 
+- We demonstrate how to import, clean and analyse your data.  
+- Analysis is organised by time, place and person.  
+     - For the purpose of the case study we separate this by descriptive analysis
+     and visualisation (normally this would be mixed together of course)  
+     - Analysis is loosely based off the monthly [epidemiology reports](https://www.fultoncountyga.gov/covid-19/epidemiology-reports) 
+     for Fulton county  
+- Text within <! > will not show in your final document.  
      - The other parts such as slashes (///), dashes (-) and tildes (~) are just aesthetic
-     - These comments are used to explain the code chunks. 
-     - We refer to functions in curly brackets, e.g. {dplyr} and functions end in brackets, e.g. count()
-     - This comment will not show up when you knit the document. 
-     - You can delete them if you want.
-- Feedback & suggestions are welcome at the [GitHub issues page](https://github.com/appliedepi/emory_training/issues)
-     - Alternatively email us at: [epirhandbook@gmail.com](mailto:epiRhandbook@gmail.com)
+     - These comments are used to explain the code chunks.   
+     - We refer to functions in curly brackets, e.g. {dplyr} and functions end in brackets, e.g. count()  
+     - This comment will not show up when you knit the document.  
+     - You can delete them if you want.  
+- Feedback & suggestions are welcome at the [GitHub issues page](https://github.com/appliedepi/emory_training/issues)  
+     - Alternatively email us at: [epirhandbook@gmail.com](mailto:epiRhandbook@gmail.com)  
 
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -357,6 +361,10 @@ linelist <- linelist %>%
 create age groups based on the age variable using 
 the age_categories() function from {epikit}. It is also possible to create 
 age groups using the {dplyr} case_when() function - but is more involved. 
+
+For more details see: 
+https://epirhandbook.com/cleaning-data-and-core-functions.html#column-creation-and-transformation
+https://epirhandbook.com/cleaning-data-and-core-functions.html#re-code-values
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
 ```{r clean_categories}
@@ -444,26 +452,86 @@ linelist <- linelist %>%
 ```
 
 
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/// vector_vars \\\
+--------------------------------------------------------------------------------
+
+Here we are going to store a list of variable names that we can then use for 
+iterating later on rather than typing them out each time. 
+In this example we are going to take all the symptom variables and store them in 
+a vector. 
+It is also possible to simply type these out with quotation marks within a c(...)
+argument (but this way we can minimise typos). 
+For more details see: 
+https://epirhandbook.com/iteration-loops-and-lists.html
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
 ```{r vector_vars}
 
-## define a list of variables for looping over 
+# define a list of variables for looping over later
+symptom_vars <- linelist %>% 
+     # choose all columns that contain "sym_" in the name but exclude "sym_resolved"
+     select(c(contains("sym_"), -sym_resolved)) %>% 
+     # pull the names out 
+     names()
 
 ```
 
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/// duplicated \\\
+--------------------------------------------------------------------------------
+
+Here we remove the duplicates based on having the same pid, gender and date of 
+birth. 
+Note that this might exclude those which are legitimately reported twice - i.e. 
+those who recovered and were reinfected. To deal with these you could create a 
+composite variable of the identifiers of interest, flag the duplicates there and 
+then add an additional argument for having a report date within six months. 
+
+For more details see: 
+https://epirhandbook.com/de-duplication.html 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
 ```{r duplicated}
 
-# use PID gender and dob 
+# get a list of all the duplicates 
+     # this is mostly to inspect manually but can be used for analysing those dropped
+duplicates <- linelist %>% 
+     get_dupes(pid, gender, date_dob)
+
+linelist <- linelist %>% 
+  ## find duplicates based on unique ID, gender and date of birth and age group 
+  ## only keep the first occurrence 
+  distinct(pid, gender, date_dob, .keep_all = TRUE)
 
 ```
+
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/// filter \\\
+--------------------------------------------------------------------------------
+
+Here we are going to filter our data set to only keep relevant cases for analysis. 
+We keep those that are reported before our surveillance cut-off date and those 
+that are entered as a confirmed case. 
+For more details on filtering see: 
+https://epirhandbook.com/cleaning-data-and-core-functions.html#filter-rows
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
 ```{r filter}
 
-# filter(confirmed_case == "Yes")
-# current week 
+# get those which do not meat our filter criteria 
+dropped <- linelist %>% 
+     filter(confirmed_case != "Yes" | 
+                 date_report > surveillance_date & 
+                 !is.na(date_report))
+
+
+# drop the cases that dont meet the criteria 
+linelist <- linelist %>% 
+     filter(confirmed_case == "Yes" & date_report <= surveillance_date)
 ```
-
-
 
 
 
