@@ -23,14 +23,14 @@ knitr::opts_chunk$set(
 
 **WORK IN PROGRESS**
 
-This is the GitHub repository for the [**Applied Epi** online seminar](https://appliedepi.github.io/emory_training) delivered 
+This is the GitHub repository for the [**Applied Epi** online seminars](https://appliedepi.github.io/emory_training) delivered 
 to the [Emory COVID-19 Response Collaborative](https://emorycovidcollaborative.org/) 
 in August 2021. 
 
 This repo contains all of the materials used for the course which includes: 
 
 -   [Timetable](https://appliedepi.github.io/emory_training/timetable/timetable.pdf)
--   [Data workflow presentation slides](https://appliedepi.github.io/emory_training/presentation/slides.html)
+-   [Data workflow presentation slides](https://appliedepi.github.io/emory_training/presentation/slides_workflow.html)
 -   [Data visualization presentation slides](https://appliedepi.github.io/emory_training/presentation/slides_ggplot.html)
 -   [Case study data and scripts (download zip)](https://minhaskamal.github.io/DownGit/#/home?url=https://github.com/appliedepi/emory_training/tree/master/case_study)
 -   [R markdown for presentations](https://github.com/appliedepi/emory_training/blob/master/presentation)

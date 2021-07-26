@@ -13,7 +13,7 @@
 **WORK IN PROGRESS**
 
 This is the GitHub repository for the [**Applied Epi** online
-seminar](https://appliedepi.github.io/emory_training) delivered to the
+seminars](https://appliedepi.github.io/emory_training) delivered to the
 [Emory COVID-19 Response
 Collaborative](https://emorycovidcollaborative.org/) in August 2021.
 
@@ -22,7 +22,7 @@ includes:
 
 -   [Timetable](https://appliedepi.github.io/emory_training/timetable/timetable.pdf)
 -   [Data workflow presentation
-    slides](https://appliedepi.github.io/emory_training/presentation/slides.html)
+    slides](https://appliedepi.github.io/emory_training/presentation/slides_workflow.html)
 -   [Data visualization presentation
     slides](https://appliedepi.github.io/emory_training/presentation/slides_ggplot.html)
 -   [Case study data and scripts (download
