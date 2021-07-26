@@ -18,6 +18,8 @@ output:
 # You need to run this line once, for the slides to render 
 # icons::download_fontawesome()
 
+# Use this command to run preview-mode in RStudio. Save Rmd to update slide preview
+# xaringan::inf_mr()
 ```
 
 
@@ -110,25 +112,33 @@ style_mono_accent(
 ```
 
 
-# About us  
-
-## R support for applied epis  
+# We are Applied Epi  
 
 ![](https://github.com/appliedepi/epiRhandbook_eng/raw/master/images/Epi%20R%20Handbook%20Banner%20Beige%201500x500.png)
 
 * We are a grassroots collaborative of applied epidemiologists  
-* The (free) Epi R Handbook has been used by 40,000 people worldwide
+* Our (free) **Epi R Handbook** has been used by 40,000 people worldwide
 * Now we offer customized training to health departments and NGOs  
 
 
-*Bookmark www.epiRhandbook.com*  
+.footnote[Bookmark [www.epiRhandbook.com](www.epirhandbook.com)!]  
 
 
 ???
 - What makes us different is that we focus on the challenges of applied epi, not academic epi. We emphasize the skills used every day by ground-level epidemiologists. 
 
 
+---
+# Introducing ourselves  
 
+* Neale Batra  
+ - Founder of Epi R Handbook. Previously @ Philly and Santa Clara County health departments. Currently working for WHO Geneva (COVID-19 analytics team)  
+* Alex Spina  
+ - Alum of EPIET (European EIS). MSF Epi. WHO AFRO. Med Student. 
+* Mathilde Mousset  
+ - Epicentre (MSF). Ecology. 
+
+(PHOTOS AND BIOS)  
 
 
 ---
@@ -176,7 +186,9 @@ Today we focus on **ggplot2** because:
 * Is accompanied by many packages that expand functionality  
 * Has well-structured grammar = consistency  
 
-Other plotting options include **base** R, **lattice**, and **plotly**  
+Other plotting options include [**base** R](https://towardsdatascience.com/base-plotting-in-r-eb365da06b22), [**lattice**](https://www.statmethods.net/advgraphs/trellis.html), and [**plotly**](https://plotly.com/r/).  
+
+
 
 
 
@@ -193,11 +205,20 @@ Other plotting options include **base** R, **lattice**, and **plotly**
 Our R work is conducted within a dedicated directory that contains:  
 
 * An R project (optional but advised)  
-* Rmarkdown script(s)  
+* R markdown scripts  
 * A data folder  
 
-```{r, echo = F}
-fs::dir_tree(path = here::here("case_study"), recurse = TRUE)
+* R project (`case_study.Rproj`)  
+  * `data/` folder  
+    * `covid_example_data/` folder
+      * `covid_example_data.xlsx`  
+      * `covid_shapefile/` folder  
+        - `FultonCountryZipCode.shp`...
+  * `scripts/` folder  
+    * `ggplot_demo.Rmd`
+
+```{r, echo = F, eval=F}
+fs::dir_tree(path = here::here("case_study", "data", "covid_example_data"), recurse = TRUE)
 ```
 
 
@@ -237,13 +258,11 @@ The **tidyverse** also includes these packages:
 
 ---
 
-class: remark-code
-
 # Import data
 
 We use a *clean* dataset, to focus on visualization techniques.  
 
-* Use `import()` from **rio** to import an RDS file  
+* Use `import()` from **rio** to import a file  
 * Use `here()` from **here** to locate the file relative to the R project root
 
 ```{r echo=FALSE, eval=TRUE}
@@ -265,9 +284,9 @@ class: remark-code
 
 # Clean data  
 
-Below is the code we use to clean the data. We will not linger here today, but it is available for you to review later.  
+See the [RMD FROM PREVIOUS SESSION] for all the cleaning code. We will not linger on this today in the interest of time.    
 
-```{r, echo=T}
+```{r, echo=F}
 linelist <- linelist_raw %>% 
   filter(confirmed_case == "Yes") %>% 
   
@@ -278,6 +297,7 @@ linelist <- linelist_raw %>%
     gender       = case_gender,
     zip          = case_zip,
     eth          = case_eth,
+    race         = case_race,
     Contact_id, 
     date_onset   = sym_startdt_FALSE,
     sym_fever,
@@ -332,7 +352,28 @@ linelist <- linelist_raw %>%
     days_hosp = as.numeric(date_outcome - date_hospitalized),
     days_hosp = replace(days_hosp, days_hosp < 0, NA),
     days_hosp = replace(days_hosp, days_hosp > 60, NA)
-    )
+    ) %>% 
+  
+  mutate(eth_race = case_when(
+          eth == "HISPANIC/LATINO"                            ~ "Hispanic, all races", 
+          race == "ASIAN" & 
+               eth != "HISPANIC/LATINO"                       ~ "Asian, NH", 
+          race == "BLACK" & 
+               eth != "HISPANIC/LATINO"                       ~ "Black, NH",
+          race == "WHITE" & 
+               eth != "HISPANIC/LATINO"                       ~ "White, NH",
+          race == "AMERICAN INDIAN/ALASKA NATIVE" |
+               race == "NATIVE HAWAIIAN/PACIFIC ISLANDER" |
+               race == "OTHER" & 
+               eth != "HISPANIC/LATINO"                       ~ "Other, NH", 
+          TRUE                                                ~ "Unknown"
+     )) %>% 
+  # set levels of a factor (define order)
+     mutate(gender      = fct_relevel(gender, "Female", "Male", "Unknown"), 
+            eth_race    = fct_relevel(eth_race, 
+                                   "Asian, NH", "Black, NH", "White, NH", 
+                                   "Hispanic, all races", "Other, NH", "Unknown")
+         )
 
 ```
 
@@ -442,19 +483,39 @@ Question: What does the "gg” in these names represent?
 ---
 # Syntax overview  
 
-* “Add” plot layers and design elements on top of one another  
-* Build a multi-layer plot object that can be saved, modified, printed, exported...  
+Build a plot object by “adding” commands that specify plot layers and design elements on top of one another  
+ 
 
---  
+--
 
 Order of layers will usually look like this:
 
-1) The baseline `ggplot()` command “opens” the plot- typically the dataset is specified here  
-2) Add “geom” layers that visualize data geometrically as shapes  
-3) Add design elements such as axis labels, title, fonts, sizes, color schemes, legends, or axes rotation  
+1) "Open" the plot with the `ggplot()` command and specify the dataset  
+
+--
+
+2) Add (`+`) “geom” layers that visualize data geometrically as shapes  
+
+--
+
+3) "Map" data columns to features of the plot such as axes, color, size, shape, fill, transparency  
 
 
-A simple example follows. We will explain each component.
+--
+
+4) Modify relevant "scales", such as a color scale  
+
+--
+
+5) Add "theme" design elements such as axis labels, title, fonts, sizes, color schemes, legends, or axes rotation  
+
+--
+
+All these layers are "added" sequentially with a `+` symbol  
+
+
+
+
 
 
 
@@ -464,13 +525,13 @@ A simple example follows. We will explain each component.
 .pull-left[
 
 `ggplot()` creates an empty canvas.  
-Assign the data frame `linelist`.  
+Assign the data frame to use.  
 
 ```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
 ggplot(data = linelist)                   
 ```
 
-Or alternatively use the `%>%` pipe operator to "pipe" the data frame *into* `ggplot()`  
+Alternatively, use the `%>%` pipe operator to "pipe" a data frame *into* `ggplot()`  
 
 ```{r , echo = TRUE, eval = FALSE, tidy = FALSE}
 linelist %>%
@@ -487,52 +548,22 @@ ggplot(data = linelist)
 ] 
 
 ???
-As you can see, this is only a blank canvas, we have not defined what should be in the x and y axes, nor linked any data to be plot. It's an empty page waiting for you. This does not produce visible changes, but ggplot will now look for columns within the *linelist* dataframe.
-Notes: if several data frames are needed, they can be added in their own *geoms* (example later).
+This is only a blank canvas, we have not defined what should be in the x and y axes. 
+If several data frames are needed, they can be added in their own geoms.
+Piping is useful to make one-time changes to a dataset prior to plotting.  
 
 
 
 
 
 ---
-# Syntax - Map columns to axes  
-
-.pull-left[
-
-Map the `x` and `y` axes to columns in the data
-
-```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
-ggplot(data = linelist,
-*       mapping = aes(
-*         x = age,
-*         y = days_hosp)
-)
-```
-
-]
-
-.pull-right[
-
-```{r , echo = FALSE, eval = TRUE, tidy = FALSE}
-ggplot(data = linelist,
-       mapping = aes(
-         x = age,
-         y = days_hosp))
-```
-] 
-
-
-
-
----
-# Geoms  
-
+# Geometries  
 
 .pull-left[
 
 Data are visualized using "geom" commands, such as `geom_point()`.  
 
-Many classical “geoms”, including:  
+Some classical “geoms” include:  
 
 Geometry        |Geom                
 ----------------|--------------------
@@ -597,7 +628,7 @@ density <- ggplot(
 
   
 lines <- linelist %>% 
-  group_by(eth,
+  group_by(eth_race,
            week_report = lubridate::floor_date(date_report, "week")) %>% 
   summarise(n_cases = n()) %>% 
   drop_na(week_report) %>% 
@@ -605,7 +636,7 @@ lines <- linelist %>%
     mapping = aes(
       x = week_report,       
       y = n_cases,
-      color = eth),
+      color = eth_race),
     size = 4
     )+
   geom_line()+
@@ -665,20 +696,55 @@ cowplot::plot_grid(top, lines, ncol = 1)
 
 
 
-
 ---
-# Syntax - "geoms"  
+# Plot aesthetics  
 
 .pull-left[
 
-Add a `geom_point()` command to display the data as points
+What else is missing from this command to create a scatter plot (points)?  
 
-```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
-ggplot(data = linelist,
-       mapping = aes(
-         x = age,
-         y = onset_hosp))
+```{r, eval=F, echo=T}
+ggplot(data = linelist)+
+  geom_point()
 ```
+
+**What columns should be used for axes?**  
+
+**How should the points be colored, shaped, etc?**  
+
+These are the plot's "aesthetics"  
+
+]
+
+.pull-right[
+
+```{r , echo = FALSE, eval = TRUE, tidy = FALSE}
+ggplot(data = linelist)
+```
+
+]
+
+
+
+---
+# Mapping aesthetics with `aes()`  
+
+.pull-left[
+
+`mapping = aes()` is a `ggplot()` argument that assigns columns to plot "aesthetics" - features *whose display could vary for each data point* (position, color, shape...)  
+
+It is unique in that its inputs must be placed within `aes()`.  
+
+Two basic aesthetic mappings are the axes: `x=` and `y=`.  
+
+```{r, eval=F, echo=T}
+ggplot(
+  data = linelist,
+  mapping = aes(x = age, y = days_hosp)
+  )
+```
+
+
 
 ]
 
@@ -693,42 +759,42 @@ ggplot(data = linelist,
 ] 
 
 
-
-
-
-
-
-
-
-
 ---
-# Syntax - "geoms"  
+# A quick note on indentations  
 
-.pull-left[
+Indentations, spaces, and newlines do not impact code execution, and can be varied to improve readability.  
 
-Add (`+`) a `geom_point()` command to display the data as points
+```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
+ggplot(data = linelist, mapping = aes(x = age, y = days_hosp))+
+  geom_point()
+```
+
+is the same as:  
 
 ```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
 ggplot(data = linelist,
-       mapping = aes(
-         x = age,
-         y = onset_hosp))+
-*  geom_point()
-```
-
-]
-
-.pull-right[
-
-
-```{r , echo = FALSE, eval = TRUE, tidy = FALSE}
-ggplot(data = linelist,
-       mapping = aes(
-         x = age,
-         y = days_hosp))+
+       mapping = aes(x = age, y = days_hosp))+
   geom_point()
 ```
-] 
+
+is the same as:  
+
+```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
+ggplot(
+  data = linelist,        # use case linelist
+  mapping = aes(          # make aesthetic mappings for all geoms
+    x = age,              # assign x-axis to age column
+    y = days_hosp))+      # assign y-axis to duration of hospitalization
+geom_point()              # display data as points
+```
+
+
+
+???
+- Explain why you might use one or the other 
+long style can enable informative comments/annotations  
+
+
 
 
 
@@ -738,10 +804,10 @@ ggplot(data = linelist,
 
 
 ---
-# Syntax - mapping placement  
+# Aesthetic mapping placement  
 
-* If mappings are written in `ggplot()` they apply to all geoms (e.g. axes).  
-* If mappings are written within a geom, they apply only to it.  
+* Mappings written in `ggplot()` apply to all geoms (e.g. axes)  
+* Mappings written within one geom apply only to it  
 
 ```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
 ggplot(                     # open the plot 
@@ -773,19 +839,33 @@ ggplot(data = linelist)+    # open plot and set dataset
 
 
 
----
-# Syntax - Indentations  
 
-Indentations, spaces, and newlines do not matter for code execution, and can improve readability.  
+
+---
+# Overplotting  
+
+.pull-left[
+
+With axes now mapped, the `geom_point()` displays the data as points
 
 ```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
-ggplot(data = linelist, mapping = aes(x = age, y = days_hosp))+
-  geom_point()
+ggplot(data = linelist,
+       mapping = aes(
+         x = age,
+         y = onset_hosp))+
+*  geom_point()
 ```
 
-is the same as:  
+This plot is difficult to interpret because points may be overlapping.  
 
-```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
+*tip: try `geom_jitter()` to slightly offset all points*  
+
+]
+
+.pull-right[
+
+
+```{r , echo = FALSE, eval = TRUE, tidy = FALSE}
 ggplot(data = linelist,
        mapping = aes(
          x = age,
@@ -793,21 +873,18 @@ ggplot(data = linelist,
   geom_point()
 ```
 
-is the same as:  
-
-```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
-ggplot(
-  data = linelist,
-  mapping = aes(
-    x = age,
-    y = days_hosp))+
-  geom_point()
-```
+] 
 
 
 
-???
-- Explain why you might use one or the other  
+
+
+
+
+
+
+
+
 
 
 
@@ -816,11 +893,11 @@ ggplot(
 
 
 ---
-# Syntax overview  
+# Adding geoms  
 
 .pull-left[
 
-Add additional geoms with `+`
+Additional geoms can be added on top  
 
 ```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
 ggplot(data = linelist,
@@ -830,6 +907,8 @@ ggplot(data = linelist,
   geom_point()+
 * geom_smooth()
 ```
+
+`geom_smooth()` gives smoothed conditional means, helping to show trends in presence of "over-plotting" (see [documentation](https://ggplot2.tidyverse.org/reference/geom_smooth.html)).  
 
 ]
 
@@ -858,12 +937,12 @@ ggplot(
 
 class: medium-large-table
 
-# Syntax - other aesthetics  
+# Other aesthetics  
 
 
 
 .pull-left[
-Aside from axes, other common "aesthetics" to specify include: 
+Aside from axes, other common "aesthetics" include: 
 
 Geometry        |Geom                
 ----------------|--------------------
@@ -881,7 +960,7 @@ Geometry        |Geom
 
 
 .pull-right[
-
+Some examples: 
 ```{r, message=F, warning=F}
 
 shape_3 <- ggplot(data = linelist, aes(x = age, y = days_hosp))+
@@ -933,8 +1012,11 @@ cowplot::plot_grid(shape_3, shape_died,
 
 
 
-??? 
-- In ggplot terminology a plot “aesthetic” has a specific meaning. It refers to a visual property of plotted data. Note that “aesthetic” here refers to the data being plotted in geoms/shapes - not the surrounding display such as titles, axis labels, background color, that you might associate with the word “aesthetics” in common English. In ggplot those details are called “themes” and are adjusted within a theme() command
+???
+
+Note that “aesthetic” in ggplot has a specific meaning that you might associate with the word “aesthetics” in common English. In ggplot those details are called “themes” and are adjusted within a theme() command
+
+Each geom accepts certain aesthetics, like `binwidth=` for `geom_histogram()`
 
 
 
@@ -948,7 +1030,7 @@ cowplot::plot_grid(shape_3, shape_died,
 
 class: medium-text
 
-# Syntax - other aesthetics  
+# Other aesthetics  
 
 
 
@@ -956,24 +1038,29 @@ class: medium-text
 
 These aesthetics can be assigned to either:  
 
-* Static values (`alpha = 0.3`)  
-  - Assign *outside* a `mapping = aes()`  
-* A data column (`aes(fill = died)`)  
-  - Assign *inside* a `mapping = aes()`  
+* **Static values** (`color = "yellow"`)  
+  - Assigned *outside* `aes()`  
+* **A data column** (`aes(fill = died)`)  
+  - Assigned *inside* `aes()`
+  - Displays data as "groups"  
+  
 
-If together, a command might look like:  
+For example, below, point shape will vary by outcome (the value in column `died`), but every point is colored yellow.   
 
-```{r, echo=F, eval=F}
-ggplot(data = linelist)+
-  geom_point(aes(x = age, y = days_hosp, shape = died), color = "yellow")
+```{r, eval=F, echo=T}
+ggplot(data = linelist,
+       mapping = aes(x = age, y = days_hosp))+
+  geom_point(
+    mapping = aes(shape = died),
+    color = "yellow")
 ```
-
-This later option creates "groups" in the display of the data.  
 
 ]
 
 
 .pull-right[
+
+Some examples:  
 
 ```{r, message=F, warning=F}
 
@@ -1031,32 +1118,38 @@ cowplot::plot_grid(shape_3, shape_died,
 
 
 ---
-# Syntax - other aesthetics  
+# Static aesthetics  
 
 .pull-left[
 
-Define an aesthetic value as *static* (applying to all data points) by writing it within the geom but outside the `aes()`  
+An aesthetic is *static*, applying to all data points, if it is assigned to a number or character value and written *outside* `aes()`  
 
 ```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
 ggplot(data = linelist,
        mapping = aes(
          x = age,
-         y = days_hosp),
-*      color = "seagreen")+ # outside aes()
-  geom_point()
+         y = days_hosp))+ 
+*geom_point(color = "seagreen")
 ```
+
+*Note the indentation and parentheses*  
+
+Other examples:  
+`size = 3`
+`transparency = 0.5`  
+`width = 1.2`  
 
 ]
 
 .pull-right[
 
 ```{r , echo = FALSE, eval = TRUE, tidy = FALSE}
-ggplot(data = linelist,
-       mapping = aes(
-         x = age,
-         y = days_hosp))+
-  geom_point(color = "seagreen")
-
+ggplot(
+  data = linelist,
+  mapping = aes(
+     x = age,
+     y = days_hosp))+
+geom_point(color = "seagreen")
 ```
 ] 
 
@@ -1066,19 +1159,20 @@ ggplot(data = linelist,
 
 
 ---
-# Syntax - other aesthetics   
+# Dynamic aesthetics   
 
 .pull-left[
 
-Define an aesthetic value as *dynamic* (varying for each data point) by writing it within the geom *and within the `aes()`  
+An aesthetic is *dynamic*, varying for each data point, if it assigned to a *column name* and written *inside* `aes()`    
 
 ```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
-ggplot(data = linelist,
-       mapping = aes(
-         x = age,
-         y = days_hosp,
-*        color = died))+   # inside aes() for dynamic
-  geom_point()
+ggplot(
+  data = linelist,
+  mapping = aes(
+    x = age,
+    y = days_hosp))+   
+geom_point(
+* mapping = aes(color = died))
 ```
 
 ]
@@ -1086,12 +1180,13 @@ ggplot(data = linelist,
 .pull-right[
 
 ```{r , echo = FALSE, eval = TRUE, tidy = FALSE}
-ggplot(data = linelist,
-       mapping = aes(
-         x = age,
-         y = days_hosp,
-         color = died))+   # inside aes() for dynamic
-  geom_point()
+ggplot(
+  data = linelist,
+  mapping = aes(
+    x = age,
+    y = days_hosp))+   
+geom_point(
+  mapping = aes(color = died))
 ```
 ]
 
@@ -1100,31 +1195,20 @@ ggplot(data = linelist,
 
 
 ---
-# Syntax - other aesthetics  
+# Multiple aesthetics - example  
 
 .pull-left[
 
-Another example: 
-
-* `color` is set to vary by the value in column `died`  
-* `alpha` (transparency) is set at 30% for all points  
-
-```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
-ggplot(data = linelist,
-       mapping = aes(
-         x = age,
-         y = days_hosp,
-         color = died),    # inside aes() for dynamic
-*      alpha = 0.3)+       # outside aes() for static
-  geom_point() 
-
-```
-
-Written a different (equivalent) way:  
+Both static and dynamic aesthetics: 
 
 ```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
 ggplot(data = linelist)+
-  geom_point(mapping = aes(x = age, y = days_hosp, color = died), alpha = 0.3)
+  geom_point(
+    mapping = aes(
+      x = age,
+      y = days_hosp,
+*     color = died),  # color varies by outcome
+*   size = 3)         # all points 3x size
 ```
 
 
@@ -1138,34 +1222,174 @@ ggplot(data = linelist,
          x = age,
          y = days_hosp,
          color = died),    
-       alpha = 0.3)+
+       size = 3)+
   geom_point()        
 ```
 ]
 
+???
+
+As there is only one geom, all aesthetics can be writtein `ggplot()`, or in `geom_point()`
+
 
 
 ---
-# Syntax - labels  
+# Scales - overview  
+
+Scale commands control *how* the aesthetic mapping manifests, for example:  
+* *Which* colors or shapes show for certain values    
+* The min/max of point sizes  
+* The min/max and frequency of axes breaks  
+
+To replace the defaults, add a `scale_` command. As a generic formula, these commands are written as `scale_AESTHETIC_METHOD()`.  
+
+1) `scale_` - this prefix never changes  
+2) Aesthetics like: `_fill_`, `_color_`, `_x_`,`_y_`, etc.  
+3) Methods like: `_continuous()`, `_discrete()`, `_manual()`, `_date()` etc.
+
+Inside the command, give arguments such as `breaks=`, `values=`, or `labels=` (there are many possibilities).  
+
+
+---
+# Scales examples  
+
+Some examples of scale commands:  
+
+You want to adjust  |Scale command
+--------------------|-------------------
+continuous y-axis   |`scale_y_continuous()`
+date x-axis         |`scale_x_date()`  
+categorical x-axis  |`scale_x_discrete()`  
+fill, continuous    |`scale_fill_continuous()`
+fill, continuous    |`scale_fill_gradient()`  
+color, manual assign|`scale_color_manual()`  
+
+
+
+
+---
+# Scales - default 
 
 .pull-left[
 
-Add labels for title, axes, and legend  
+Here, the fill of a bar plot uses the default colors and y-axis breaks:  
+
+```{r, eval=F, echo=T}
+ggplot(linelist)+
+  geom_bar(aes(x = eth_race, fill = died))
+```
+
+]
+
+.pull-right[
+
+```{r, eval=T, echo=F}
+ggplot(linelist)+
+  geom_bar(aes(x = eth_race, fill = died))
+```
+
+]
+
+
+
+---
+# Scales - adjusted fill 
+
+.pull-left[
+
+First, in a `scale_fill_manual()` we list the color assignments in a vector (within `c()`).   
+
+```{r, eval=F, echo=T}
+ggplot(linelist)+
+geom_bar(aes(x = eth_race, fill = died))+
+*scale_fill_manual(        
+*  values = c("Yes"    = "violetred", 
+*             "No"     = "aquamarine",
+*            "Unknown" = "grey"))
+  #na.value = "grey"  # for missing values, if applicable
+```
+
+
+]
+
+.pull-right[
+
+```{r, eval=T, echo=F}
+ggplot(linelist)+
+geom_bar(aes(x = eth_race, fill = died))+
+scale_fill_manual(        
+  values = c("Yes" = "violetred", 
+             "No" = "aquamarine",
+            "Unknown" = "grey"))
+```
+]
+
+
+
+
+---
+# Scales - adjusted y-axis 
+
+.pull-left[
+
+Then, in `scale_y_continuous()` we adjust the y-axis breaks using `seq()` to define a numeric sequence.   
+
+```{r, eval=F, echo=T}
+ggplot(linelist)+
+geom_bar(aes(x = eth_race, fill = died))+
+scale_fill_manual(        
+  values = c("Yes"    = "violetred", 
+             "No"     = "aquamarine",
+            "Unknown" = "grey"))+
+*scale_y_continuous(
+*  breaks = seq(from = 0,
+*               to = 35000,
+*               by = 5000))
+```
+
+
+]
+
+.pull-right[
+
+```{r}
+ggplot(linelist)+
+geom_bar(aes(x = eth_race, fill = died))+
+scale_fill_manual(        
+  values = c("Yes" = "violetred", 
+             "No" = "aquamarine",
+            "Unknown" = "grey"))+
+scale_y_continuous(
+  breaks = seq(from = 0,
+               to = 35000,
+               by = 5000))
+```
+
+]
+
+
+
+---
+# Labels  
+
+.pull-left[
+
+Use `lab()` to add title, subtitle, caption, axes labels, and to edit legend title  
 
 ```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
-ggplot(data = linelist,
-       mapping = aes(
-         x = age,
-         y = days_hosp,
-         color = died),    
-       alpha = 0.3)+
-  geom_point()+
-* labs(
-*    title = "Duration of admission among hospitalized COVID-19 patients",
-*    x = "Age (years)",
-*    y = "Duration (days)",
-*    caption = "Fictional COVID-19 data",
-*    color = "Deceased"
+ggplot(data = linelist)+
+geom_point(
+  mapping = aes(
+    x = age,
+    y = days_hosp,
+    color = died),    
+  alpha = 0.3)+
+*labs(
+*  title = "Duration of admission among hospitalized COVID-19 patients",
+*  x = "Age (years)",
+*  y = "Duration (days)",
+*  caption = "Fictional COVID-19 data",
+*  color = "Deceased"
 )
 ```
 
@@ -1174,31 +1398,65 @@ ggplot(data = linelist,
 .pull-right[
 
 ```{r , echo = FALSE, eval = TRUE, tidy = FALSE}
-ggplot(data = linelist,
-       mapping = aes(
-         x = age,
-         y = days_hosp,
-         color = died),    
-       alpha = 0.3)+
-  geom_point()+
-  labs(
-    title = "Duration of admission among hospitalized COVID-19 patients",
-    x = "Age (years)",
-    y = "Duration (days)",
-    caption = "Fictional COVID-19 data",
-    color = "Deceased")
+ggplot(data = linelist)+
+geom_point(
+  mapping = aes(
+    x = age,
+    y = days_hosp,
+    color = died),    
+  alpha = 0.3)+
+labs(
+  title = "Duration of admission among hospitalized COVID-19 patients",
+  x = "Age (years)",
+  y = "Duration (days)",
+  caption = "Fictional COVID-19 data",
+  color = "Deceased"
+)
 ```
 ]
 
 
 
+---
+# Label tips  
+
+See the [Epi R Handbook page](https://epirhandbook.com/characters-and-strings.html#dynamic-strings) on adjusting characters with the **stringr** package
+
+**New lines**  
+Use `\n` within the string to bump to a new line, or place the text in [`str_wrap()`](https://stringr.tidyverse.org/reference/str_wrap.html) and specify the number of characters to wrap at.  
+
+```{r, eval=F, echo=T}
+title = str_wrap("This is a really long title", 30)
+```
+
+**Dynamic labels**  
+Use `str_glue()` to imbed R code that updates with the data.  
+
+```{r, eval=F, echo=T}
+caption = stringr::str_glue("Data as of {Sys.Date()}"))
+```
+
+```{r, eval=F, echo=T}
+caption = stringr::str_glue("{nrow(linelist %>% filter(is.na(date_onset)))} cases missing date of onset and not shown"))
+```
+
+**Legend title**  
+In `labs()`, write the aesthetic that created the legend (e.g. `fill=`, `color=`, `shape=`) and provide the title in quotation marks.  
+
+
+
+???
+Explain that in str_glue, anything within curly brackets it will run as R code.  
+
 
 ---
-# Syntax - theme  
+# Themes  
 
 .pull-left[
 
-`theme()` adjusts non-data plot features. Pre-defined themes are easy to add.  
+Themes are non-data plot features (background, text side/color, etc).  
+
+[These "complete themes"](https://ggplot2.tidyverse.org/reference/ggtheme.html) are easy to add.  
 
 ```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
 ggplot(data = linelist,
@@ -1239,33 +1497,39 @@ ggplot(data = linelist,
 ```
 ]
 
+???
+Others include theme_grey, theme_classic, etc... adjust base text size.
+
+
+
+
+
 
 
 ---
-# Syntax - theme  
+# Syntax - micro-adjust theme  
 
 .pull-left[
 
-Micro-adjust with `theme()` (micro commands for each small feature)  
-
-See the [complete list](https://ggplot2.tidyverse.org/reference/theme.html)  
+Use `theme()` and [this list](https://ggplot2.tidyverse.org/reference/theme.html) of feature-specific arguments.  
 
 ```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
-ggplot(data = linelist,
-       mapping = aes(
-         x = age,
-         y = days_hosp,
-         color = died),    
-       alpha = 0.3)+
-  geom_point()+
-  labs(
-     title = "Duration of admission among hospitalized COVID-19 patients",
-     x = "Age (years)",
-     y = "Duration (days)",
-     caption = "Fictional COVID-19 data",
-     color = "Deceased")+
-  theme_minimal()+
-* theme(legend.position = "bottom")
+ggplot(
+  data = linelist,
+  mapping = aes(
+    x = age, y = days_hosp, color = died),    
+    alpha = 0.3)+
+geom_point()+
+labs(
+  title = "Duration of admission among hospitalized COVID-19 patients",
+  x = "Age (years)", y = "Duration (days)",
+  caption = "Fictional COVID-19 data",
+  color = "Deceased")+
+theme_minimal(base_size = 14)+
+*theme(
+* legend.position = "bottom",
+* plot.title = element_text(color = "red", face = "bold"),
+* axis.title.y = element_text(angle = 90))
 ```
 
 ]
@@ -1287,7 +1551,58 @@ ggplot(data = linelist,
     caption = "Fictional COVID-19 data",
     color = "Deceased")+
   theme_minimal()+
-  theme(legend.position = "bottom")
+  theme(
+    legend.position = "bottom",
+    plot.title = element_text(color = "red",
+                              size = 20,
+                              face = "bold"),
+    axis.title.y = element_text(angle = 0))
+```
+]
+
+???
+Talk about these theme() arguments and how they consist of two parts, just like `mapping = aes()`. 
+Explain that nobody has these all memorized, but the common ones are easy to remember once you use them enough.  
+
+
+
+
+
+
+
+---
+# Make an epicurve  
+
+.pull-left[
+
+Use `geom_histogram()` with specified bins.   
+
+```{r , echo = TRUE, eval = FALSE, tidy = FALSE}
+ggplot(
+  data = linelist,
+  mapping = aes(x = date_onset)  
+) + #<<
+  geom_histogram() #<<
+```
+
+--
+Since we have only one geom and one data frame linked to the plot, we could move the _mapping_ to the `geom_histogram()` call:  
+
+```{r , echo = TRUE, eval = FALSE, tidy = FALSE}
+ggplot() + 
+  geom_histogram(
+    data = linelist,
+    mapping = aes(x = date_onset))
+````
+] 
+
+.pull-right[
+```{r }
+ggplot(
+  data = linelist,
+  mapping = aes(x = date_onset)  
+  ) + 
+  geom_histogram()
 ```
 ]
 
@@ -1295,14 +1610,540 @@ ggplot(data = linelist,
 
 
 
----  
+---
+# Show groups  
+
+So far the graph shows the distribution of cases in all hospitals. 
+
+It would make sense to break down the visualization by hospitals.
+
+Two options:  
+
+* Fill each hospital in different color (stacked histogram)
+* Create multiple plots, each showing a different hospital
+
+
+
+---
+# Color by group
+
+.pull-left[
+
+To color by group (stacked epicurve), we need to map the variable `eth_race` to the `fill=` aesthetic *in* the `aes()`:  
+
+```{r , echo = TRUE, eval = FALSE, tidy = FALSE}
+ggplot(data = linelist,
+       mapping = aes(
+         x    = date_onset,
+         fill = eth_race))+ #<<
+  geom_histogram()
+```
+
+Note: the _fill_ aesthetics control the color filling areas while the _color_ aesthetics control the color of lines and points.
+
+] 
+
+.pull-right[
+```{r }
+ggplot(data = linelist) +
+  geom_histogram(
+    mapping = aes(
+      x = date_onset,
+      fill = eth_race
+      )
+    )
+```
+]
+
+
+
+---
+# A common error  
+
+.pull-left[
+
+You have multiple data points per x-value, but forgot to separate out the groups
+
+```{r, eval=F, echo = T}
+linelist %>% 
+  group_by(died,
+           week_onset = lubridate::floor_date(date_onset, "week")) %>% 
+  summarise(n_cases = n()) %>% 
+  drop_na(week_onset) %>% 
+
+  ggplot(
+    mapping = aes(
+      x = week_onset,       
+      y = n_cases)
+    )+
+  geom_line()+
+  labs(title = "geom_line()")
+```
+]
+
+.pull-right[
+
+```{r, eval=T, echo=F}
+linelist %>% 
+  group_by(died,
+           week_onset = lubridate::floor_date(date_onset, "week")) %>% 
+  summarise(n_cases = n()) %>% 
+  drop_na(week_onset) %>% 
+
+  ggplot(
+    mapping = aes(
+      x = week_onset,       
+      y = n_cases)
+    )+
+  geom_line()+
+  labs(title = "Weekly cases, by hospital (?)")
+
+
+```
+]
+
+
+
+---
+# A common error - resolved  
+
+.pull-left[
+
+You have multiple data points per x-value, but forgot to separate out the groups
+
+```{r, eval=F, echo = T}
+linelist %>% 
+  group_by(died,
+           week_onset = lubridate::floor_date(date_onset, "week")) %>% 
+  summarise(n_cases = n()) %>% 
+  drop_na(week_onset) %>% 
+
+  ggplot(
+    mapping = aes(
+      x = week_onset,       
+      y = n_cases,
+      color = died)   #<<
+    )+
+  geom_line()+
+  labs(title = "geom_line()")
+```
+]
+
+.pull-right[
+
+```{r, eval=T, echo=F}
+linelist %>% 
+  group_by(died,
+           week_onset = lubridate::floor_date(date_onset, "week")) %>% 
+  summarise(n_cases = n()) %>% 
+  drop_na(week_onset) %>% 
+  
+  ggplot(
+    mapping = aes(
+      x = week_onset,       
+      y = n_cases,
+      color = died)
+    )+
+  geom_line()+
+  labs(title = "Weekly cases, by outcome")
+
+
+```
+]
+
+
+
+
+
+---
+# Facets/small-multiples
+
+
+.pull-left[
+
+To generate one graph by hospital:  
+
+```{r , echo = TRUE, eval = FALSE, tidy = FALSE}
+ggplot(data = linelist,
+       mapping = aes(x = date_onset)) +
+  geom_histogram() +
+  facet_wrap(~eth_race) #<<
+```
+
+] 
+
+
+
+.pull-right[
+```{r }
+ggplot(data = linelist,
+       mapping = aes(x = date_onset)) +
+  geom_histogram() +
+  facet_wrap(~ eth_race)
+```
+
+]
+
+
+
+
+
+---
+# Bar plots  
+
+`geom_col()` and `geom_bar()` are used to make general bar plots (non-epicurves).
+
+Use `geom_bar()` if bar height should reflect the number of rows in the data (e.g. a case linelist).  
+
+```{r, echo=T, eval=F}
+ggplot(linelist)+            # begin with linelist       
+*  geom_bar(
+     mapping = aes(x = eth_race)) # one bar per race/ethnicity. No y= argument. 
+```
+
+Use `geom_col()` if the data have a numeric column containing the desired bar height (i.e. aggregated count data).  
+
+```{r, eval=F, echo=T}
+ggplot(linelist_agg)+    # begin with aggregated count data            
+*  geom_col(
+    mapping = aes(x = eth_race, y = n))   # bar height is value in column "n"
+```
+
+
+---
+
+class: medium-table
+
+# Bar plot (linelist data)  
+
+.pull-left[
+
+With `geom_bar()`, the height reflects the number of rows per x-axis group.  
+
+```{r, eval=T, echo=F}
+linelist %>% 
+  select(date_onset, eth_race, died) %>% 
+  head(6) %>% 
+  knitr::kable()
+```
+
+```{r, echo=T, eval=F}
+ggplot(linelist)+             
+  geom_bar(                 # column height by number of rows
+    mapping = aes(x = eth_race)) # one bar per race/ethnicity. No y= argument. 
+```
+
+]
+
+.pull-right[
+
+```{r, eval=T, echo=F}
+ggplot(linelist)+             
+  geom_bar(                 # column height by number of rows
+    mapping = aes(x = eth_race)) # one bar per race/ethnicity. No y= argument. 
+```
+]
+
+---
+
+class: medium-table
+
+# Bar plot - linelist (grouped)  
+
+.pull-left[
+
+To achieve "stacked" bars with `geom_bar()`, simply assign the group column to `fill =` within `aes()`
+```{r, eval=T, echo=F}
+linelist %>% 
+  select(date_onset, eth_race, died) %>% 
+  head(6) %>% 
+  knitr::kable()
+```
+
+```{r, echo=T, eval=F}
+ggplot(linelist)+             
+  geom_bar(           # column height by number of rows
+    mapping = aes(
+      x = eth_race,        # one bar per ethnicity. No y= argument.
+      fill = died))   # stack bars by column "died" 
+```
+
+]
+
+.pull-right[
+
+```{r, eval=T, echo=F}
+ggplot(linelist)+             
+  geom_bar(           # column height by number of rows
+    mapping = aes(
+      x = eth_race,        # one bar per ethnicity. No y= argument.
+      fill = died))   # stack bars by column "died"  
+```
+]
+
+
+
+---
+
+class: medium-table
+
+# Bar plot - counts  
+
+.pull-left[
+
+In contrast, `geom_col()` uses a column of counts in the data, such as column `n` in this `linelist_eth` dataset:
+
+```{r, eval=T, echo=F}
+linelist_eth <- linelist %>% 
+  count(eth_race)
+
+linelist_eth %>% 
+  head(6) %>% 
+  knitr::kable()
+```
+
+```{r, echo=T, eval=F}
+ggplot(linelist_eth)+             
+*  geom_col(         # column height by numeric value
+    mapping = aes(   
+      x = eth_race,       # one bar per ethnicity.
+*     y = n))        # y= column specifies bar height    
+```
+
+
+Column `n` is assigned to the `y=` argument to provide the bar height.    
+
+```{r, echo=F, eval=T}
+ggplot(linelist_eth)+             
+  geom_col(         # column height by numeric value
+    mapping = aes(   
+      x = eth_race,       # one bar per ethnicity.
+      y = n))        # y= column specifies bar height   
+```
+
+]
+
+.pull-right[
+
+```{r, eval=T, echo=F}
+ggplot(linelist)+             
+  geom_bar(              # column height by number of rows
+    mapping = aes(
+      x = eth_race,           # one bar per ethnicity. No y= argument. 
+      fill = died        # divide into stacked bars by outcome
+    )
+  )
+```
+
+
+]
+
+
+
+---
+
+class: medium-table
+
+# Bar plot - counts (stacked)  
+
+.pull-left[
+
+To have "stacked" bars using `geom_col()`, each plotting group must have its own rows in the data. Use "long"-style like below:  
+
+```{r, echo = F, eval=T}
+linelist_eth_died <- linelist %>% 
+  count(eth_race, died)
+
+linelist_eth_died %>% 
+  head(6) %>% 
+  knitr::kable()
+```
+
+]
+
+.pull-right[
+
+```{r, echo=F, eval=T}
+ggplot(linelist_eth_died)+ # begin with data aggregated by day/ethnicity              
+  geom_col(               # column height by aggregated counts
+    mapping = aes(
+      x = eth_race,            # one bar per ethnicity. 
+      y = n,              # bar height from column "n"
+      fill = died))       # stacked bars by outcome
+```
+
+]
+
+
+---
+# Bar plot - a common error 
+
+.pull-left[
+
+If your data look like this (counts) and your plot looks like that (bars of same height), ensure you are using `geom_col()` and not `geom_bar()`!  
+
+```{r, echo=F, eval=T}
+linelist %>% 
+  count(eth_race) %>% 
+  knitr::kable()
+```
+
+]
+
+.pull-right[
+
+```{r, echo=F, eval=T}
+linelist %>% 
+  count(eth_race) %>% 
+  ggplot()+
+  geom_bar(
+    mapping = aes(x = eth_race))
+```
+
+]
+
+
+
+
+---
+# Bar plots (flip axes)  
+
+.pull-left[
+
+It is simple to flip the axes on any ggplot by adding `coord_flip()`  
+
+
+```{r, echo=T, eval=F}
+ggplot(linelist)+        # begin with case linelist    
+  geom_bar(              # column height by number of rows
+    mapping = aes(
+      x = eth_race,           # one bar per ethnicity. No y= argument. 
+      fill = died))+     # stacked bars by outcome
+* coord_flip()           # flip x and y axes
+```
+
+
+]
+
+.pull-right[
+
+```{r, eval=T, echo=F}
+ggplot(linelist)+             
+  geom_bar(              # column height by number of rows
+    mapping = aes(
+      x = eth_race,           # one bar per ethnicity. No y= argument. 
+      fill = died))+     # divide into stacked bars by outcome
+  coord_flip()           # flip x and y axes
+```
+]
+
+
+---
+# Bar plots (adjust order)  
+
+.pull-left[
+
+Use functions from the **forcats** package to convert the column to class *factor* and adjust the "levels".  
+
+Changes can be made outside ggplot (a lasting change to the dataset), or inside (applies only to this plot).  
+
+[1] See the Epi R Handbook page on [factors](https://epirhandbook.com/factors.html#within-a-plot). 
+
+]
+
+.pull-right[
+
+```{r, eval=T, echo=F}
+ggplot(linelist)+             
+  geom_bar(              # column height by number of rows
+    mapping = aes(
+      x = eth_race,           # one bar per ethnicity. No y= argument. 
+      fill = died))+     # divide into stacked bars by outcome
+  coord_flip()           # flip x and y axes
+```
+]
+
+
+
+
+
+
+---
+# Bar plots (adjust order)  
+
+.pull-left[
+
+Below, to order by frequency, `fct_infreq()` is applied to the x-axis column `eth_race` and the fill column `died`.
+
+```{r, echo=T, eval=F}
+ggplot(linelist)+          # begin with case linelist    
+  geom_bar(                # column height by number of rows
+    mapping = aes(
+*     x = fct_infreq(eth_race), # one bar per ethnicity. No y= argument. 
+*     fill = fct_infreq(died)))+       # stacked bars by outcome
+ coord_flip()              # flip x and y axes
+```
+
+]
+
+.pull-right[
+
+```{r, eval=T, echo=F}
+ggplot(linelist)+             
+  geom_bar(              # column height by number of rows
+    mapping = aes(
+      x = fct_infreq(eth_race),           # one bar per ethnicity. No y= argument. 
+      fill = fct_infreq(died)))+     # divide into stacked bars by outcome
+  coord_flip()           # flip x and y axes
+```
+]
+
+
+
+
+---
+# Bar plots (reverse order)  
+
+.pull-left[
+
+To *reverse* bar order, use `fct_rev()` from the **forcats** package. it can be wrapped around other functions. 
+
+The below reverse the previous frequency ordering from `fct_infreq()`.  
+
+
+```{r, echo=F, eval=F}
+ggplot(linelist)+              
+  geom_bar(                
+    mapping = aes(
+*     x = fct_rev(fct_infreq(eth_race)),  # ordered in reverse frequency
+*     fill = fct_rev(fct_infreq(died))))+       
+ coord_flip()              
+```
+
+[1] See the Epi R Handbook page on [factors](https://epirhandbook.com/factors.html#within-a-plot). 
+]
+
+.pull-right[
+
+```{r, eval=T, echo=F}
+ggplot(linelist)+             
+  geom_bar(              # column height by number of rows
+    mapping = aes(
+      x = fct_rev(fct_infreq(eth_race)),            
+      fill = fct_rev(fct_infreq(died))))+     
+  coord_flip()          
+```
+
+]
+
+---
 
 # Labeling  
 
 Aggregate zip codes into number of cases and number of deaths
 
 
----  
+---
 
 # Final slide
 
