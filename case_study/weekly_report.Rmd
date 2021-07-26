@@ -77,7 +77,10 @@ pacman::p_load(
   janitor,    # data cleaning and tables
   lubridate,  # working with dates
   epikit,     # age_categories() function
-  tidyverse   # data management and visualization
+  tidyverse,  # data management and visualization
+  flextable,  # converting tables to pretty images
+  sf,         # manage spatial data using a Simple Feature format
+  scales      # define colour schemes for flextables 
 )
 
 ```
@@ -128,12 +131,28 @@ https://epirhandbook.com/import-and-export.html
 
 ```{r import}
 
-# import the raw data set 
+## TODO: at the end remove "case_study" from path - so that can be used within case_study.Rproj
+
+# import the raw case data set 
 # define the path using {here} then pass that to the {rio} import function 
-linelist_raw <- here("case_study", "data", 
+# linelist_raw <- here("case_study", "data", 
+#                      "covid_example_data", "covid_example_data.xlsx") %>% 
+#      # specify the sheet to read using which (default is to read first sheet)
+#      import(which = "in")
+
+linelist_raw <- here("data", 
                      "covid_example_data", "covid_example_data.xlsx") %>% 
      # specify the sheet to read using which (default is to read first sheet)
      import(which = "in")
+
+
+# import shapefile
+  # for mapping and for extracting population counts for zipcodes
+# shapefile <- read_sf(here("case_study", "data", 
+#                      "covid_example_data", "covid_shapefile", "FultonCountyZipCodes.shp"))
+
+shapefile <- read_sf(here("data", 
+                     "covid_example_data", "covid_shapefile", "FultonCountyZipCodes.shp"))
 
 ```
 
@@ -433,7 +452,7 @@ linelist <- linelist %>%
      mutate(across(.cols = c(gender, race, eth, zip, 
                              county, contact_id, contact_hh, 
                              hospitalized, died, died_covid, confirmed_case,
-                             contains("sym_")),
+                             contains("sym_"), age_group),
           ~fct_explicit_na(.x, na_level = "Unknown"))) %>% 
     
      # set levels of a factor (define order)
@@ -461,7 +480,7 @@ iterating later on rather than typing them out each time.
 In this example we are going to take all the symptom variables and store them in 
 a vector. 
 It is also possible to simply type these out with quotation marks within a c(...)
-argument (but this way we can minimise typos). 
+argument. 
 For more details see: 
 https://epirhandbook.com/iteration-loops-and-lists.html
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
@@ -474,6 +493,9 @@ symptom_vars <- linelist %>%
      select(c(contains("sym_"), -sym_resolved)) %>% 
      # pull the names out 
      names()
+
+# type out the variables of interest
+demographic_vars <- c("gender", "age_group", "eth_race")
 
 ```
 
@@ -530,8 +552,273 @@ dropped <- linelist %>%
 
 # drop the cases that dont meet the criteria 
 linelist <- linelist %>% 
-     filter(confirmed_case == "Yes" & date_report <= surveillance_date)
+     filter(confirmed_case == "Yes" & 
+              date_report <= surveillance_date & 
+                 !is.na(date_report))
 ```
+
+# Descriptive analysis 
+This section will be analysing data by time place and person to produce descriptive
+tables. 
+
+
+## Time 
+
+```{r}
+
+## TODO: make sure this comes out in the word (error about valid_percent)
+## TODO: Fix column widths 
+
+linelist %>% 
+tabyl(epiweek) %>% 
+  select(-valid_percent) %>% 
+  adorn_totals() %>%  
+  adorn_pct_formatting(affix_sign = FALSE) %>% 
+  flextable() %>% 
+  autofit()
+
+```
+
+# Place 
+
+```{r}
+
+recent_period   <- c(seq(surveillance_week  - 13, surveillance_week, by = 1))
+previous_period <- c(seq(surveillance_week  - 27, surveillance_week - 14, by = 1))
+
+zip_counts <- linelist %>% 
+  group_by(zip) %>% 
+  summarise(
+    recent   = sum(date_report %in% recent_period),
+    previous = sum(date_report %in% previous_period)
+  ) %>% 
+  adorn_totals() %>% 
+  mutate(
+    perc_change = round((recent - previous) / previous * 100, digits = 1), 
+    )
+
+```
+
+
+
+```{r}
+
+
+zip_pop <- shapefile %>% 
+  as_tibble() %>% 
+  select(ZipCode, Population) %>% 
+  adorn_totals()
+  
+
+zip_counts <- left_join(zip_counts, 
+                        zip_pop, 
+                        by = c("zip" = "ZipCode")
+                        ) %>% 
+  mutate(
+    across(c(recent, previous), 
+                ~round(.x / Population * 10000, digits = 1), 
+                .names = "{.col}_inc"), 
+    across(c(perc_change, recent_inc, previous_inc), 
+           ~case_when(
+             is.na(.x) ~ 0,
+             .x == Inf ~ 100, 
+             TRUE      ~ .x
+             )
+           )
+    )
+```
+
+
+```{r}
+
+recent_period_labels <- str_c(
+  format(min(recent_period), format = "%m/%d"), 
+  "-", 
+  format(max(recent_period), format = "%m/%d")
+)
+
+previous_period_labels <- str_c(
+  format(min(previous_period), format = "%m/%d"), 
+  "-", 
+  format(max(previous_period), format = "%m/%d")
+)
+
+
+# pick colours 
+# RColorBrewer::brewer.pal(3, "RdYlGn") %>% 
+#   scales::show_col()
+
+## TODO: consider switching this to scales::col_bin
+row_colour <- case_when( 
+  zip_counts$perc_change < 0 ~ "#91CF60", 
+  zip_counts$perc_change > 0 ~ "#FC8D59", 
+  TRUE                       ~ "#FFFFBF")
+
+## TODO: Fix column widths 
+
+zip_counts %>% 
+  select(zip, recent, recent_inc, previous, previous_inc, perc_change) %>% 
+  flextable() %>% 
+  bg(j = "perc_change", 
+     bg = row_colour
+     ) %>% 
+  
+  add_header_row(
+    values = c("", 
+               str_c("Recent 14-day reporting period\n", recent_period_labels), 
+               "", 
+               str_c("Previous 14-day reporting period\n", previous_period_labels), 
+               "", 
+               "Change between reporting periods"
+               )) %>% 
+  set_header_labels(
+    zip          = "Zip Code", 
+    recent       = "n", 
+    recent_inc   = "Incidence", 
+    previous     = "n", 
+    previous_inc = "Incidence", 
+    perc_change  = "%"
+  ) %>% 
+  merge_at(i = 1, j = 2:3, part = "header") %>% 
+  merge_at(i = 1, j = 4:5, part = "header") %>% 
+  align(align = "center", part = "header") %>% 
+  bold(part = "header") %>% 
+  bold(i = nrow(zip_counts), part = "body") %>% 
+  footnote(j = c(3, 5), part = "header", ref_symbols = c("a"),
+           value = as_paragraph("Incidence calculated as cases per 10,000 population by zip code")) %>% 
+  footnote(j = 6, part = "header", ref_symbols = c("b"),
+           value = as_paragraph("These reflect the percentage increase or decrease of new diagnoses between the 14 days preceding the past 7 days and the 14 days preceding that."))
+
+```
+
+
+# Person 
+
+```{r}
+
+total_cases <- purrr::map(
+  demographic_vars,
+  ~ tabyl(linelist, .x) %>%
+    select("Characteristic" = .x, n, percent)
+) %>% 
+  bind_rows()
+
+recent_cases <- purrr::map(
+  demographic_vars, 
+  ~filter(linelist, 
+          date_report >= (surveillance_date - 28)) %>% 
+    tabyl(.x) %>% 
+    select(n, percent)
+) %>% 
+  bind_rows()
+
+
+total_deaths <- purrr::map(
+  demographic_vars, 
+  ~filter(linelist, 
+          died_covid == "Yes") %>% 
+    tabyl(.x, show_na = TRUE) %>%
+    select(n, percent)
+) %>% 
+  bind_rows()
+
+
+recent_deaths <- purrr::map(
+  demographic_vars, 
+  ~filter(linelist, 
+          died_covid == "Yes" & 
+          date_died >= (surveillance_date - 28)) %>% 
+    tabyl(.x) %>% 
+    select(n, percent) %>% 
+    mutate(variable = .x)
+) %>% 
+  bind_rows()
+
+
+
+overall <- linelist %>% 
+  summarise(
+    Characteristic = "Total",
+    cases = n(),
+    perc  = NA, 
+    cases_recent = sum(date_report >= (surveillance_date - 28)), 
+    perc_recent  = NA, 
+    deaths = sum(died_covid == "Yes"), 
+    perc_deaths = NA, 
+    deaths_recent = sum(died_covid == "Yes" & 
+                          date_died >= (surveillance_date - 28)),
+    perc_deaths_recent = NA, 
+    variable = "Overall"
+  )
+
+
+demographics_counts <- bind_cols(total_cases, recent_cases, total_deaths, recent_deaths) %>% 
+  mutate(across(contains("percent"), 
+                ~round(.x * 100, digits = 1)
+                )) 
+
+names(overall) <- names(demographics_counts)
+
+demographics_counts <- bind_rows(overall, demographics_counts)
+
+
+percentage_cols <- names(demographics_counts) %>% 
+  str_detect("percent") %>% 
+  which()
+
+gender_colours <- scales::col_bin(
+  palette = c("#91CF60", "#FC8D59"), 
+  domain  = c(0, 100),
+  bins    = 2
+)
+
+age_colours <- scales::col_bin(
+  palette = c("#91CF60","#FFFFBF", "#FC8D59"),
+  domain  = c(0, 100), 
+  bins    = c(0, 5, 20, 100)
+)
+
+eth_colours <- scales::col_bin(
+  palette = c("#91CF60","#FFFFBF", "#FC8D59"),
+  domain  = c(0, 100), 
+  bins    = c(0, 10, 40, 100)
+)
+
+
+## TODO: Fix column widths 
+
+demographics_counts %>% 
+  flextable(
+    # retain variable column for formatting but do not display it
+    col_keys = names(demographics_counts)[-10]
+  ) %>% 
+  set_header_labels(
+    "n...2"       = "Total Confirmed Cases", 
+    "percent...3" = "% of Total Cases", 
+    "n...4"       = "Confirmed Cases past 28 days", 
+    "percent...5" = "% of Confirmed Cases past 28 days", 
+    "n...6"       = "Total Confirmed Deaths", 
+    "percent...7" = "% of Total Deaths", 
+    "n...8"       = "Confirmed Deaths past 28 days",
+    "percent...9" = "% of Confirmed Deaths past 28 days"
+  ) %>% 
+  align(align = "center", part = "header") %>% 
+  bold(part = "header") %>% 
+  bold(i = 1, part = "body") %>% 
+  bg(i = ~variable == "gender",
+     j = percentage_cols, bg = gender_colours) %>% 
+  bg(i = ~variable == "age_group",
+     j = percentage_cols, bg = age_colours) %>% 
+  bg(i = ~variable == "eth_race",
+     j = percentage_cols, bg = eth_colours) %>% 
+  hline(i = ~Characteristic %in% c("Total", "Unknown")) %>% 
+  footnote(i = ~Characteristic == "Unknown", j = 1, part = "body", ref_symbols = c("a"),
+           value = as_paragraph("Unknown includes cases not yet interviewed")) %>% 
+  footnote(i = 1, j = c(6, 8), part = "header", ref_symbols = c("b"),
+           value = as_paragraph("Deaths refer to all persons who had a positive PCR test result for Covid-19 and there is evidence that COVID-19 was the cause of death or a significant contributor to their death."))
+
+```
+
 
 
 
