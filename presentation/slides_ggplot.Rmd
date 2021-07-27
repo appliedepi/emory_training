@@ -5,6 +5,7 @@ author: '[EpiRhandbook Team](https:://epirhandbook.com) <br><br> `r icons::icon_
 date: "August 2021"
 output:
   xaringan::moon_reader:
+    self_contained: FALSE
     seal: TRUE
     lib_dir: libs
     nature:
@@ -132,7 +133,7 @@ style_mono_accent(
 # Introducing ourselves  
 
 * Neale Batra  
- - Founder of Epi R Handbook. Previously @ Philly and Santa Clara County health departments. Currently working for WHO Geneva (COVID-19 analytics team)  
+ - Founder of Epi R Handbook. Previously epi and preparedness at Philly and Santa Clara County health departments. Currently working for WHO Geneva COVID-19 analytics team  
 * Alex Spina  
  - Alum of EPIET (European EIS). MSF Epi. WHO AFRO. Med Student. 
 * Mathilde Mousset  
@@ -490,24 +491,24 @@ Build a plot object by “adding” commands that specify plot layers and design
 
 Order of layers will usually look like this:
 
-1) "Open" the plot with the `ggplot()` command and specify the dataset  
+1) **"Open" the plot** with the `ggplot()` command and specify the dataset  
 
 --
 
-2) Add (`+`) “geom” layers that visualize data geometrically as shapes  
+2) **Add (`+`) “geom” layers** that visualize data geometrically as shapes  
 
 --
 
-3) "Map" data columns to features of the plot such as axes, color, size, shape, fill, transparency  
+3) **"Map" data columns** to features of the plot such as axes, color, size, shape, fill, transparency  
 
 
 --
 
-4) Modify relevant "scales", such as a color scale  
+4) **Modify "scales"**, such as a color scale  
 
 --
 
-5) Add "theme" design elements such as axis labels, title, fonts, sizes, color schemes, legends, or axes rotation  
+5) **Add design elements** such as axis labels, title, fonts, text sizes, background themes, or axes rotation  
 
 --
 
@@ -1132,10 +1133,8 @@ ggplot(data = linelist,
 *geom_point(color = "seagreen")
 ```
 
-*Note the indentation and parentheses*  
-
 Other examples:  
-`size = 3`
+`size = 3`  
 `transparency = 0.5`  
 `width = 1.2`  
 
@@ -1175,6 +1174,7 @@ geom_point(
 * mapping = aes(color = died))
 ```
 
+*Note: `color = died` could also be written in `ggplot()`'s `aes()`.*
 ]
 
 .pull-right[
@@ -1190,7 +1190,10 @@ geom_point(
 ```
 ]
 
+???
 
+In the next slide, the color = died will appear in the ggplot()'s aes() command for simplicity.
+This works because there is only one geom and the geom_point will inherit the color mapping.  
 
 
 
@@ -1236,18 +1239,18 @@ As there is only one geom, all aesthetics can be writtein `ggplot()`, or in `geo
 ---
 # Scales - overview  
 
-Scale commands control *how* the aesthetic mapping manifests, for example:  
-* *Which* colors or shapes show for certain values    
+Scale commands control *how* the aesthetic mappings manifest, for example:  
+* *Which* colors or shapes to display  
 * The min/max of point sizes  
 * The min/max and frequency of axes breaks  
 
 To replace the defaults, add a `scale_` command. As a generic formula, these commands are written as `scale_AESTHETIC_METHOD()`.  
 
-1) `scale_` - this prefix never changes  
-2) Aesthetics like: `_fill_`, `_color_`, `_x_`,`_y_`, etc.  
+1) `scale_` : this prefix never changes  
+2) Aesthetics like: `_fill_` , `_color_` , `_x_` , `_y_` , etc.  
 3) Methods like: `_continuous()`, `_discrete()`, `_manual()`, `_date()` etc.
 
-Inside the command, give arguments such as `breaks=`, `values=`, or `labels=` (there are many possibilities).  
+Inside the command, use arguments such as `breaks=`, `values=`, or `labels=` (there are many possibilities).  
 
 
 ---
@@ -1272,7 +1275,7 @@ color, manual assign|`scale_color_manual()`
 
 .pull-left[
 
-Here, the fill of a bar plot uses the default colors and y-axis breaks:  
+Here, the fill of a bar plot uses the **default colors and axis breaks**:  
 
 ```{r, eval=F, echo=T}
 ggplot(linelist)+
@@ -1285,7 +1288,8 @@ ggplot(linelist)+
 
 ```{r, eval=T, echo=F}
 ggplot(linelist)+
-  geom_bar(aes(x = eth_race, fill = died))
+  geom_bar(aes(x = eth_race, fill = died))+
+  theme_gray(base_size = 18)
 ```
 
 ]
@@ -1297,7 +1301,7 @@ ggplot(linelist)+
 
 .pull-left[
 
-First, in a `scale_fill_manual()` we list the color assignments in a vector (within `c()`).   
+First, in a `scale_fill_manual()` we list the color assignments, in a vector `c()`.   
 
 ```{r, eval=F, echo=T}
 ggplot(linelist)+
@@ -1320,7 +1324,8 @@ geom_bar(aes(x = eth_race, fill = died))+
 scale_fill_manual(        
   values = c("Yes" = "violetred", 
              "No" = "aquamarine",
-            "Unknown" = "grey"))
+            "Unknown" = "grey"))+
+theme_gray(base_size = 18)
 ```
 ]
 
@@ -1362,10 +1367,167 @@ scale_fill_manual(
 scale_y_continuous(
   breaks = seq(from = 0,
                to = 35000,
-               by = 5000))
+               by = 5000))+
+theme_gray(base_size = 18)
 ```
 
 ]
+
+
+
+
+
+---
+# Scales - "Floating plots" 
+
+.pull-left[
+
+In any `scale_x_` or `scale_y_` command, use `expand = c(0,0)` to remove excess space around the plot features.  
+
+```{r, eval=F, echo=T}
+ggplot(linelist)+
+geom_bar(aes(x = eth_race, fill = died))+
+scale_fill_manual(        
+  values = c("Yes"    = "violetred", 
+             "No"     = "aquamarine",
+            "Unknown" = "grey"))+
+scale_y_continuous(
+  breaks = seq(from = 0,
+               to = 35000,
+               by = 5000),
+* expand = c(0,0))+
+*scale_x_discrete(
+*  expand = c(0,0))
+```
+
+
+]
+
+.pull-right[
+
+```{r}
+ggplot(linelist)+
+geom_bar(aes(x = eth_race, fill = died))+
+scale_fill_manual(        
+  values = c("Yes" = "violetred", 
+             "No" = "aquamarine",
+            "Unknown" = "grey"))+
+scale_y_continuous(
+  breaks = seq(from = 0,
+               to = 35000,
+               by = 5000),
+  expand = c(0,0))+
+scale_x_discrete(
+  expand = c(0,0))+
+theme_grey(base_size = 18)
+```
+
+]
+
+
+
+
+---
+# Scales - date axis
+
+.pull-left[
+Default date axes can be adjusted with `scale_x_date()`, which offers special arguments `date_breaks=` and `date_labels=`.  
+
+```{r, eval=F, echo=T}
+ggplot(linelist)+
+geom_histogram(aes(x = date_onset))
+```
+
+
+]
+
+.pull-right[
+
+```{r}
+ggplot(linelist)+
+geom_histogram(aes(x = date_onset))+
+theme_grey(base_size = 18)
+
+```
+
+]
+
+
+
+
+
+
+
+---
+# Scales - date axis
+
+.pull-left[
+Specify break intervals to `date_breaks=` using values like "1 week", or "2 weeks", or "3 months" 
+
+```{r, eval=F, echo=T}
+ggplot(linelist)+
+geom_histogram(aes(x = date_onset))+
+*scale_x_date(
+*  date_breaks = "3 months")
+
+```
+
+
+]
+
+.pull-right[
+
+```{r}
+ggplot(linelist)+
+geom_histogram(aes(x = date_onset))+
+scale_x_date(
+  date_breaks = "3 months"
+)+
+theme_grey(base_size = 18)
+
+```
+
+]
+
+
+
+
+---
+# Scales - date axis
+
+.pull-left[
+Specify date format to `date_labels=` using "strptime" syntax ([link](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/strptime)) like `"%d %b %Y"` for DD MMM YYYY.  
+
+
+```{r, eval=F, echo=T}
+ggplot(linelist)+
+geom_histogram(aes(x = date_onset))+
+scale_x_date(
+  date_breaks = "3 months",
+* date_labels = "%d %b\n%Y")  # \n is a newline
+
+```
+
+See Epi R Handbook [Epicurves](https://epirhandbook.com/epidemic-curves.html) and [Strings](https://epirhandbook.com/characters-and-strings.html) pages for more tips
+
+]
+
+.pull-right[
+
+```{r}
+ggplot(linelist)+
+geom_histogram(aes(x = date_onset))+
+scale_x_date(
+  date_breaks = "3 months",
+  date_labels = "%d %b\n%Y"
+)+
+theme_grey(base_size = 18)
+
+```
+
+]
+
+
 
 
 
@@ -1374,7 +1536,7 @@ scale_y_continuous(
 
 .pull-left[
 
-Use `lab()` to add title, subtitle, caption, axes labels, and to edit legend title  
+Use `lab()` to edit title, subtitle, caption, axes labels, and legend title  
 
 ```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
 ggplot(data = linelist)+
@@ -1411,7 +1573,8 @@ labs(
   y = "Duration (days)",
   caption = "Fictional COVID-19 data",
   color = "Deceased"
-)
+)+
+theme_grey(base_size = 18)
 ```
 ]
 
@@ -1433,15 +1596,15 @@ title = str_wrap("This is a really long title", 30)
 Use `str_glue()` to imbed R code that updates with the data.  
 
 ```{r, eval=F, echo=T}
-caption = stringr::str_glue("Data as of {Sys.Date()}"))
+caption = str_glue("Data as of {Sys.Date()}"))
 ```
 
 ```{r, eval=F, echo=T}
-caption = stringr::str_glue("{nrow(linelist %>% filter(is.na(date_onset)))} cases missing date of onset and not shown"))
+caption = str_glue("{nrow(linelist %>% filter(is.na(date_onset)))} cases missing date of onset and not shown"))
 ```
 
 **Legend title**  
-In `labs()`, write the aesthetic that created the legend (e.g. `fill=`, `color=`, `shape=`) and provide the title in quotation marks.  
+In `labs()`, write the aesthetic that created the legend, like `fill=`, `color=`, or `shape=`, and provide a title.  
 
 
 
@@ -1472,7 +1635,7 @@ ggplot(data = linelist,
      y = "Duration (days)",
      caption = "Fictional COVID-19 data",
      color = "Deceased")+
-* theme_minimal(base_size = 14)
+* theme_minimal(base_size = 18)
 ```
 
 ]
@@ -1493,7 +1656,7 @@ ggplot(data = linelist,
     y = "Duration (days)",
     caption = "Fictional COVID-19 data",
     color = "Deceased")+
-  theme_minimal(base_size = 14)
+  theme_minimal(base_size = 18)
 ```
 ]
 
@@ -1528,7 +1691,8 @@ labs(
 theme_minimal(base_size = 14)+
 *theme(
 * legend.position = "bottom",
-* plot.title = element_text(color = "red", face = "bold"),
+* plot.title = element_text(color = "red",
+*                           face = "bold"),
 * axis.title.y = element_text(angle = 90))
 ```
 
@@ -1550,7 +1714,7 @@ ggplot(data = linelist,
     y = "Duration (days)",
     caption = "Fictional COVID-19 data",
     color = "Deceased")+
-  theme_minimal()+
+  theme_minimal(base_size = 18)+
   theme(
     legend.position = "bottom",
     plot.title = element_text(color = "red",
@@ -1568,10 +1732,137 @@ Explain that nobody has these all memorized, but the common ones are easy to rem
 
 
 
+---
+# Make an epicurve  
+
+Two approaches that we suggest:  
+
+1) Use the **incidence2** package  
+  * Fast, simple, and modifiable with ggplot additions  
+  
+2) Use ggplot's `geom_histogram()`  
+  * Most customizeability  
+  * Most complex code  
+  
+See the Epi R handbook's [Epicurves page](https://epirhandbook.com/epidemic-curves.html) for details and common scenarios  
+
+
+
+
+
 
 
 ---
-# Make an epicurve  
+# Epicurve - make incidence object 
+
+.pull-left[
+
+Load **incidence2**  
+
+```{r, echo=T, eval=F}
+pacman::p_load(incidence2) # install/load
+```
+
+**Create** an incidence object from your dataset  
+
+```{r, echo=T, eval=F}
+weekly <- incidence(
+  x = linelist,            # define dataset
+  date_index = date_onset, # date column
+  interval = "week")       # bin interval   
+```
+
+**Plot** the incidence object  
+
+```{r , echo = TRUE, eval = FALSE, tidy = FALSE}
+plot(weekly)
+```
+]
+
+.pull-right[
+
+```{r, echo=F, eval=T}
+library(incidence2)
+weekly <- incidence(
+  x = linelist,            # define dataset
+  date_index = date_onset, # date column
+  interval = "week")       # bin interval   
+
+plot(weekly)
+```
+
+]
+
+
+
+
+---
+# Epicurve - incidence object 
+
+.pull-left[
+
+Adjust the interval
+
+```{r, echo=T, eval=F}
+bimonthly <- incidence(
+  x = linelist,            # define dataset
+  date_index = date_onset, # date column
+*  interval = "2 months")  # bin interval   
+```
+
+**Plot** the incidence object  
+
+```{r , echo = TRUE, eval = FALSE, tidy = FALSE}
+plot(bimonthly)
+```
+
+]
+
+.pull-right[
+
+```{r, echo=F, eval=T}
+library(incidence2)
+bimonthly <- incidence(
+  x = linelist,            # define dataset
+  date_index = date_onset, # date column
+  interval = "2 months")       # bin interval   
+
+plot(bimonthly)
+```
+
+]
+
+
+---
+# Epicurve - ggplot  
+
+Since we have only one geom and one data frame linked to the plot, we could move the _mapping_ to the `geom_histogram()` call:  
+
+```{r , echo = TRUE, eval = FALSE, tidy = FALSE}
+ggplot() + 
+  geom_histogram(
+    data = linelist,
+    mapping = aes(x = date_onset))
+````
+ 
+
+.pull-right[
+```{r }
+ggplot(
+  data = linelist,
+  mapping = aes(x = date_onset)  
+  ) + 
+  geom_histogram()
+```
+]
+
+
+
+
+
+
+---
+# Epicurve - ggplot  
 
 .pull-left[
 
