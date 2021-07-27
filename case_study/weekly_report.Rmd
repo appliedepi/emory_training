@@ -3,8 +3,9 @@ title: "Emory Covid-19 Case Study Script"
 author: "EpiRHandbook Team"
 date: "13 August 2021"
 output: 
-     word_document: 
-          keep_md: TRUE
+  officedown::rdocx_document: 
+            reference_docx: "template_style.docx"
+            keep_md: TRUE
 params: 
      surveillance_date: 2021-06-30
 ---
@@ -36,7 +37,6 @@ This comment will not show up when you knit the document.
 A comment with a title with slashes indicates a name of a code chunk.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
-
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 /// setup \\\
 --------------------------------------------------------------------------------
@@ -59,10 +59,13 @@ https://epirhandbook.com/r-on-network-drives.html#r-on-network-drives
 
 ```{r setup, include=FALSE}
 
+#TODO: turn off warnings and messages 
+
 # hide all code chunks in the output, but show errors 
      # nb. warnings and messages still shown
 knitr::opts_chunk$set(echo = FALSE,  # hide all code chunks in output
-                      error = TRUE   # show errors if they appear, but don't stop (produce the word doc)
+                      error = TRUE,  # show errors if they appear, but don't stop (produce the word doc)
+                      fig.topcaption = TRUE  # show figure titles on top of plot
                      )
 
 # Ensures the package "pacman" is installed
@@ -71,6 +74,8 @@ if (!require("pacman")) {
 
 # install (if necessary) and load packages to be used
 pacman::p_load(
+  officedown, # format MS word document output
+  officer,    # add table of contents to output
   rio,        # importing data  
   here,       # relative file pathways 
   skimr,      # get overview of data
@@ -86,8 +91,32 @@ pacman::p_load(
 ```
 
 
+\pagebreak 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/// define_current_week \\\
+/// table_of_contents \\\
+--------------------------------------------------------------------------------
+This chunk adds a table of contents to your report using the {officedown} package. 
+You can also add in a list of tables and figures. 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+```{r table_of_contents}
+
+# table of contents based on headings 
+block_toc() 
+
+# list of tables 
+block_toc(style = "Table Caption")
+
+# list of figures 
+block_toc(style = "Image Caption")
+
+```
+
+\pagebreak 
+
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/// define_reporting_periods \\\
 --------------------------------------------------------------------------------
 Here we use the date you want to report on, defined in parameters above to create
 a date object which we can use for filtering datasets and analysis. 
@@ -95,12 +124,17 @@ a date object which we can use for filtering datasets and analysis.
 We also create a week object to make grouping data easier. In this scenario we 
 have defined the week to start on Wednesdays as this is when Fulton County 
 releases their reports (but you can choose any other day of the week too). 
+
+From these we are then able to define periods 14 and 28 days prior to our 
+situation report date. We can also make the appropriate labels to auto-populate
+table titles. 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
-```{r define_current_week}
+```{r define_reporting_periods}
 
 # create a date object from the parameter
-surveillance_date <- as.Date(params$surveillance_date)
+# Minus 7 days surveillance date to account for lag in reporting lab results
+surveillance_date <- as.Date(params$surveillance_date) - 7
 
 # create an epiweek object from the date 
 # floor_date rounds to the closest week here
@@ -109,6 +143,34 @@ surveillance_week <- floor_date(surveillance_date,
                           unit = "week", 
                           # define week to start on Wednesday
                           week_start = 3)
+
+# define recent (past 14 days) and previous (28 to 14 days prior)
+recent_period   <- c(seq(surveillance_week  - 13, surveillance_week, by = 1))
+previous_period <- c(seq(surveillance_week  - 27, surveillance_week - 14, by = 1))
+
+# define the cut-off dates for the recent period (for table headers)
+recent_period_labels <- str_c(
+  format(min(recent_period), format = "%m/%d"), 
+  "-", 
+  format(max(recent_period), format = "%m/%d")
+)
+
+# define the cut-off dates for previous period (for table headers) 
+previous_period_labels <- str_c(
+  format(min(previous_period), format = "%m/%d"), 
+  "-", 
+  format(max(previous_period), format = "%m/%d")
+)
+
+
+# define a label for past 28 days (for table captions)
+full_period_labels <- str_c(
+  format(min(previous_period), format = "%B %d"), 
+  "-", 
+  format(surveillance_week, format = "%B %d, %Y")
+)
+
+
 ```
 
 
@@ -131,28 +193,31 @@ https://epirhandbook.com/import-and-export.html
 
 ```{r import}
 
-## TODO: at the end remove "case_study" from path - so that can be used within case_study.Rproj
+## TODO: at the end remove "case_study" from path - so that can be used within case_study.Rproj (also delete the if statement [keep the else])
 
-# import the raw case data set 
-# define the path using {here} then pass that to the {rio} import function 
-# linelist_raw <- here("case_study", "data", 
-#                      "covid_example_data", "covid_example_data.xlsx") %>% 
-#      # specify the sheet to read using which (default is to read first sheet)
-#      import(which = "in")
+if (str_detect(here::here(), "emory_training")) {
 
-linelist_raw <- here("data", 
-                     "covid_example_data", "covid_example_data.xlsx") %>% 
+linelist_raw <- here::here("case_study", "data",
+                     "covid_example_data", "covid_example_data.xlsx") %>%
      # specify the sheet to read using which (default is to read first sheet)
      import(which = "in")
 
+shapefile <- read_sf(here::here("case_study", "data",
+                     "covid_example_data", "covid_shapefile", "FultonCountyZipCodes.shp"))
+} else {
+  
+# import the raw case data set 
+  # define the path using {here} then pass that to the {rio} import function
+linelist_raw <- here("data",
+                     "covid_example_data", "covid_example_data.xlsx") %>%
+     # specify the sheet to read using which (default is to read first sheet)
+     import(which = "in")
 
 # import shapefile
   # for mapping and for extracting population counts for zipcodes
-# shapefile <- read_sf(here("case_study", "data", 
-#                      "covid_example_data", "covid_shapefile", "FultonCountyZipCodes.shp"))
-
 shapefile <- read_sf(here("data", 
                      "covid_example_data", "covid_shapefile", "FultonCountyZipCodes.shp"))
+}
 
 ```
 
@@ -323,7 +388,6 @@ entered dates (notice that one individual was -20 years old).
 Then we show how to create new numeric variables for the number of days between 
 two dates. 
 
-
 For more details see: 
 https://epirhandbook.com/cleaning-data-and-core-functions.html#num_cats
 https://epirhandbook.com/cleaning-data-and-core-functions.html#clean_case_when
@@ -481,6 +545,7 @@ In this example we are going to take all the symptom variables and store them in
 a vector. 
 It is also possible to simply type these out with quotation marks within a c(...)
 argument. 
+
 For more details see: 
 https://epirhandbook.com/iteration-loops-and-lists.html
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
@@ -537,6 +602,7 @@ linelist <- linelist %>%
 Here we are going to filter our data set to only keep relevant cases for analysis. 
 We keep those that are reported before our surveillance cut-off date and those 
 that are entered as a confirmed case. 
+
 For more details on filtering see: 
 https://epirhandbook.com/cleaning-data-and-core-functions.html#filter-rows
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
@@ -557,34 +623,53 @@ linelist <- linelist %>%
                  !is.na(date_report))
 ```
 
+\pagebreak
+
 # Descriptive analysis 
 This section will be analysing data by time place and person to produce descriptive
 tables. 
 
+## Summary 
+TODO: add in the summary bullet points as seen in the Fulton report
 
 ## Time 
 
-```{r}
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/// epiweek_table \\\
+--------------------------------------------------------------------------------
 
-## TODO: make sure this comes out in the word (error about valid_percent)
-## TODO: Fix column widths 
+Here we use the {janitor} tabyl() funciton to get case counts by calendar week 
+(as well as the percentage these contribute to the overall). 
+
+For more details on filtering see: 
+https://epirhandbook.com/descriptive-tables.html
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+
+```{r epiweek_table, tab.cap="COVID-19 case counts by calendar week in Fulton County", tab.id="time_tab"}
+## TODO: comment all code from here on
+## TODO: Add table captions 
 
 linelist %>% 
 tabyl(epiweek) %>% 
-  select(-valid_percent) %>% 
   adorn_totals() %>%  
   adorn_pct_formatting(affix_sign = FALSE) %>% 
+  select("Calendar Week" = epiweek, 
+         "Cases (n)" = n, 
+         "Percent (%)" = percent) %>% 
   flextable() %>% 
   autofit()
 
 ```
 
-# Place 
+As you can see from above in TODO fix this reference... table \@ref(tab:time_tab) , we saw xyz (TODO: say something meaningful)
+
+\pagebreak 
+
+## Place 
 
 ```{r}
 
-recent_period   <- c(seq(surveillance_week  - 13, surveillance_week, by = 1))
-previous_period <- c(seq(surveillance_week  - 27, surveillance_week - 14, by = 1))
 
 zip_counts <- linelist %>% 
   group_by(zip) %>% 
@@ -629,32 +714,19 @@ zip_counts <- left_join(zip_counts,
 ```
 
 
-```{r}
-
-recent_period_labels <- str_c(
-  format(min(recent_period), format = "%m/%d"), 
-  "-", 
-  format(max(recent_period), format = "%m/%d")
-)
-
-previous_period_labels <- str_c(
-  format(min(previous_period), format = "%m/%d"), 
-  "-", 
-  format(max(previous_period), format = "%m/%d")
-)
+```{r zip_table, tab.cap = "COVID-19 new case counts by ZIP-code", tab.id = "zip_tab"}
 
 
 # pick colours 
 # RColorBrewer::brewer.pal(3, "RdYlGn") %>% 
 #   scales::show_col()
 
-## TODO: consider switching this to scales::col_bin
+
 row_colour <- case_when( 
   zip_counts$perc_change < 0 ~ "#91CF60", 
   zip_counts$perc_change > 0 ~ "#FC8D59", 
   TRUE                       ~ "#FFFFBF")
 
-## TODO: Fix column widths 
 
 zip_counts %>% 
   select(zip, recent, recent_inc, previous, previous_inc, perc_change) %>% 
@@ -687,14 +759,18 @@ zip_counts %>%
   footnote(j = c(3, 5), part = "header", ref_symbols = c("a"),
            value = as_paragraph("Incidence calculated as cases per 10,000 population by zip code")) %>% 
   footnote(j = 6, part = "header", ref_symbols = c("b"),
-           value = as_paragraph("These reflect the percentage increase or decrease of new diagnoses between the 14 days preceding the past 7 days and the 14 days preceding that."))
+           value = as_paragraph("These reflect the percentage increase or decrease of new diagnoses 
+                                between the 14 days preceding the past 7 days and the 14 days
+                                preceding that.")) %>% 
+  set_table_properties(layout = "autofit")
 
 ```
 
+<!---BLOCK_LANDSCAPE_START--->
 
-# Person 
+## Person 
 
-```{r}
+```{r demographics_tab, tab.cap = str_c("Cumulative and recent confirmed COVID-19 case and death counts by gender, age, and race/ethnicity in Fulton County, Georgia. Past 28 day period refers to ", full_period_labels), tab.id = "demog_tab"}
 
 total_cases <- purrr::map(
   demographic_vars,
@@ -785,7 +861,7 @@ eth_colours <- scales::col_bin(
 )
 
 
-## TODO: Fix column widths 
+## TODO: Fix warnings and messages    
 
 demographics_counts %>% 
   flextable(
@@ -815,10 +891,31 @@ demographics_counts %>%
   footnote(i = ~Characteristic == "Unknown", j = 1, part = "body", ref_symbols = c("a"),
            value = as_paragraph("Unknown includes cases not yet interviewed")) %>% 
   footnote(i = 1, j = c(6, 8), part = "header", ref_symbols = c("b"),
-           value = as_paragraph("Deaths refer to all persons who had a positive PCR test result for Covid-19 and there is evidence that COVID-19 was the cause of death or a significant contributor to their death."))
+           value = as_paragraph("Deaths refer to all persons who had a positive PCR test result 
+                                for Covid-19 and there is evidence that COVID-19 was the cause of 
+                                death or a significant contributor to their death.")) %>% 
+  set_table_properties(layout = "autofit")
+
+```
+
+
+<!---BLOCK_LANDSCAPE_STOP--->
+
+
+# Visualisation 
+
+This is a reference to figure \@ref(fig:epicurve) below which shows xyz (TODO: say something meaningful)
+
+```{r epicurve, fig.cap = "this is a plot", fig.id = "epicurve"}
+
+ggplot(data = linelist,
+       mapping = aes(
+         x = age,
+         y = days_onset_hosp))+
+   geom_point()
 
 ```
 
 
 
-
+ 
