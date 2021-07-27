@@ -1013,8 +1013,6 @@ eth_colours <- scales::col_bin(
 # create styled table  
 ######################
 
-## TODO: Fix warnings and messages    
-
 demographics_counts %>%
   # initiate flextable to produce styled output table
   flextable(
