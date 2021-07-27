@@ -603,7 +603,7 @@ Here we are going to filter our data set to only keep relevant cases for analysi
 We keep those that are reported before our surveillance cut-off date and those 
 that are entered as a confirmed case. 
 
-For more details on filtering see: 
+For more details see: 
 https://epirhandbook.com/cleaning-data-and-core-functions.html#filter-rows
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
@@ -638,72 +638,117 @@ TODO: add in the summary bullet points as seen in the Fulton report
 /// epiweek_table \\\
 --------------------------------------------------------------------------------
 
-Here we use the {janitor} tabyl() funciton to get case counts by calendar week 
+Here we use the {janitor} tabyl() function to get case counts by calendar week 
 (as well as the percentage these contribute to the overall). 
 
-For more details on filtering see: 
+We then create use {flextable} to produce a clean output table. 
+
+For more details see: 
 https://epirhandbook.com/descriptive-tables.html
+https://epirhandbook.com/tables-for-presentation.html
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
-
 ```{r epiweek_table, tab.cap="COVID-19 case counts by calendar week in Fulton County", tab.id="time_tab"}
+
 ## TODO: comment all code from here on
-## TODO: Add table captions 
 
 linelist %>% 
-tabyl(epiweek) %>% 
+  # get counts and percentages 
+  tabyl(epiweek) %>% 
+  # add the overall counts as a row
   adorn_totals() %>%  
+  # change from proportions to percentages (do not add a % sign)
   adorn_pct_formatting(affix_sign = FALSE) %>% 
+  # rename columns 
   select("Calendar Week" = epiweek, 
          "Cases (n)" = n, 
          "Percent (%)" = percent) %>% 
+  # produce styled output table
   flextable() %>% 
+  # fit columns widths to contents
   autofit()
 
 ```
 
-As you can see from above in TODO fix this reference... table \@ref(tab:time_tab) , we saw xyz (TODO: say something meaningful)
+As you can see from above in TODO fix this reference... table \@ref(tab:time_tab) we saw xyz (TODO: say something meaningful)
 
 \pagebreak 
 
 ## Place 
 
-```{r}
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/// zip_counts \\\
+--------------------------------------------------------------------------------
 
+Here we use {dplyr} functions to get case counts based on periods created in the 
+define_reporting_periods code chunk above. 
+We store as an object called zip_counts so that it can be merged with population
+in the chunks below. 
+
+For more details see: 
+https://epirhandbook.com/descriptive-tables.html#dplyr-package
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+```{r zip_counts}
 
 zip_counts <- linelist %>% 
   group_by(zip) %>% 
+  # count cases in the appropriate period 
   summarise(
     recent   = sum(date_report %in% recent_period),
     previous = sum(date_report %in% previous_period)
   ) %>% 
   adorn_totals() %>% 
+  # a percentage change column and round the digits
   mutate(
     perc_change = round((recent - previous) / previous * 100, digits = 1), 
     )
 
 ```
 
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/// zip_join \\\
+--------------------------------------------------------------------------------
 
+Here we use {dplyr} functions extract the population counts from our shapefile, 
+and then merge these with our zip_counts from above. 
+N.b. the left_join functions preserves all the rows from the first dataset 
+provided and only merges the rows from the second that match. 
+We then calculate incidence per 10,000 population. 
 
-```{r}
+For more details see: 
+https://epirhandbook.com/descriptive-tables.html#dplyr-package
+https://epirhandbook.com/joining-data.html
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
+```{r zip_join}
 
+# extract population counts for each zip from the shapefile
 zip_pop <- shapefile %>% 
+  # change to tibble (otherwise geo-data gets pulled with)
   as_tibble() %>% 
+  # only keep zip code and population counts
   select(ZipCode, Population) %>% 
+  # add a row with overall counts
   adorn_totals()
   
-
+# merge case counts and population counts
+# zip (or ZipCode in the shapefile) variable is the unique identifier
 zip_counts <- left_join(zip_counts, 
                         zip_pop, 
                         by = c("zip" = "ZipCode")
                         ) %>% 
+  # calculate the incidence 
   mutate(
+    # for each period (recent and previous)
     across(c(recent, previous), 
-                ~round(.x / Population * 10000, digits = 1), 
-                .names = "{.col}_inc"), 
+           # divide each variable by population (and round outcome)
+           ~round(.x / Population * 10000, digits = 1), 
+           # for each period create a new variable with _inc on the end
+           .names = "{.col}_inc"), 
+    # for each of the calculated variables (percentage and incidence)
     across(c(perc_change, recent_inc, previous_inc), 
+           # fix the outliers: set missing to 0 and infity (divided by 0) to 100
            ~case_when(
              is.na(.x) ~ 0,
              .x == Inf ~ 100, 
@@ -713,28 +758,48 @@ zip_counts <- left_join(zip_counts,
     )
 ```
 
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/// zip_table \\\
+--------------------------------------------------------------------------------
+
+Here we use {flextable} to produce a publication-ready table. We also demonstrate
+how to colour cells based on their values, defining the cut-offs in advance using
+{dplyr} case_when(). Colours are called here using HEX-codes but can also be 
+referred to by name. 
+
+For more details see: 
+https://epirhandbook.com/tables-for-presentation.html
+https://colorbrewer2.org/#type=sequential&scheme=Reds&n=3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
 ```{r zip_table, tab.cap = "COVID-19 new case counts by ZIP-code", tab.id = "zip_tab"}
 
 
-# pick colours 
+# pick colours (uncomment next to lines)
 # RColorBrewer::brewer.pal(3, "RdYlGn") %>% 
 #   scales::show_col()
 
-
+# choose colours to fill in cells  
 row_colour <- case_when( 
+  # those less than zero will be green (decreasing cases)
   zip_counts$perc_change < 0 ~ "#91CF60", 
+  # over zero red (increasing)
   zip_counts$perc_change > 0 ~ "#FC8D59", 
+  # missing or zero orange
   TRUE                       ~ "#FFFFBF")
 
 
 zip_counts %>% 
+  # keep the columns of interest and define order
   select(zip, recent, recent_inc, previous, previous_inc, perc_change) %>% 
+  # initiate flextable to produce styled output table
   flextable() %>% 
+  # fill in cells - choose the column and then pass our colour-scheme defined above
   bg(j = "perc_change", 
      bg = row_colour
      ) %>% 
-  
+  # add in a header for labelling counts and incidence by period 
+    # note the empty columns ("") to fit to the original table headers
   add_header_row(
     values = c("", 
                str_c("Recent 14-day reporting period\n", recent_period_labels), 
@@ -743,6 +808,8 @@ zip_counts %>%
                "", 
                "Change between reporting periods"
                )) %>% 
+  # redefine column names based on original names
+    # note the different syntax to dplyr::select, here it is old_name = new_name
   set_header_labels(
     zip          = "Zip Code", 
     recent       = "n", 
@@ -751,109 +818,193 @@ zip_counts %>%
     previous_inc = "Incidence", 
     perc_change  = "%"
   ) %>% 
+  # combine the headers cells for the appropriate periods 
+  # (i defines rows, j defines columns)
   merge_at(i = 1, j = 2:3, part = "header") %>% 
   merge_at(i = 1, j = 4:5, part = "header") %>% 
+  # move the header text to the centre
   align(align = "center", part = "header") %>% 
+  # make header text bold 
   bold(part = "header") %>% 
+  # make the row with totals in it bold (i.e. the last row in the dataframe)
   bold(i = nrow(zip_counts), part = "body") %>% 
+  # add in footnotes for variables (referencing the header cells)
   footnote(j = c(3, 5), part = "header", ref_symbols = c("a"),
            value = as_paragraph("Incidence calculated as cases per 10,000 population by zip code")) %>% 
   footnote(j = 6, part = "header", ref_symbols = c("b"),
            value = as_paragraph("These reflect the percentage increase or decrease of new diagnoses 
                                 between the 14 days preceding the past 7 days and the 14 days
                                 preceding that.")) %>% 
+  # make your table fit to the maximum width of the word document
   set_table_properties(layout = "autofit")
 
 ```
+
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The tag below will change the page to landscape in the word document output. 
+This is part of the {officer} package - and is accompanied by a second tag below
+to stop the landscape orientation. 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
 <!---BLOCK_LANDSCAPE_START--->
 
 ## Person 
 
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/// demographics_tab \\\
+--------------------------------------------------------------------------------
+
+Here we use {purrr} to iterate over demographics variables (defined in the 
+vector_vars code chunk) - to produce tables of counts and percentages for cases
+and deaths. 
+
+We use {dplyr} bind_rows() and bind_cols() to combine the various smaller dataframes
+of counts in to one large table. 
+
+And then we colour in our {flextable} with different criteria for each of the 
+demographic variables of interest. 
+
+For more details see: 
+https://epirhandbook.com/tables-for-presentation.html
+https://epirhandbook.com/iteration-loops-and-lists.html
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
 ```{r demographics_tab, tab.cap = str_c("Cumulative and recent confirmed COVID-19 case and death counts by gender, age, and race/ethnicity in Fulton County, Georgia. Past 28 day period refers to ", full_period_labels), tab.id = "demog_tab"}
 
+# get counts tables for measures of interest 
+############################################
+
+# counts of total cases 
 total_cases <- purrr::map(
+  # for each variable listed
   demographic_vars,
-  ~ tabyl(linelist, .x) %>%
+  # create a table  
+  ~tabyl(linelist, .x) %>%
+    # only keep variables of interest and rename the variable column 
+      # this is so that they are all the same for merging 
     select("Characteristic" = .x, n, percent)
 ) %>% 
+  # combine rows in to one dataframe
   bind_rows()
 
+
+# counts of new cases (last 28 days) 
 recent_cases <- purrr::map(
+  # for each variable listed
   demographic_vars, 
+  # filter the linelist for dates on or after 28 days ago
   ~filter(linelist, 
           date_report >= (surveillance_date - 28)) %>% 
+    # get counts based on filtered data
     tabyl(.x) %>% 
+    # nb we dont keep the characteristic column because it would be duplicated
     select(n, percent)
 ) %>% 
   bind_rows()
 
-
+# counts of total deaths 
 total_deaths <- purrr::map(
+  # for each variable listed
   demographic_vars, 
+  # filter for those who died 
   ~filter(linelist, 
           died_covid == "Yes") %>% 
+    # get counts based on filtered data 
     tabyl(.x, show_na = TRUE) %>%
     select(n, percent)
 ) %>% 
   bind_rows()
 
-
+# counts of new deaths (last 28 days)
 recent_deaths <- purrr::map(
+  # for each variable listed
   demographic_vars, 
+  # filter to those who died in the last 28 days
   ~filter(linelist, 
           died_covid == "Yes" & 
           date_died >= (surveillance_date - 28)) %>% 
+    # get counts based on filtered data
     tabyl(.x) %>% 
     select(n, percent) %>% 
+    # add in a variable column (used for colouring later) 
     mutate(variable = .x)
 ) %>% 
   bind_rows()
 
 
-
+# total counts for all of the above measures (not by demographic)
 overall <- linelist %>% 
   summarise(
+    # add in row label 
     Characteristic = "Total",
+    # counts of total cases 
     cases = n(),
+    # leave all percentages empty (would just be 100)
     perc  = NA, 
+    # counts of new cases (last 28 days) 
     cases_recent = sum(date_report >= (surveillance_date - 28)), 
     perc_recent  = NA, 
+    # counts of total deaths 
     deaths = sum(died_covid == "Yes"), 
     perc_deaths = NA, 
+    # counts of new deaths (last 28 days)
     deaths_recent = sum(died_covid == "Yes" & 
                           date_died >= (surveillance_date - 28)),
     perc_deaths_recent = NA, 
+    # add in a variable column (used for colouring later) 
     variable = "Overall"
   )
 
 
+
+# merge tables together 
+#######################
+
+# combine all the demographic tables - side by side
 demographics_counts <- bind_cols(total_cases, recent_cases, total_deaths, recent_deaths) %>% 
+  # mutate each of the proportion columns to be percentages
   mutate(across(contains("percent"), 
                 ~round(.x * 100, digits = 1)
                 )) 
 
+# make sure names for the totals row matches the merged demographics table
 names(overall) <- names(demographics_counts)
 
+# add in the totals row at the top of the merged demographics table
 demographics_counts <- bind_rows(overall, demographics_counts)
 
 
+
+# define colour scheme 
+######################
+
+# get the column numbers than are percentages (based on the name) 
 percentage_cols <- names(demographics_counts) %>% 
   str_detect("percent") %>% 
   which()
 
+# define colour cut-offs for gender column 
 gender_colours <- scales::col_bin(
+  # choose colours 
   palette = c("#91CF60", "#FC8D59"), 
+  # choose min and max (range)
   domain  = c(0, 100),
+  # choose how to split (in this case above and below 50)
   bins    = 2
 )
 
+# define colour cut-offs for gender column 
 age_colours <- scales::col_bin(
+  # choose colours
   palette = c("#91CF60","#FFFFBF", "#FC8D59"),
+  # choose min and max (range)
   domain  = c(0, 100), 
+  # choose cut-off categories 
   bins    = c(0, 5, 20, 100)
 )
 
+# define colour cut-offs for ethnicity column 
 eth_colours <- scales::col_bin(
   palette = c("#91CF60","#FFFFBF", "#FC8D59"),
   domain  = c(0, 100), 
@@ -861,13 +1012,18 @@ eth_colours <- scales::col_bin(
 )
 
 
+# create styled table  
+######################
+
 ## TODO: Fix warnings and messages    
 
 demographics_counts %>% 
+  # initiate flextable to produce styled output table
   flextable(
     # retain variable column for formatting but do not display it
     col_keys = names(demographics_counts)[-10]
   ) %>% 
+  # redefine column names based on original names
   set_header_labels(
     "n...2"       = "Total Confirmed Cases", 
     "percent...3" = "% of Total Cases", 
@@ -878,22 +1034,35 @@ demographics_counts %>%
     "n...8"       = "Confirmed Deaths past 28 days",
     "percent...9" = "% of Confirmed Deaths past 28 days"
   ) %>% 
+  # move the header text to the centre
   align(align = "center", part = "header") %>% 
-  bold(part = "header") %>% 
+  # make header text bold 
+  bold(part = "header") %>%
+  # make the totals row bold (i.e. first row)
   bold(i = 1, part = "body") %>% 
+  # fill in the cells
+  # choose the rows with gender counts 
   bg(i = ~variable == "gender",
-     j = percentage_cols, bg = gender_colours) %>% 
+     # choose the columns with percentages in them 
+     j = percentage_cols, 
+     # fill in based on previous defined cut-offs
+     bg = gender_colours) %>% 
   bg(i = ~variable == "age_group",
      j = percentage_cols, bg = age_colours) %>% 
   bg(i = ~variable == "eth_race",
      j = percentage_cols, bg = eth_colours) %>% 
+  # add horizontal lines after the cells with totals and unknowns 
+    # (short-cut to find row ending of each demographic variable)
   hline(i = ~Characteristic %in% c("Total", "Unknown")) %>% 
+  # add in footnotes for rows counting unknowns (reference in first column)
   footnote(i = ~Characteristic == "Unknown", j = 1, part = "body", ref_symbols = c("a"),
            value = as_paragraph("Unknown includes cases not yet interviewed")) %>% 
+  # add in footnote for deaths counts (ref in the header)
   footnote(i = 1, j = c(6, 8), part = "header", ref_symbols = c("b"),
            value = as_paragraph("Deaths refer to all persons who had a positive PCR test result 
                                 for Covid-19 and there is evidence that COVID-19 was the cause of 
                                 death or a significant contributor to their death.")) %>% 
+  # make your table fit to the maximum width of the word document
   set_table_properties(layout = "autofit")
 
 ```
