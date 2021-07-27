@@ -650,8 +650,6 @@ https://epirhandbook.com/tables-for-presentation.html
 
 ```{r epiweek_table, tab.cap="COVID-19 case counts by calendar week in Fulton County", tab.id="time_tab"}
 
-## TODO: comment all code from here on
-
 linelist %>% 
   # get counts and percentages 
   tabyl(epiweek) %>% 
@@ -1017,51 +1015,51 @@ eth_colours <- scales::col_bin(
 
 ## TODO: Fix warnings and messages    
 
-demographics_counts %>% 
+demographics_counts %>%
   # initiate flextable to produce styled output table
   flextable(
     # retain variable column for formatting but do not display it
     col_keys = names(demographics_counts)[-10]
-  ) %>% 
+  ) %>%
   # redefine column names based on original names
   set_header_labels(
-    "n...2"       = "Total Confirmed Cases", 
-    "percent...3" = "% of Total Cases", 
-    "n...4"       = "Confirmed Cases past 28 days", 
-    "percent...5" = "% of Confirmed Cases past 28 days", 
-    "n...6"       = "Total Confirmed Deaths", 
-    "percent...7" = "% of Total Deaths", 
+    "n...2"       = "Total Confirmed Cases",
+    "percent...3" = "% of Total Cases",
+    "n...4"       = "Confirmed Cases past 28 days",
+    "percent...5" = "% of Confirmed Cases past 28 days",
+    "n...6"       = "Total Confirmed Deaths",
+    "percent...7" = "% of Total Deaths",
     "n...8"       = "Confirmed Deaths past 28 days",
     "percent...9" = "% of Confirmed Deaths past 28 days"
-  ) %>% 
+  ) %>%
   # move the header text to the centre
-  align(align = "center", part = "header") %>% 
-  # make header text bold 
+  align(align = "center", part = "header") %>%
+  # make header text bold
   bold(part = "header") %>%
   # make the totals row bold (i.e. first row)
-  bold(i = 1, part = "body") %>% 
+  bold(i = 1, part = "body") %>%
   # fill in the cells
-  # choose the rows with gender counts 
+  # choose the rows with gender counts
   bg(i = ~variable == "gender",
-     # choose the columns with percentages in them 
-     j = percentage_cols, 
+     # choose the columns with percentages in them
+     j = percentage_cols,
      # fill in based on previous defined cut-offs
-     bg = gender_colours) %>% 
+     bg = gender_colours) %>%
   bg(i = ~variable == "age_group",
-     j = percentage_cols, bg = age_colours) %>% 
+     j = percentage_cols, bg = age_colours) %>%
   bg(i = ~variable == "eth_race",
-     j = percentage_cols, bg = eth_colours) %>% 
-  # add horizontal lines after the cells with totals and unknowns 
+     j = percentage_cols, bg = eth_colours) %>%
+  # add horizontal lines after the cells with totals and unknowns
     # (short-cut to find row ending of each demographic variable)
-  hline(i = ~Characteristic %in% c("Total", "Unknown")) %>% 
+  hline(i = ~Characteristic %in% c("Total", "Unknown")) %>%
   # add in footnotes for rows counting unknowns (reference in first column)
   footnote(i = ~Characteristic == "Unknown", j = 1, part = "body", ref_symbols = c("a"),
-           value = as_paragraph("Unknown includes cases not yet interviewed")) %>% 
+           value = as_paragraph("Unknown includes cases not yet interviewed")) %>%
   # add in footnote for deaths counts (ref in the header)
   footnote(i = 1, j = c(6, 8), part = "header", ref_symbols = c("b"),
-           value = as_paragraph("Deaths refer to all persons who had a positive PCR test result 
-                                for Covid-19 and there is evidence that COVID-19 was the cause of 
-                                death or a significant contributor to their death.")) %>% 
+           value = as_paragraph("Deaths refer to all persons who had a positive PCR test result
+                                for Covid-19 and there is evidence that COVID-19 was the cause of
+                                death or a significant contributor to their death.")) %>%
   # make your table fit to the maximum width of the word document
   set_table_properties(layout = "autofit")
 
