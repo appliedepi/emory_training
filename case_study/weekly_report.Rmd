@@ -85,7 +85,9 @@ pacman::p_load(
   tidyverse,  # data management and visualization
   flextable,  # converting tables to pretty images
   sf,         # manage spatial data using a Simple Feature format
-  scales      # define colour schemes for flextables 
+  scales,     # define colour schemes for flextables 
+  gtsummary,  # summary statistics, tests and regressions 
+  labelled    # create variable labels to be displayed in table outputs
 )
 
 ```
@@ -1063,9 +1065,183 @@ demographics_counts %>%
 
 ```
 
-
 <!---BLOCK_LANDSCAPE_STOP--->
 
+### Risk factors for mortality
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/// rf_unknowns \\\
+--------------------------------------------------------------------------------
+
+Here we need to define our variables of interest to investigate as risk factors. 
+We then need to swap factor levels so that the appropriate levels are selected 
+as the exposure level in regression. 
+we then need to keep only complete cases (i.e. that don't have any missings
+for any of the variables of interest). 
+Finally, we  use the {labelled} package to assign text for each variable name to appear 
+in output tables. 
+
+For more details see: 
+https://epirhandbook.com/univariate-and-multivariable-regression.html#store-explanatory-variables
+https://epirhandbook.com/cleaning-data-and-core-functions.html#re-code-values
+http://larmarange.github.io/labelled/
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+```{r rf_unknowns}
+
+# define variables of interest (save typing them out later) 
+descriptive_vars <- c("gender", 
+                      "age_group",
+                      "eth_race",
+                      symptom_vars,
+                      "hospitalized",
+                      "days_hosp")
+
+# filter dataset  
+rf_data <- linelist %>% 
+  # only keep variables of interest
+  select(died_covid, age, all_of(descriptive_vars)) %>% 
+  # set unknown back to NA for all factor variables
+  mutate(across(where(is.factor), 
+                ~fct_recode(.x, 
+                            NULL = "Unknown"))) %>% 
+  # flip factor levels (so that the reference values are correct)
+  mutate(gender = fct_relevel(gender, "Female", "Male")) %>% 
+  mutate(across(all_of(c("died_covid", symptom_vars, "hospitalized")), 
+                ~fct_relevel(.x, "No", "Yes")
+                )) %>% 
+  # only keep rows with complete data for all variables of interest
+  drop_na(any_of(c("died_covid", "age", descriptive_vars)))
+
+
+# define variable labels to show in output tables 
+rf_data <- rf_data %>% 
+  set_variable_labels(
+  died_covid         = "Died",
+  age                = "Age (years)",
+  gender             = "Gender",
+  age_group          = "Age group (years)", 
+  eth_race           = "Ethnicity",
+  sym_fever          = "Fever", 
+  sym_subjfever      = "Subjective fever", 
+  sym_myalgia        = "Myalgia", 
+  sym_losstastesmell = "Loss taste/smell", 
+  sym_sorethroat     = "Sore throat", 
+  sym_cough          = "Cough", 
+  sym_headache       = "Headache", 
+  hospitalized       = "Hospitalized",
+  days_hosp          = "Days in hospital"
+  )
+
+```
+
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/// simple_stats \\\
+--------------------------------------------------------------------------------
+
+Here we demonstrate how to do simple statistical tests using the {gtsummary} 
+package. We can define which tests to run for which variables and then modify the 
+table format afterwards, also using {gtsummary}. The syntax for formatting is 
+similar to {flextable} and as this needs to be in {flextable} for MS word anyway, 
+you could also do all the formatting using {flextable}.  
+
+For more details see: 
+https://epirhandbook.com/simple-statistical-tests.html#stats_gt
+https://epirhandbook.com/tables-for-presentation.html
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+```{r simple_stats}
+
+rf_data %>%
+  # keep variables of interest
+  select(died_covid, gender, eth_race, age, days_hosp) %>%
+  # produce summary table and specify grouping variable
+  tbl_summary(
+    by = died_covid
+  ) %>%
+  # specify what test to perform
+  add_p(
+    list(
+      all_continuous() ~ "kruskal.test",
+      eth_race ~ "kruskal.test",
+      all_dichotomous() ~ "chisq.test"
+    )
+  ) %>%
+  # edit what the column headers say (using {gtsummary})
+  # nb. {n} automatically shows the number in that group and \n is a linebreak
+  modify_header(update = list(
+    stat_1 ~ "**Dead**\n (N={n})",
+    stat_2 ~ "**Alive**\n (N={n})"
+  )) %>%
+  # edit what it says in the footnote (using {gtsummary})
+  modify_footnote(update = list(
+    all_stat_cols() ~ "n (%) for categorical;\n median (IQR) for continuous",
+    p.value ~ "Pearson's Chi-squared test for dichotomous;\n Kruskal-Wallis rank sum test for continuous and categorical"
+  )) %>%
+  # change to flextable format
+  as_flex_table() %>%
+  # make header text bold (using {flextable})
+  bold(part = "header")
+```
+
+```{r}
+## TODO: finish describing this section and add tab.caps
+
+
+# produce table with regression estimates
+regress_tab <- rf_data %>%
+  # drop variables not interested in 
+  select(-age_group, -eth_race) %>%
+  # produce univariate table
+  tbl_uvregression(
+    # define outcome variable
+    y = died_covid, 
+    # define regression want to run (generalised linear model)
+    method = glm, 
+    # define what type of glm want to run (logistic)
+    method.args = list(family = binomial), 
+    # exponentiate to produce odds ratios (rather than log odds)
+    exponentiate = TRUE, 
+    # do not show the overall counts (this is done in cross_tab below)
+    hide_n = TRUE,
+    ## uncomment this line if you want to not show reference rows
+    # show_single_row = c(symptom_vars, gender, hospitalized),
+    ## note: NULL at the end allows you to have a comma before a commented out row
+    NULL
+  )
+
+# produce table with counts by outcome (using the data fed to the regression above)
+cross_tab <- regress_tab$inputs$data %>%
+  tbl_summary(
+    # group by outcome 
+    by = died_covid,
+    ## uncomment this line if you only want to show the "Male" row for gender
+    ## this would be run if you also uncommented the single_row in regression above
+    # value = list(gender ~"Male"),
+    ## show all levels (otherwise only shows the "Yes" level)
+    type = list(all_dichotomous() ~ "categorical"),
+    ## note: NULL at the end allows you to have a comma before a commented out row
+    NULL
+  )
+
+# combine tables 
+tbl_merge(list(cross_tab, regress_tab)) %>%
+  # edit what it says in the grouping headers 
+  modify_spanning_header(update = list(
+    c("stat_1_1","stat_2_1") ~ "Died",
+    c("estimate_2", "ci_2", "p.value_2") ~ "Univariate regression")) %>% 
+  # edit what it says in the footnote (using {gtsummary})
+  modify_footnote(update = list(
+    all_stat_cols() ~ "n (%) for categorical;\n median (IQR) for continuous")) %>% 
+  # change to flextable format
+  as_flex_table() %>%
+  # make header text bold (using {flextable})
+  bold(part = "header")
+```
+
+
+TODO: Demonstrate in-line functions from {gtsummary} 
 
 # Visualisation 
 
