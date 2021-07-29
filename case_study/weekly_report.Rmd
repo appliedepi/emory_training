@@ -210,15 +210,17 @@ shapefile <- read_sf(here::here("case_study", "data",
   
 # import the raw case data set 
   # define the path using {here} then pass that to the {rio} import function
-linelist_raw <- here::here("data",
-                     "covid_example_data", "covid_example_data.xlsx") %>%
-     # specify the sheet to read using which (default is to read first sheet)
-     import(which = "in")
-
-# import shapefile
+  # specify the sheet to read using which (default is to read first sheet)
+  linelist_raw <- rio::import(
+    file = here::here("data", "covid_example_data", "covid_example_data.xlsx"),
+    which = "in"
+  )
+  
+  # import shapefile
   # for mapping and for extracting population counts for zipcodes
-shapefile <- read_sf(here::here("data", 
-                     "covid_example_data", "covid_shapefile", "FultonCountyZipCodes.shp"))
+  shapefile <- read_sf(
+    here::here("data", "covid_example_data", "covid_shapefile", "FultonCountyZipCodes.shp")
+  )
 }
 
 ```
@@ -253,10 +255,10 @@ View(linelist_raw)
 summary(linelist_raw)
 
 # get information about each variable in a dataset 
-     # nb. “POSIXct” is a type of raw date class 
+# nb. “POSIXct” is a type of raw date class 
 skim(linelist_raw)
 
-# view unique values contained in variables 
+# view unique values contained in variables - useful for categorical variables
 # you can run this for any column -- just replace the column name
 unique(linelist_raw$case_gender) 
 
@@ -347,11 +349,28 @@ https://epirhandbook.com/cleaning-data-and-core-functions.html#column-names
 
 ```{r clean_dates}
 
-linelist <- linelist %>%
-     
-  # convert all date columns, ymd() from lubridate
-  mutate(across(contains("date"), ymd)) %>%
-
+linelist <- linelist %>% 
+  # convert all date columns to date type 
+  # note that dates must be formatted correctly - in some cases date parsers from lubridate can be used here
+  mutate(
+    date_report =       as.Date(date_report),
+    date_dob =          as.Date(date_dob),
+    date_onset =        as.Date(date_onset)
+    # date_recovery =     as.Date(date_recovery),
+    # date_hospitalized = as.Date(date_hospitalized),
+    # date_discharge =    as.Date(date_discharge),
+    # date_died =         as.Date(date_died),
+    # date_positive =     as.Date(date_positive)
+  ) %>% 
+  
+  # we can do this in a much faster way by by using across()
+  # the apply the as.Date() function to every column with "date" in the name
+  # the top mutate can be deleted now!
+  mutate(across(
+    .cols = contains("date"),
+    .fns = as.Date
+  )) %>%
+  
   # remove onset dates prior to 2020
   mutate(
        across(
