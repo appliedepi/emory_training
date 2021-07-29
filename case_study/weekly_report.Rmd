@@ -197,7 +197,7 @@ https://epirhandbook.com/import-and-export.html
 
 ## TODO: at the end remove "case_study" from path - so that can be used within case_study.Rproj (also delete the if statement [keep the else])
 
-if (str_detect(here::here(), "emory_training")) {
+if (str_detect(here::here(), "emory_training$")) {
 
 linelist_raw <- here::here("case_study", "data",
                      "covid_example_data", "covid_example_data.xlsx") %>%
@@ -210,14 +210,14 @@ shapefile <- read_sf(here::here("case_study", "data",
   
 # import the raw case data set 
   # define the path using {here} then pass that to the {rio} import function
-linelist_raw <- here("data",
+linelist_raw <- here::here("data",
                      "covid_example_data", "covid_example_data.xlsx") %>%
      # specify the sheet to read using which (default is to read first sheet)
      import(which = "in")
 
 # import shapefile
   # for mapping and for extracting population counts for zipcodes
-shapefile <- read_sf(here("data", 
+shapefile <- read_sf(here::here("data", 
                      "covid_example_data", "covid_shapefile", "FultonCountyZipCodes.shp"))
 }
 
