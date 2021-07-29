@@ -147,8 +147,8 @@ surveillance_week <- floor_date(surveillance_date,
                           week_start = 3)
 
 # define recent (past 14 days) and previous (28 to 14 days prior)
-recent_period   <- c(seq(surveillance_week  - 13, surveillance_week, by = 1))
-previous_period <- c(seq(surveillance_week  - 27, surveillance_week - 14, by = 1))
+recent_period   <- seq(surveillance_week  - 13, surveillance_week, by = 1)
+previous_period <- seq(surveillance_week  - 27, surveillance_week - 14, by = 1)
 
 # define the cut-off dates for the recent period (for table headers)
 recent_period_labels <- str_c(
