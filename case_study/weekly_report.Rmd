@@ -151,14 +151,14 @@ recent_period   <- seq(surveillance_week  - 13, surveillance_week, by = 1)
 previous_period <- seq(surveillance_week  - 27, surveillance_week - 14, by = 1)
 
 # define the cut-off dates for the recent period (for table headers)
-recent_period_labels <- str_c(
+recent_period_labels <- paste0(
   format(min(recent_period), format = "%m/%d"), 
   "-", 
   format(max(recent_period), format = "%m/%d")
 )
 
 # define the cut-off dates for previous period (for table headers) 
-previous_period_labels <- str_c(
+previous_period_labels <- paste0(
   format(min(previous_period), format = "%m/%d"), 
   "-", 
   format(max(previous_period), format = "%m/%d")
@@ -166,7 +166,7 @@ previous_period_labels <- str_c(
 
 
 # define a label for past 28 days (for table captions)
-full_period_labels <- str_c(
+full_period_labels <- paste0(
   format(min(previous_period), format = "%B %d"), 
   "-", 
   format(surveillance_week, format = "%B %d, %Y")
