@@ -368,7 +368,7 @@ linelist <- linelist %>%
   # the top mutate can be deleted now!
   mutate(across(
     .cols = contains("date"),
-    .fns = as.Date
+    .fns = ~as.Date(.x)
   )) %>%
   
   # remove onset dates prior to 2020
