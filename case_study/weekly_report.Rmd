@@ -1287,8 +1287,126 @@ ggplot(data = linelist,
 
 ## geospatial 
 
-gifs for maps projections to put in slides (consider just recreating w code)
+TODO: gifs for maps projections to put in slides (consider just recreating w code)
 https://twitter.com/mbostock/status/1292887409474994176
 https://twitter.com/Amazing_Maps/status/456921227068968960/photo/1
+
+```{r crs}
+
+shapefile <- st_transform(shapefile, crs = "+proj=longlat +datum=WGS84 +no_defs")
+
+
+```
+
+
+
+
+```{r points_map}
+ggplot() + 
+  geom_sf(data = shapefile) +
+  geom_point(data = filter(linelist, lat > 1), 
+             aes(x = lon, y = lat, colour = eth_race), 
+             alpha = 0.5) + 
+  coord_sf(crs = "+proj=longlat +datum=WGS84 +no_defs")
+
+
+```
+ 
+```{r choropleth_map}
+
+shapefile <- left_join(shapefile, zip_counts, 
+                       by = c("ZipCode" = "zip"))
+shapefile <- shapefile %>% 
+  mutate(incidence = age_categories(
+    recent_inc,
+    breakers = c(0, 1, 2, 3, 4, 5, 6, 100), 
+    ceiling = TRUE
+  ))
+
+ggplot(shapefile) + 
+  geom_sf(aes(fill = incidence)) + 
+  scale_fill_brewer()
+
+```
+ 
+ 
+```{r bivar_map}
+
+```
+
+
+```{r trivar_map}
+
+```
+
+
+
+```{r heatmap}
+
+
+bounding_box <- shapefile %>% 
+  st_bbox()  %>% st_as_sfc()
+
+
+#define your x and y minimum/maximum coordinates
+xmin <- st_point(c(bounding_box[1], bounding_box[2]))
+xmax <- st_point(c(bounding_box[3], bounding_box[2]))
+ymin <- xmin
+ymax <- st_point(c(bounding_box[1], bounding_box[4]))
+                 
+
+xaxis <- st_sfc(xmin, xmax, crs = 4326)
+yaxis <- st_sfc(ymin, ymax, crs = 4326)
+                 
+#calculate the distance in metres on the axes of your basemap based on longitude and latitude
+#i.e. how many metres on your x axis and how many on your y
+xdist <- st_distance(xaxis)[2] %>% units::set_units("miles")
+ydist <- st_distance(yaxis)[2] %>% units::set_units("miles")
+
+xunits <- st_distance(xmin, xmax)
+yunits <- st_distance(ymin, ymax)
+
+
+#divide the difference in latitude or longitude by the corresponding distance
+#multiply by 1000 to get how many units latitude and longitude correspond to one kilometre
+xfact <- as.numeric(xunits / xdist)
+yfact <- as.numeric(yunits / ydist)
+
+
+ggplot() + 
+  geom_sf(data = shapefile) + 
+  ggplot2::stat_density_2d(
+        data = filter(linelist,
+                      lat > 1 &
+                        date_report %in% recent_period),
+        aes(
+          x = lon,
+          y = lat,
+          fill = ..level..,
+          # alpha = after_stat("level"),
+          NULL
+          ),
+        # bins = 10,
+        geom = "polygon",
+        # contour = TRUE,
+        # contour_var = "count",
+        show.legend = TRUE,
+        h = c(xfact, yfact))
+
+   # ggplot2::geom_density_2d_filled(
+   #      data = filter(linelist, 
+   #                    lat > 1 &
+   #                      date_report %in% recent_period),
+   #      aes(
+   #        x = lon,
+   #        y = lat),
+   #      contour_var = "count",
+   #      geom = "polygon",
+   #      show.legend = TRUE,
+   #      h = c(xfact, yfact))
+
+```
+
+ 
 
  
