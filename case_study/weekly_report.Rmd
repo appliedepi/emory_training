@@ -822,7 +822,7 @@ https://colorbrewer2.org/#type=sequential&scheme=Reds&n=3
 #   scales::show_col()
 
 # choose colours to fill in cells  
-row_colour <- case_when( 
+row_colour <- case_when(
   # those less than zero will be green (decreasing cases)
   zip_counts$perc_change < 0 ~ "#91CF60", 
   # over zero red (increasing)
@@ -844,9 +844,9 @@ zip_counts %>%
     # note the empty columns ("") to fit to the original table headers
   add_header_row(
     values = c("", 
-               str_c("Recent 14-day reporting period\n", recent_period_labels), 
+               paste0("Recent 14-day reporting period\n", recent_period_labels), 
                "", 
-               str_c("Previous 14-day reporting period\n", previous_period_labels), 
+               paste0("Previous 14-day reporting period\n", previous_period_labels), 
                "", 
                "Change between reporting periods"
                )) %>% 
@@ -917,6 +917,28 @@ https://epirhandbook.com/iteration-loops-and-lists.html
 # get counts tables for measures of interest 
 ############################################
 
+# we generate 3 summary tables and bind them together
+# summary demographic table for gender
+dem_gender <- linelist %>% 
+  tabyl(gender) %>% 
+  select(Characteristic = gender, n, percent)
+
+# summary demographic table for age
+dem_age <- linelist %>% 
+  tabyl(age_group) %>% 
+  select(Characteristic = age_group, n, percent)
+
+# summary demographic table for ethnicity and race
+dem_eth_race <- linelist %>% 
+  tabyl(eth_race) %>% 
+  select(Characteristic = eth_race, n, percent)
+
+# bind all tables together
+total_cases <- bind_rows(list(dem_gender, dem_age, dem_eth_race))
+
+
+# this can be done iteratively (we are repeating code)
+# this uses the {purrr} package to iterate over each variable
 # counts of total cases 
 total_cases <- purrr::map(
   # for each variable listed
