@@ -683,10 +683,13 @@ We then create use {flextable} to produce a clean output table.
 For more details see: 
 https://epirhandbook.com/descriptive-tables.html
 https://epirhandbook.com/tables-for-presentation.html
+https://epirhandbook.com/descriptive-tables.html#tbl_janitor
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
 ```{r epiweek_table, tab.cap="COVID-19 case counts by calendar week in Fulton County", tab.id="timetab"}
 
+# produce a quick descriptive table of number of cases reported by date
+# we aren't saving this, but just letting it display in the markdown
 linelist %>% 
   # get counts and percentages 
   tabyl(epiweek) %>% 
@@ -710,7 +713,7 @@ Note that tab.caps cannot have any special characters in them (e.g. "_") otherwi
 referencing as below does not work. 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
-As you can see from above in Table \@ref(tab:timetab) we saw xyz (TODO: say something meaningful)
+As you can see from above in Table \@ref(tab:timetab) we can see clear trends in reporting patterns - cases increase and peak in July 2020 and December/January 2020/2021
 
 \pagebreak 
 
@@ -786,16 +789,15 @@ zip_counts <- left_join(zip_counts,
            ~round(.x / Population * 10000, digits = 1), 
            # for each period create a new variable with _inc on the end
            .names = "{.col}_inc"), 
-    # for each of the calculated variables (percentage and incidence)
-    across(c(perc_change, recent_inc, previous_inc), 
-           # fix the outliers: set missing to 0 and infity (divided by 0) to 100
-           ~case_when(
-             is.na(.x) ~ 0,
-             .x == Inf ~ 100, 
-             TRUE      ~ .x
-             )
-           )
-    )
+    
+    # replace 0s in incidence with 0
+    across(contains("inc"), ~replace_na(.x, 0)),
+    perc_change = case_when(
+      # fix the outliers: set missing to 0 and infinity (divided by 0) to 100
+      is.na(perc_change)       ~ 0,
+      is.infinite(perc_change) ~ 100, 
+      TRUE            ~ perc_change
+    ))
 ```
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
