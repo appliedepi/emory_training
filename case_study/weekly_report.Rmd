@@ -345,6 +345,7 @@ the syntax New name = Old name.
 
 For more details see: 
 https://epirhandbook.com/cleaning-data-and-core-functions.html#column-names
+https://epirhandbook.com/cleaning-data-and-core-functions.html#clean_tidyselect
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
 ```{r clean_dates}
@@ -365,6 +366,7 @@ linelist <- linelist %>%
   
   # we can do this in a much faster way by by using across()
   # the apply the as.Date() function to every column with "date" in the name
+  # contains() is a tidyselect function (see the handbook for details)
   # the top mutate can be deleted now!
   mutate(across(
     .cols = contains("date"),
@@ -521,7 +523,7 @@ linelist <- linelist %>%
      mutate(across(c(county, state), str_to_title)) %>% 
      
      
-    
+     # recode with searching for string patterns 
      mutate(contact_id = case_when(
        str_detect(contact_id, "Yes")     ~ "Yes", 
        str_detect(contact_id, "No")      ~ "No", 
@@ -529,10 +531,11 @@ linelist <- linelist %>%
        TRUE                                ~ "Unknown"
      )) %>% 
   
-  
-     # remove text from a string (everything after the dash) - this uses regular expressions (regex)
-     # see handbook section on regex for understanding how this works
-     mutate(contact_id = str_remove(linelist$contact_id, "-.*")) %>% 
+     # # this section does the same as above, but takes advantage of the way the data is formatted
+     # # data is formatted as "Yes/No-A/Symptomatic"
+     # # remove text from a string (everything after the dash) - this uses regular expressions (regex)
+     # # see handbook section on regex for understanding how this works
+     # mutate(contact_id = str_remove(linelist$contact_id, "-.*")) %>% 
 
      # recode with searching for string patterns 
      mutate(sym_resolved = case_when(
