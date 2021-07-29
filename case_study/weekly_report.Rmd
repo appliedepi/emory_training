@@ -455,6 +455,9 @@ linelist <- linelist %>%
     days_hosp = replace(days_hosp, days_hosp > 60, NA)
   )
 
+# it's a good habit to make sure the variables you're generating seem realistic (are you calculating them correctly?)
+summary(linelist$days_hosp)
+
 ```
 
 
