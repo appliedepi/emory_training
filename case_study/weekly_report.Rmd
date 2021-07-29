@@ -472,6 +472,7 @@ age groups using the {dplyr} case_when() function - but is more involved.
 For more details see: 
 https://epirhandbook.com/cleaning-data-and-core-functions.html#column-creation-and-transformation
 https://epirhandbook.com/cleaning-data-and-core-functions.html#re-code-values
+https://epirhandbook.com/characters-and-strings.html?q=regex#regular-expressions-regex
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
 ```{r clean_categories}
@@ -519,9 +520,20 @@ linelist <- linelist %>%
      # change from upper-case to lower case (with leading capital)
      mutate(across(c(county, state), str_to_title)) %>% 
      
-     # remove text from a string (everything after the dash)  
-     mutate(contact_id = str_remove(linelist$contact_id, "-.*")) %>% 
      
+    
+     mutate(contact_id = case_when(
+       str_detect(contact_id, "Yes")     ~ "Yes", 
+       str_detect(contact_id, "No")      ~ "No", 
+       str_detect(contact_id, "Unknown") ~ "Unknown", 
+       TRUE                                ~ "Unknown"
+     )) %>% 
+  
+  
+     # remove text from a string (everything after the dash) - this uses regular expressions (regex)
+     # see handbook section on regex for understanding how this works
+     mutate(contact_id = str_remove(linelist$contact_id, "-.*")) %>% 
+
      # recode with searching for string patterns 
      mutate(sym_resolved = case_when(
           str_detect(sym_resolved, "Yes")     ~ "Yes", 
