@@ -492,7 +492,8 @@ linelist <- linelist %>%
                                  "Unknown", died_covid), 
             confirmed_case = if_else(confirmed_case == "Pending", 
                                      "Unknown", confirmed_case), 
-            sym_myalgia = if_else(sym_myalgia == "YES", "Yes", sym_myalgia)
+            # force categorical variables to use consistent cases (this can be done for others) 
+            sym_myalgia = str_to_title(sym_myalgia),
             ) %>% 
      
      #replace one category and leave rest over multiple variables 
@@ -503,17 +504,15 @@ linelist <- linelist %>%
      # create a composite category from race and ethnicitiy  
           #  (nb. this sets those that are non-specified in eth to non-hispanic)
      mutate(eth_race = case_when(
+       # we evaluate if ethnicity is HISPANIC/LATINO **FIRST**
+       # case_when() evaluates in order (like if, else if, else)
           eth == "HISPANIC/LATINO"                            ~ "Hispanic, all races", 
-          race == "ASIAN" & 
-               eth != "HISPANIC/LATINO"                       ~ "Asian, NH", 
-          race == "BLACK" & 
-               eth != "HISPANIC/LATINO"                       ~ "Black, NH",
-          race == "WHITE" & 
-               eth != "HISPANIC/LATINO"                       ~ "White, NH",
-          race == "AMERICAN INDIAN/ALASKA NATIVE" |
-               race == "NATIVE HAWAIIAN/PACIFIC ISLANDER" |
-               race == "OTHER" & 
-               eth != "HISPANIC/LATINO"                       ~ "Other, NH", 
+          race == "ASIAN"                                     ~ "Asian, NH", 
+          race == "BLACK"                                     ~ "Black, NH",
+          race == "WHITE"                                     ~ "White, NH",
+      # find all instances of NATIVE (covers AMERICAN INDIAN/ALASKA NATIVE **AND** NATIVE HAWAIIAN/PACIFIC ISLANDER)
+          str_detect(race, "NATIVE")                          ~ "Other, NH",
+          race == "OTHER"                                     ~ "Other, NH", 
           TRUE                                                ~ "Unknown"
      )) %>% 
      
