@@ -78,7 +78,10 @@ pacman::p_load(
   here,       # relative file pathways  
   skimr,      # review data
   janitor,    # data cleaning and tables
+  epikit,     # age categories
   lubridate,  # working with dates
+  incidence2, # epidemic curves
+  apyramid,   # age pyramids
   tidyverse,  # data management and visualization
   xaringanthemer  # for styling presentation 
 )
@@ -238,8 +241,9 @@ fs::dir_tree(path = here::here("case_study", "data", "covid_example_data"), recu
 pacman::p_load(
   rio,            # import/export
   here,           # file locator
-  rmarkdown,      # reports
   lubridate,      # working with dates
+  incidence2,     # epidemic curves
+  apyramid,       # demographic pyramids
   tidyverse       # mega-package for data management and visualization
   )
 ```
@@ -374,7 +378,16 @@ linelist <- linelist_raw %>%
             eth_race    = fct_relevel(eth_race, 
                                    "Asian, NH", "Black, NH", "White, NH", 
                                    "Hispanic, all races", "Other, NH", "Unknown")
-         )
+         ) %>% 
+  
+       # create age group variable
+     mutate(
+     age_group = age_categories(age,
+      # define break points
+      c(0, 10, 20, 30, 40, 50, 60, 70),
+      # whether last break should be highest category
+      ceiling = FALSE
+     ))
 
 ```
 
@@ -1329,7 +1342,8 @@ theme_gray(base_size = 18)
 ```
 ]
 
-
+???
+Discuss the na.value= arguments in most scale commands, and the difference between having NA values in the data and having an explicit missing value such as "Unknown".
 
 
 ---
@@ -1670,6 +1684,128 @@ Others include theme_grey, theme_classic, etc... adjust base text size.
 
 
 ---
+# Themes  
+
+.pull-left[
+
+Themes are non-data plot features (background, text side/color, etc).  
+
+[These "complete themes"](https://ggplot2.tidyverse.org/reference/ggtheme.html) are easy to add.  
+
+]
+
+.pull-right[
+
+```{r , echo = FALSE, eval = TRUE, tidy = FALSE}
+
+minimal <- ggplot(data = linelist,
+       mapping = aes(
+         x = age,
+         y = days_hosp),    
+       alpha = 0.3)+
+  geom_point()+
+  labs(
+    title = "theme_minimal()",
+    x = "Age (years)",
+    y = "Duration (days)",
+    caption = "Fictional COVID-19 data")+
+  theme_minimal(base_size = 18)
+
+
+
+bw <- ggplot(data = linelist,
+       mapping = aes(
+         x = age,
+         y = days_hosp),    
+       alpha = 0.3)+
+  geom_point()+
+  labs(
+    title = "theme_bw()",
+    x = "Age (years)",
+    y = "Duration (days)",
+    caption = "Fictional COVID-19 data")+
+  theme_bw(base_size = 18)
+
+
+
+grey <- ggplot(data = linelist,
+       mapping = aes(
+         x = age,
+         y = days_hosp),    
+       alpha = 0.3)+
+  geom_point()+
+  labs(
+    title = "theme_grey()",
+    x = "Age (years)",
+    y = "Duration (days)",
+    caption = "Fictional COVID-19 data")+
+  theme_grey(base_size = 18)
+
+
+dark <- ggplot(data = linelist,
+       mapping = aes(
+         x = age,
+         y = days_hosp),    
+       alpha = 0.3)+
+  geom_point()+
+  labs(
+    title = "theme_dark()",
+    x = "Age (years)",
+    y = "Duration (days)",
+    caption = "Fictional COVID-19 data")+
+  theme_dark(base_size = 18)
+
+
+
+void <- ggplot(data = linelist,
+       mapping = aes(
+         x = age,
+         y = days_hosp),    
+       alpha = 0.3)+
+  geom_point()+
+  labs(
+    title = "theme_void()",
+    x = "Age (years)",
+    y = "Duration (days)",
+    caption = "Fictional COVID-19 data")+
+  theme_void(base_size = 18)
+
+
+
+light <- ggplot(data = linelist,
+       mapping = aes(
+         x = age,
+         y = days_hosp),    
+       alpha = 0.3)+
+  geom_point()+
+  labs(
+    title = "theme_light()",
+    x = "Age (years)",
+    y = "Duration (days)",
+    caption = "Fictional COVID-19 data")+
+  theme_light(base_size = 18)
+
+
+themes_plots <- cowplot::plot_grid(
+  minimal, light,
+  bw, grey,
+  dark, void,
+  nrow = 3, rel_widths = c(2,2))
+
+themes_plots
+
+```
+
+
+
+]
+
+
+
+
+
+
+---
 # Syntax - micro-adjust theme  
 
 .pull-left[
@@ -1684,7 +1820,7 @@ ggplot(
     alpha = 0.3)+
 geom_point()+
 labs(
-  title = "Duration of admission among hospitalized COVID-19 patients",
+  title = "Duration of admission among\nhospitalized COVID-19 patients",
   x = "Age (years)", y = "Duration (days)",
   caption = "Fictional COVID-19 data",
   color = "Deceased")+
@@ -1709,7 +1845,7 @@ ggplot(data = linelist,
        alpha = 0.3)+
   geom_point()+
   labs(
-    title = "Duration of admission among hospitalized COVID-19 patients",
+    title = "Duration of admission among\nhospitalized COVID-19 patients",
     x = "Age (years)",
     y = "Duration (days)",
     caption = "Fictional COVID-19 data",
@@ -1727,6 +1863,7 @@ ggplot(data = linelist,
 ???
 Talk about these theme() arguments and how they consist of two parts, just like `mapping = aes()`. 
 Explain that nobody has these all memorized, but the common ones are easy to remember once you use them enough.  
+Remember to add them AFTER any complete themes.
 
 
 
@@ -1807,7 +1944,7 @@ Adjust the interval
 bimonthly <- incidence(
   x = linelist,            # define dataset
   date_index = date_onset, # date column
-*  interval = "2 months")  # bin interval   
+* interval = "2 months")   # bin interval   
 ```
 
 **Plot** the incidence object  
@@ -1815,6 +1952,8 @@ bimonthly <- incidence(
 ```{r , echo = TRUE, eval = FALSE, tidy = FALSE}
 plot(bimonthly)
 ```
+
+Try "Sunday weeks" or "MMWR week" for Sunday weeks.  
 
 ]
 
@@ -1833,27 +1972,51 @@ plot(bimonthly)
 ]
 
 
----
-# Epicurve - ggplot  
 
-Since we have only one geom and one data frame linked to the plot, we could move the _mapping_ to the `geom_histogram()` call:  
+
+---
+# Epicurve - groups 
+
+.pull-left[
+
+To add groups, specify them to `groups=` in the `incidence()` command AND `fill=` in the `plot()` command:  
+
+```{r, echo=T, eval=F}
+SunWeeks <- incidence(
+  x = linelist,              # define dataset
+  date_index = date_onset,   # date column
+  interval = "Sunday weeks", # bin interval
+* groups = eth_race)      
+```
 
 ```{r , echo = TRUE, eval = FALSE, tidy = FALSE}
-ggplot() + 
-  geom_histogram(
-    data = linelist,
-    mapping = aes(x = date_onset))
-````
- 
+plot(SunWeeks,
+* fill = eth_race)
+```
+
+If grouping by multiple columns, nest them in both places within `c()`:  
+
+```{r, eval=F, echo=T}
+groups = c(eth_race, gender)
+```
+
+]
 
 .pull-right[
-```{r }
-ggplot(
-  data = linelist,
-  mapping = aes(x = date_onset)  
-  ) + 
-  geom_histogram()
+
+
+
+```{r, echo=F, eval=T}
+SunWeeks <- incidence(
+  x = linelist,              # define dataset
+  date_index = date_onset,   # date column
+  interval = "Sunday weeks", # bin interval
+  groups = eth_race) 
+
+plot(SunWeeks,
+  fill = eth_race)
 ```
+
 ]
 
 
@@ -1861,40 +2024,50 @@ ggplot(
 
 
 
+
+
 ---
-# Epicurve - ggplot  
+# Epicurve - groups 
 
 .pull-left[
 
-Use `geom_histogram()` with specified bins.   
+Add `NA` (missing) values as their own group with `na_as_group=TRUE`  
 
-```{r , echo = TRUE, eval = FALSE, tidy = FALSE}
-ggplot(
-  data = linelist,
-  mapping = aes(x = date_onset)  
-) + #<<
-  geom_histogram() #<<
+```{r, echo=T, eval=F}
+SunWeeks <- incidence(
+  x = linelist,              # define dataset
+  date_index = date_onset,   # date column
+  interval = "Sunday weeks", # bin interval
+  groups = eth_race,
+* na_as_group = TRUE)      
 ```
 
---
-Since we have only one geom and one data frame linked to the plot, we could move the _mapping_ to the `geom_histogram()` call:  
-
+Adjust legend title with `labs()`, as in any ggplot
 ```{r , echo = TRUE, eval = FALSE, tidy = FALSE}
-ggplot() + 
-  geom_histogram(
-    data = linelist,
-    mapping = aes(x = date_onset))
-````
-] 
+plot(SunWeeks,
+  fill = eth_race)+
+*labs(fill = "Race and/nEthnicity")
+```
+
+]
 
 .pull-right[
-```{r }
-ggplot(
-  data = linelist,
-  mapping = aes(x = date_onset)  
-  ) + 
-  geom_histogram()
+
+
+
+```{r, echo=F, eval=T}
+SunWeeks <- incidence(
+  x = linelist,              # define dataset
+  date_index = date_onset,   # date column
+  interval = "Sunday weeks", # bin interval
+  groups = eth_race,
+  na_as_group = TRUE) 
+
+plot(SunWeeks,
+  fill = eth_race)+
+labs(fill = "Race and\nEthnicity")
 ```
+
 ]
 
 
@@ -1902,48 +2075,593 @@ ggplot(
 
 
 ---
-# Show groups  
+# Epicurve - groups 
 
-So far the graph shows the distribution of cases in all hospitals. 
+.pull-left[
 
-It would make sense to break down the visualization by hospitals.
+Add other ggplot commands with `+`:  
 
-Two options:  
+```{r, echo=T, eval=F}
+SunWeeks <- incidence(
+  x = linelist,              # define dataset
+  date_index = date_onset,   # date column
+  interval = "Sunday weeks", # bin interval
+  groups = eth_race)      
+```
 
-* Fill each hospital in different color (stacked histogram)
-* Create multiple plots, each showing a different hospital
+```{r , echo = TRUE, eval = FALSE, tidy = FALSE}
+plot(SunWeeks, fill = eth_race)+
+scale_y_continuous(
+  expand = c(0,0),
+  breaks = seq(0,2000,250))+
+theme(legend.position = "top")+
+labs(fill = "Race and\nEthnicity")
+```
+
+Note: 
+]
+
+.pull-right[
+
+
+
+```{r, echo=F, eval=T}
+SunWeeks <- incidence(
+  x = linelist,              # define dataset
+  date_index = date_onset,   # date column
+  interval = "Sunday weeks", # bin interval
+  groups = eth_race,
+  na_as_group = TRUE) 
+
+plot(SunWeeks,
+  fill = eth_race)+
+scale_y_continuous(expand = c(0,0),
+                   breaks = seq(0,2000,250))+
+theme(legend.position = "top")+
+labs(fill = "Race and\nEthnicity")
+```
+
+]
+
 
 
 
 ---
-# Color by group
+# Epicurve - date axis 
 
 .pull-left[
 
-To color by group (stacked epicurve), we need to map the variable `eth_race` to the `fill=` aesthetic *in* the `aes()`:  
+Do not add `scale_x_date()` to modify. Instead, use custom arguments in `plot()`:  
 
 ```{r , echo = TRUE, eval = FALSE, tidy = FALSE}
-ggplot(data = linelist,
-       mapping = aes(
-         x    = date_onset,
-         fill = eth_race))+ #<<
-  geom_histogram()
+plot(SunWeeks,
+  fill = eth_race,
+*  date_format = "%a %d %b %Y\n (Week %W)", 
+*  angle = 30)+                           # angle of date labels)+
+scale_y_continuous(
+  expand = c(0,0),
+  breaks = seq(0,2000,250))+
+theme(legend.position = "top")+
+labs(fill = "Race and\nEthnicity")
 ```
 
-Note: the _fill_ aesthetics control the color filling areas while the _color_ aesthetics control the color of lines and points.
-
-] 
+Note: 
+]
 
 .pull-right[
-```{r }
-ggplot(data = linelist) +
-  geom_histogram(
-    mapping = aes(
-      x = date_onset,
-      fill = eth_race
-      )
-    )
+
+
+
+```{r, echo=F, eval=T}
+SunWeeks <- incidence(
+  x = linelist,              # define dataset
+  date_index = date_onset,   # date column
+  interval = "Sunday weeks", # bin interval
+  groups = eth_race,
+  na_as_group = TRUE) 
+
+plot(SunWeeks,
+  fill = eth_race,
+  date_format = "%a %d %b %Y\n (Week %W)", 
+  angle = 30)+                           # angle of date labels)+
+scale_y_continuous(
+  expand = c(0,0),
+  breaks = seq(0,2000,250))+
+theme(legend.position = "top")+
+labs(fill = "Race and\nEthnicity")
 ```
+
+]
+
+
+
+
+
+
+
+
+---
+# Epicurve - show cases 
+
+.pull-left[
+
+For small outbreaks, the style `show_cases = TRUE` may be helpful:  
+
+```{r, eval=F, echo=T}
+zip30024 <- incidence(
+  x = linelist %>% filter(zip == 30024), # define dataset
+  date_index = date_onset,   # date column
+  interval = "Sunday weeks", # bin interval
+  groups = eth_race)
+```
+
+```{r , echo = TRUE, eval = FALSE, tidy = FALSE}
+plot(zip30024,
+  fill = eth_race,
+* show_cases = TRUE)+
+theme(legend.position = "bottom")+
+labs(title = "COVID-19 cases in ZIP 30024")
+```
+
+]
+
+.pull-right[
+
+```{r, echo=F, eval=T}
+zip30024 <- incidence(
+  x = linelist %>% filter(zip == 30024), # define dataset
+  date_index = date_onset,   # date column
+  interval = "Sunday weeks", # bin interval
+  groups = eth_race) 
+
+plot(zip30024,
+  fill = eth_race,
+ show_cases = TRUE)+
+theme(legend.position = "bottom")+
+labs(title = "COVID-19 cases in ZIP 30024")
+```
+
+]
+
+
+
+
+
+
+
+
+
+---
+# Epicurve - color palette 
+
+.pull-left[
+
+Try a built-in color palette  
+
+
+```{r, echo=T, eval=F}
+plot(SunWeeks,
+  fill = eth_race, 
+* col_pal = muted)
+```
+
+Note a palette is an *object* and so not in quotes.  
+
+]
+
+.pull-right[
+
+
+
+```{r, echo=F, eval=T}
+SunWeeks <- incidence(
+  x = linelist,              # define dataset
+  date_index = date_onset,   # date column
+  interval = "Sunday weeks", # bin interval
+  groups = eth_race,
+  na_as_group = TRUE) 
+
+plot(SunWeeks,
+  fill = eth_race, 
+  col_pal = muted)
+```
+
+
+
+]
+
+???
+This uses the build-in argument from incidence2 to accept color palettes.
+
+
+
+
+
+
+---
+# Epicurve - color palette 
+
+.pull-left[
+
+Or a palette from **base** R:  
+
+```{r, echo=T, eval=F}
+plot(SunWeeks,
+  fill = eth_race, 
+* col_pal = rainbow)
+```
+
+
+]
+
+.pull-right[
+
+
+
+```{r, echo=F, eval=T}
+plot(SunWeeks,
+  fill = eth_race, 
+  col_pal = rainbow)
+```
+
+]
+
+???
+This again uses the argument to accept color palettes
+
+
+
+
+
+
+---
+# Epicurve - color palette 
+
+.pull-left[
+
+Add `scale_fill_viridis_d()` for palettes that are color-blind friendly:  
+
+```{r, echo=T, eval=F}
+plot(SunWeeks, fill = eth_race)+
+*scale_fill_viridis_d(
+    option = "inferno",     # color scheme, try also "plasma" or default
+    name = "Race and\nEthnicity",  # legend name
+    na.value = "grey")      # for missing values
+```
+
+[Viridis](https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html) (try with `option = "plasma"` or "inferno"), and [colorbrewer](https://www.r-graph-gallery.com/38-rcolorbrewers-palettes.html) palette functions can be added to any ggplot as well.  
+
+]
+
+.pull-right[
+
+
+
+```{r, echo=F, eval=T}
+plot(SunWeeks, fill = eth_race)+
+   scale_fill_viridis_d(
+    name = "Age Category",  # legend name
+    na.value = "grey")      # for missing values
+```
+
+
+]
+
+
+
+
+
+
+
+
+
+
+---
+# Demographic pyramids  
+
+We suggest two ways to make age pyramids:  
+
+1) Use the **apyramid** package - simple, easy  
+
+2) Use **ggplot2** - more customizeable, but opportunity for error  
+
+See the Epi R Handbook [page on demographic pyramids](https://epirhandbook.com/demographic-pyramids-and-likert-scales.html) for more information on both.  
+
+
+
+---
+# Demographic pyramids
+
+The function `age_pyramid()` from **apyramid** offers an easy interface:  
+
+.pull-left[
+
+```{r, echo=T, eval=F}
+age_pyramid(
+  data = linelist,
+  age_group = "age_group",
+  split_by = "gender")
+```
+
+Three `gender` values are detected, so the plot is not a traditional pyramid.  
+
+
+]
+
+.pull-right[
+
+```{r, eval=T, echo=F}
+age_pyramid(
+  data = linelist,
+  age_group = "age_group",
+  split_by = "gender")
+```
+
+]
+
+
+
+---
+# Demographic pyramids
+
+Let's remove "Unknown" as an explicit category, by converting to `NA` and dropping the unused factor level:  
+
+```{r, echo=T, eval=T}
+linelist_2g <- linelist %>% 
+  mutate(
+    gender = na_if(gender, "Unknown"), # convert to NA 
+    gender = fct_drop(gender))         # drop unused factor levels
+```
+
+`tabyl()` from **janitor** makes pretty tabulations
+
+```{r, echo=T, eval=T}
+linelist_2g %>%
+  tabyl(gender) %>% 
+  adorn_pct_formatting()
+```
+
+
+
+
+---
+# Demographic pyramids
+
+.pull-left[
+Now make the pyramid again, using the revised dataset:  
+
+```{r, echo=T, eval=F}
+age_pyramid(
+* data = linelist_2g,
+  age_group = "age_group",
+  split_by = "gender")
+```
+
+]
+
+.pull-right[
+
+```{r, eval=T, echo=F}
+age_pyramid(
+  data = linelist_2g,
+  age_group = "age_group",
+  split_by = "gender")
+```
+
+]
+
+
+
+
+---
+# Demographic pyramids
+
+.pull-left[
+
+Further modifications:  
+
+* Percents instead of raw counts on the x-axis  
+* No mid-point designation  
+* Specified colors  
+
+```{r, echo=T, eval=F}
+age_pyramid(
+  data = linelist_2g,
+  age_group = "age_group",
+  split_by = "gender",
+* proportional = TRUE,
+* show_midpoint = FALSE,
+* pal = c("darkgreen", "brown")) # colors only, not legend labels
+```
+
+]
+
+.pull-right[
+
+```{r, eval=T, echo=F}
+age_pyramid(
+  data = linelist_2g,
+  age_group = "age_group",
+  split_by = "gender",
+  proportional = TRUE,
+  show_midpoint = FALSE,
+  pal = c("darkgreen", "brown"))
+```
+
+]
+
+
+---
+# Demographic pyramids
+
+You can add further ggplot commands 
+
+.pull-left[
+
+
+```{r, echo=T, eval=F}
+age_pyramid(
+  data = linelist_2g,
+  age_group = "age_group",
+  split_by = "gender",
+  proportional = TRUE,
+  show_midpoint = FALSE)+
+*theme_minimal()+
+*labs(
+*  title = "Age and Gender of COVID-19 cases",
+*  subtitle = "Fulton County, GA",
+*  x = "Percent of total",
+*  y = "Age group",
+*  fill = "Gender",
+*  caption = "Caption here")
+```
+
+]
+
+.pull-right[
+
+```{r, eval=T, echo=F}
+age_pyramid(
+  data = linelist_2g,
+  age_group = "age_group",
+  split_by = "gender",
+  proportional = TRUE,
+  show_midpoint = FALSE)+
+theme_minimal()+
+labs(
+  title = "Age and Gender of COVID-19 cases",
+  subtitle = "Fulton County, GA",
+  x = "Percent of total",
+  y = "Age group",
+  fill = "Gender",
+  caption = "Caption here")
+```
+
+]
+
+
+
+---
+# Dynamic labels example
+
+Let's use these dynamic labels for the demographic pyramid, so that they will update with the data.  
+
+For complicated `str_glue()` cases, define the dynamic components outside the quotation marks.  
+
+**Caption**  
+```{r, eval=F, echo=T}
+labs(caption = str_glue(
+  "{missing} cases missing either age or gender are not shown.",
+  missing = linelist_2g %>%
+            filter(is.na(gender) | is.na(age_group)) %>% 
+            nrow()
+  ))
+```
+
+
+
+---
+# Dynamic labels example
+
+Let's use these dynamic labels for the demographic pyramid, so that they will update with the data:  
+
+**Subtitle**  
+```{r, eval=F, echo=T}
+labs(subtitle = str_glue(
+  "Fulton County, GA, reported {min_date} - {max_date}",
+  
+  min_date = format(
+    min(linelist_2g$date_report, na.rm=T),
+    "%b %d %Y"),
+  
+  max_date = format(
+    max(linelist_2g$date_report, na.rm=T),
+    "%b %d %Y")
+  )
+  ) 
+```
+
+
+
+
+---
+class: remark-code
+
+# Dynamic captions
+
+Now applying those dynamic captions:  
+
+.pull-left[
+
+
+```{r, echo=T, eval=F}
+age_pyramid(
+  data = linelist_2g,
+  age_group = "age_group",
+  split_by = "gender",
+  proportional = TRUE,
+  show_midpoint = FALSE)+
+theme_minimal()+
+labs(
+  title = "Age and Gender of COVID-19 cases",
+  subtitle = str_glue(
+  "Fulton County, GA, reported {min_date} - {max_date}",
+  
+  min_date = format(
+    min(linelist_2g$date_report, na.rm=T),
+    "%b %d %Y"),
+  
+  max_date = format(
+    max(linelist_2g$date_report, na.rm=T),
+    "%b %d %Y")
+  ),
+  x = "Percent of total",
+  y = "Age group",
+  fill = "Gender",
+  caption = str_glue(
+    "{missing} cases missing either age or gender are not shown.",
+    missing = linelist_2g %>%
+              filter(is.na(gender) | is.na(age_group)) %>% 
+              nrow())
+  )
+```
+
+]
+
+.pull-right[
+
+```{r, eval=T, echo=F}
+age_pyramid(
+  data = linelist_2g,
+  age_group = "age_group",
+  split_by = "gender",
+  proportional = TRUE,
+  show_midpoint = FALSE)+
+theme_minimal()+
+labs(
+  title = "Age and Gender of COVID-19 cases",
+  subtitle = str_glue(
+  "Fulton County, GA, reported {min_date} - {max_date}",
+  
+  min_date = format(
+    min(linelist_2g$date_report, na.rm=T),
+    "%b %d %Y"),
+  
+  max_date = format(
+    max(linelist_2g$date_report, na.rm=T),
+    "%b %d %Y")
+  ),
+  x = "Percent of total",
+  y = "Age group",
+  fill = "Gender",
+  caption = str_glue(
+    "{missing} cases missing either age or gender are not shown.",
+    missing = linelist_2g %>%
+              filter(is.na(gender) | is.na(age_group)) %>% 
+              nrow())
+  )
+```
+
 ]
 
 
@@ -2402,7 +3120,7 @@ To *reverse* bar order, use `fct_rev()` from the **forcats** package. it can be 
 The below reverse the previous frequency ordering from `fct_infreq()`.  
 
 
-```{r, echo=F, eval=F}
+```{r, echo=T, eval=F}
 ggplot(linelist)+              
   geom_bar(                
     mapping = aes(
@@ -2434,7 +3152,125 @@ ggplot(linelist)+
 Aggregate zip codes into number of cases and number of deaths
 
 
----
 
+
+---
+# Epicurve - ggplot  
+
+Since we have only one geom and one data frame linked to the plot, we could move the _mapping_ to the `geom_histogram()` call:  
+
+```{r , echo = TRUE, eval = FALSE, tidy = FALSE}
+ggplot() + 
+  geom_histogram(
+    data = linelist,
+    mapping = aes(x = date_onset))
+````
+ 
+
+.pull-right[
+```{r }
+ggplot(
+  data = linelist,
+  mapping = aes(x = date_onset)  
+  ) + 
+  geom_histogram()
+```
+]
+
+
+
+
+
+
+---
+# Epicurve - ggplot  
+
+.pull-left[
+
+Use `geom_histogram()` with specified bins.   
+
+```{r , echo = TRUE, eval = FALSE, tidy = FALSE}
+ggplot(
+  data = linelist,
+  mapping = aes(x = date_onset)  
+) + #<<
+  geom_histogram() #<<
+```
+
+--
+Since we have only one geom and one data frame linked to the plot, we could move the _mapping_ to the `geom_histogram()` call:  
+
+```{r , echo = TRUE, eval = FALSE, tidy = FALSE}
+ggplot() + 
+  geom_histogram(
+    data = linelist,
+    mapping = aes(x = date_onset))
+````
+] 
+
+.pull-right[
+```{r }
+ggplot(
+  data = linelist,
+  mapping = aes(x = date_onset)  
+  ) + 
+  geom_histogram()
+```
+]
+
+
+
+
+
+---
+# Show groups  
+
+So far the graph shows the distribution of cases in all hospitals. 
+
+It would make sense to break down the visualization by hospitals.
+
+Two options:  
+
+* Fill each hospital in different color (stacked histogram)
+* Create multiple plots, each showing a different hospital
+
+
+
+---
+# Color by group
+
+.pull-left[
+
+To color by group (stacked epicurve), we need to map the variable `eth_race` to the `fill=` aesthetic *in* the `aes()`:  
+
+```{r , echo = TRUE, eval = FALSE, tidy = FALSE}
+ggplot(data = linelist,
+       mapping = aes(
+         x    = date_onset,
+         fill = eth_race))+ #<<
+  geom_histogram()
+```
+
+Note: the _fill_ aesthetics control the color filling areas while the _color_ aesthetics control the color of lines and points.
+
+] 
+
+.pull-right[
+```{r }
+ggplot(data = linelist) +
+  geom_histogram(
+    mapping = aes(
+      x = date_onset,
+      fill = eth_race
+      )
+    )
+```
+]
+
+
+
+
+
+---
 # Final slide
 
