@@ -952,16 +952,16 @@ class: medium-large-table
 .pull-left[
 Aside from axes, other common "aesthetics" include: 
 
-Geometry        |Geom                
-----------------|--------------------
-`shape = `      |Display point as dot, star, triangle, square...
-`fill =  `      |The *interior* color (e.g of bar or boxplot)  
-`color = `      |The *exterior* or bar, boxplot - OR point color  
-`size = `       |Line thickness, point size...
-`alpha = `      |Transparency (1 = opaque, 0 = invisible)
-`width = `      |Width of "bar plot" bars
-`linetype = `   |Either solid, dashed, dotted, etc.  
-`binwidth = `   |Width of histogram bins  
+Geometry     |Aspect of geom controlled                
+-------------|--------------------
+`shape`      |Display point as dot, star, triangle, square...
+`fill`       |The *interior* color (e.g. of bar or boxplot)  
+`color`      |The *exterior* of bar, boxplot - OR point color  
+`size`       |Line thickness, point size...
+`alpha`      |Transparency (1 = opaque, 0 = invisible)
+`width`      |Width of "bar plot" bars
+`linetype`   |Line type: solid, dashed, dotted, etc.  
+`binwidth`   |Width of histogram bins  
   
 
 ]
