@@ -151,14 +151,14 @@ recent_period   <- seq(surveillance_week  - 13, surveillance_week, by = 1)
 previous_period <- seq(surveillance_week  - 27, surveillance_week - 14, by = 1)
 
 # define the cut-off dates for the recent period (for table headers)
-recent_period_labels <- paste0(
+recent_period_labels <- str_c(
   format(min(recent_period), format = "%m/%d"), 
   "-", 
   format(max(recent_period), format = "%m/%d")
 )
 
 # define the cut-off dates for previous period (for table headers) 
-previous_period_labels <- paste0(
+previous_period_labels <- str_c(
   format(min(previous_period), format = "%m/%d"), 
   "-", 
   format(max(previous_period), format = "%m/%d")
@@ -166,7 +166,7 @@ previous_period_labels <- paste0(
 
 
 # define a label for past 28 days (for table captions)
-full_period_labels <- paste0(
+full_period_labels <- str_c(
   format(min(previous_period), format = "%B %d"), 
   "-", 
   format(surveillance_week, format = "%B %d, %Y")
@@ -844,9 +844,9 @@ zip_counts %>%
     # note the empty columns ("") to fit to the original table headers
   add_header_row(
     values = c("", 
-               paste0("Recent 14-day reporting period\n", recent_period_labels), 
+               str_c("Recent 14-day reporting period\n", recent_period_labels), 
                "", 
-               paste0("Previous 14-day reporting period\n", previous_period_labels), 
+               str_c("Previous 14-day reporting period\n", previous_period_labels), 
                "", 
                "Change between reporting periods"
                )) %>% 
