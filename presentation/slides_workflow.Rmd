@@ -119,6 +119,7 @@ Prioritised report generation -> simpler code in the Handbook
 
 - Create a project directory
 --
+
   + File -> New Directory...
 
 --
@@ -162,15 +163,16 @@ Prioritised report generation -> simpler code in the Handbook
 ---
 # File paths & importing data  
 
-##### Use the `here` and `rio` packages to import data
+#### Use the `here` and `rio` packages to import data
 
---
 - `here::set_here()` to establish root directory
  
 --
+
 - `here::here()` to see current directory
  
 --
+
 - `rio::import()` to import a file
  
 --
@@ -209,23 +211,68 @@ linelist_raw <- here::here("case_study", "data",
 
 
 
+
 ---
-# Header  
-## This is a subheader
+# Cleaning data  
+
+#### Use `dplyr` to clean data
+
+1. Visually inspect data (`summary()`, `glimpse()`)
+
+--
+
+2. Rename and choose fields (`select()`)
+
+--
+
+3. Parse and clean fields
+ + parse dates (using `lubridate`)
+ + clean categorical variables
+ + clean numeric variables
+
+--
+
+4. Filter data and remove duplicates
 
 
-- Hello our name is 
-  + blabla
-  + blabla
 
 .footnote[
-[1] Something _super_ important to say 
+[1] [EpiRHandbook section on cleaning](https://epirhandbook.com/cleaning-data-and-core-functions.html)
 
-[2] Some **other** stuff 
-
-[3] bla
+[2] [EpiRHandbook section on dates](https://epirhandbook.com/working-with-dates.html)
 ]
 
+---
+
+
+---
+# Cleaning data
+#### Example code
+
+
+```{r, eval=FALSE, echo = TRUE}
+
+linelist <- raw_linelist %>% 
+  # choose variables
+  select(date_birth, age, gender, date_onset) %>% 
+  # parse dates, clean gender, clean erroneous ages
+  mutate(dob = ymd(dob),
+         date_onset = ymd(date_onset),
+         gender = str_to_title(gender),
+         age = ifelse(age < 0, NA_integer_, age)) %>% 
+  # remove recent data to account for lag
+  filter(date_onset < Sys.Date() - weeks(2))
+
+```
+
+.footnote[
+[1] [EpiRHandbook section on cleaning](https://epirhandbook.com/cleaning-data-and-core-functions.html)
+
+[2] [EpiRHandbook section on dates](https://epirhandbook.com/working-with-dates.html)
+]
+
+
+---
 
 ???
 
