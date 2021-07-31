@@ -114,6 +114,103 @@ We also assume you have reviewed the Handbook pages on [R Basics](https://epirha
 Prioritised report generation -> simpler code in the Handbook  
 
 ---
+# Setting the scene  
+### Start with a new R project
+
+- Create a project directory
+--
+  + File -> New Directory...
+
+--
+
+## TODO ADD IMG TO MASTER
+
+![](https://github.com/appliedepi/emory_training/blob/master/presentation/images/make_proj.png?raw=true)  
+
+
+--
+
+- Create a Rmarkdown file to get started!
+
+---
+
+---
+# Rmarkdown parameterisation  
+## This is a subheader
+
+
+- Hello our name is 
+  + blabla
+  + blabla
+
+.footnote[
+[1] Something _super_ important to say 
+
+[2] Some **other** stuff 
+
+[3] bla
+]
+
+
+???
+
+- I think these are presenter notes 
+- You can see them in presenter mode 
+  + Keyboard shortcut is 'p' 
+---
+
+---
+# File paths & importing data  
+### Establish working directory
+
+
+- Use the `here` package to work with directories [1]
+--
+ ++ `here::set_here()` to establish root directory
+--
+ ++ `here::here()` to see current directory
+--
+
+- Use `rio` to import (most) files [2]
+--
+ ++ `rio::import()` to import a file
+--
+
+```{r, eval=FALSE}
+
+# import excel file from data folder
+# use  sheet named **in**
+raw_linelist <- rio::import(here::here("data", "covid_linelist.xlsx"), which = "in")
+
+```
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+
+raw_linelist <- rio::import(
+  here::here("case_study", "data",
+                     "covid_example_data", "covid_example_data.xlsx") %>%
+     # specify the sheet to read using which (default is to read first sheet)
+     import(which = "in")
+)
+
+```
+
+.footnote[
+[1] [EpiRHandbook section on here package](https://epirhandbook.com/import-and-export.html?q=here#here)
+[2] [EpiRHandbook section on importing](https://epirhandbook.com/cleaning-data-and-core-functions.html?q=import#import)
+]
+
+
+???
+
+- I think these are presenter notes 
+- You can see them in presenter mode 
+  + Keyboard shortcut is 'p' 
+---
+
+
+
+---
 # Header  
 ## This is a subheader
 
