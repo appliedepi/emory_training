@@ -262,6 +262,14 @@ skim(linelist_raw)
 # you can run this for any column -- just replace the column name
 unique(linelist_raw$case_gender) 
 
+
+# we can also loop through all categorical variables to look at all possibilities
+# see later in the script for introductions to using iteration
+# walk(linelist_raw %>% 
+#        select(is.character) %>% 
+#        names(),
+#      ~str_c(.x, ": ", unique(linelist_raw[[.x]])))
+
 ```
 
 
