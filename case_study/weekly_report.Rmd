@@ -1293,7 +1293,20 @@ https://twitter.com/Amazing_Maps/status/456921227068968960/photo/1
 
 ```{r crs}
 
-shapefile <- st_transform(shapefile, crs = "+proj=longlat +datum=WGS84 +no_defs")
+shapefile <- st_transform(shapefile, crs = 4326)
+
+
+# convert linelist data frame into sf object
+linelist_sf <- linelist %>%
+  drop_na(lat, lon) %>% 
+  filter(lat >= 33 & lat <= 35, 
+         lon >= -85 & lon <= -84, 
+         date_report %in% recent_period) %>% 
+  st_as_sf(
+    coords = c("lon", "lat"),
+    crs = 4326, 
+    stringsAsFactors = FALSE
+    )
 
 
 ```
@@ -1304,24 +1317,96 @@ shapefile <- st_transform(shapefile, crs = "+proj=longlat +datum=WGS84 +no_defs"
 ```{r points_map}
 ggplot() + 
   geom_sf(data = shapefile) +
-  geom_point(data = filter(linelist, lat > 1), 
-             aes(x = lon, y = lat, colour = eth_race), 
-             alpha = 0.5) + 
-  coord_sf(crs = "+proj=longlat +datum=WGS84 +no_defs")
+  geom_sf(data = linelist_sf, aes(colour = fct_infreq(eth_race)), alpha = 0.5)
+
+
+## if you didnt have your gps points in an sf object you could just use geom_point()
+  # geom_point(data = linelist %>% 
+  #              filter(lat >= 33 & lat <= 35, 
+  #                     lon >= -85 & lon <= -84),
+  #            aes(x = lon, y = lat, colour = eth_race),
+  #            alpha = 0.5)
+
+
 
 
 ```
  
-```{r choropleth_map}
+```{r choropleth_map_join}
 
-shapefile <- left_join(shapefile, zip_counts, 
+# combine counts data with shapefile 
+shapefile <- left_join(shapefile, 
+                       select(zip_counts, -Population), 
                        by = c("ZipCode" = "zip"))
+
+# fix the groupings 
 shapefile <- shapefile %>% 
-  mutate(incidence = age_categories(
-    recent_inc,
-    breakers = c(0, 1, 2, 3, 4, 5, 6, 100), 
-    ceiling = TRUE
-  ))
+  mutate(
+    incidence = case_when(
+      recent        < 10     ~ NA_character_, 
+      recent_inc   <= 18.6  ~ "≤18.6", 
+      recent_inc   <= 21.3  ~ "≤21.3", 
+      recent_inc   <= 22.7  ~ "≤22.7",
+      recent_inc   <= 34.2  ~ "≤34.2", 
+      TRUE                  ~ NA_character_
+    ))
+
+```
+ 
+```{r choropleth_map_over}
+
+shapefile <- shapefile %>% 
+  mutate(cases = lengths(st_intersects(., linelist_sf)), 
+         deaths = lengths(st_intersects(., 
+                                        filter(linelist_sf, 
+                                               died_covid == "Yes")))
+  )
+
+
+
+shapefile <- shapefile %>% 
+  mutate(
+    incidence = round(cases / Population * 100000, digits = 1),
+    incidence = case_when(
+           # fix the outliers: set missing to 0 and infinity (divided by 0) to 100
+           is.na(incidence)       ~ 0,
+           is.infinite(incidence) ~ NA_real_, 
+           TRUE                   ~ incidence)
+    )
+
+
+# define breaks 
+breakers <- shapefile %>% 
+  as_tibble() %>% 
+  filter(cases > 10) %>% 
+  select(incidence) %>% 
+  quantile(probs = seq(0, 1, 0.25), na.rm = TRUE) 
+## TODO need to pull this out so age_categories works 
+
+
+
+
+shapefile <- shapefile %>% 
+  mutate(
+    # create a categorical variable using the age_categories function 
+    # (we aren't using ages - but it functions the same way!)
+    incidence_cats = age_categories(incidence, breakers = breakers)
+  )
+
+
+## create a categorical variable using the age_categories function 
+## (we aren't using ages - but it functions the same way!)
+afro_shp <- afro_shp %>% 
+  mutate(prop_reps_cat = age_categories(prop_reps, breakers = breakers))
+## fix NA and 100+ category 
+afro_shp <- afro_shp %>% 
+  mutate(prop_reps_cat = fct_recode(prop_reps_cat, 
+                                    "0"   = "0-0",
+                                    "100" = "100+"))
+         
+
+
+
 
 ggplot(shapefile) + 
   geom_sf(aes(fill = incidence)) + 
@@ -1330,7 +1415,13 @@ ggplot(shapefile) +
 ```
  
  
+
+ 
 ```{r bivar_map}
+
+
+
+
 
 ```
 
@@ -1345,7 +1436,7 @@ ggplot(shapefile) +
 
 
 bounding_box <- shapefile %>% 
-  st_bbox()  %>% st_as_sfc()
+  st_bbox()
 
 
 #define your x and y minimum/maximum coordinates
@@ -1360,8 +1451,8 @@ yaxis <- st_sfc(ymin, ymax, crs = 4326)
                  
 #calculate the distance in metres on the axes of your basemap based on longitude and latitude
 #i.e. how many metres on your x axis and how many on your y
-xdist <- st_distance(xaxis)[2] %>% units::set_units("miles")
-ydist <- st_distance(yaxis)[2] %>% units::set_units("miles")
+xdist <- st_distance(xaxis)[2] %>% units::set_units("km")
+ydist <- st_distance(yaxis)[2] %>% units::set_units("km")
 
 xunits <- st_distance(xmin, xmax)
 yunits <- st_distance(ymin, ymax)
@@ -1374,34 +1465,51 @@ yfact <- as.numeric(yunits / ydist)
 
 
 ggplot() + 
-  geom_sf(data = shapefile) + 
-  ggplot2::stat_density_2d(
+  geom_sf(data = shapefile) +
+  stat_density_2d(
         data = filter(linelist,
                       lat > 1 &
                         date_report %in% recent_period),
         aes(
           x = lon,
           y = lat,
-          fill = ..level..,
+          fill = after_stat(level),
           # alpha = after_stat("level"),
           NULL
           ),
         # bins = 10,
+        # breaks = c(...), 
         geom = "polygon",
         # contour = TRUE,
-        # contour_var = "count",
+        # contour_var = "density",
         show.legend = TRUE,
-        h = c(xfact, yfact))
+        h = c(xfact, yfact)
+        ) + 
+  ggspatial::annotation_scale(unit_category = "metric") + 
+  theme(
+    panel.grid = element_blank()
+  ) + 
+  geom_vline(xintercept=seq(-84.8, -84.1, by=xfact)) + 
+  geom_hline(yintercept=seq(33.5, 34.2, by=yfact)) + 
+  geom_point(
+        data = filter(linelist,
+                      lat > 1 &
+                        date_report %in% recent_period),
+        aes(x = lon, y = lat), 
+         colour = "red",
+             alpha = 0.5
+  )
 
    # ggplot2::geom_density_2d_filled(
-   #      data = filter(linelist, 
+   #      data = filter(linelist,
    #                    lat > 1 &
    #                      date_report %in% recent_period),
    #      aes(
    #        x = lon,
-   #        y = lat),
+   #        y = lat, 
+   #        fill = after_stat(level)),
    #      contour_var = "count",
-   #      geom = "polygon",
+   #      # geom = "polygon",
    #      show.legend = TRUE,
    #      h = c(xfact, yfact))
 
