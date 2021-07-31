@@ -265,10 +265,10 @@ unique(linelist_raw$case_gender)
 
 # we can also loop through all categorical variables to look at all possibilities
 # see later in the script for introductions to using iteration
-# walk(linelist_raw %>% 
-#        select(is.character) %>% 
-#        names(),
-#      ~str_c(.x, ": ", unique(linelist_raw[[.x]])))
+walk(linelist_raw %>%
+       select(is.character) %>%
+       names(),
+     ~str_c(.x, ": ", unique(linelist_raw[[.x]])))
 
 ```
 
@@ -466,7 +466,7 @@ linelist <- linelist %>%
   )
 
 # it's a good habit to make sure the variables you're generating seem realistic (are you calculating them correctly?)
-# summary(linelist$days_hosp)
+summary(linelist$days_hosp)
 
 ```
 
