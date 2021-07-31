@@ -1180,6 +1180,7 @@ rf_data <- linelist %>%
                 ~fct_relevel(.x, "No", "Yes")
                 )) %>% 
   # only keep rows with complete data for all variables of interest
+  # note that this will drop rows where **ANY** of the listed variables are NA
   drop_na(any_of(c("died_covid", "age", descriptive_vars)))
 
 
