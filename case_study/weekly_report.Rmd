@@ -147,8 +147,8 @@ surveillance_week <- floor_date(surveillance_date,
                           week_start = 3)
 
 # define recent (past 14 days) and previous (28 to 14 days prior)
-recent_period   <- c(seq(surveillance_week  - 13, surveillance_week, by = 1))
-previous_period <- c(seq(surveillance_week  - 27, surveillance_week - 14, by = 1))
+recent_period   <- seq(surveillance_week  - 13, surveillance_week, by = 1)
+previous_period <- seq(surveillance_week  - 27, surveillance_week - 14, by = 1)
 
 # define the cut-off dates for the recent period (for table headers)
 recent_period_labels <- str_c(
@@ -197,7 +197,7 @@ https://epirhandbook.com/import-and-export.html
 
 ## TODO: at the end remove "case_study" from path - so that can be used within case_study.Rproj (also delete the if statement [keep the else])
 
-if (str_detect(here::here(), "emory_training")) {
+if (str_detect(here::here(), "emory_training$")) {
 
 linelist_raw <- here::here("case_study", "data",
                      "covid_example_data", "covid_example_data.xlsx") %>%
@@ -210,15 +210,17 @@ shapefile <- read_sf(here::here("case_study", "data",
   
 # import the raw case data set 
   # define the path using {here} then pass that to the {rio} import function
-linelist_raw <- here("data",
-                     "covid_example_data", "covid_example_data.xlsx") %>%
-     # specify the sheet to read using which (default is to read first sheet)
-     import(which = "in")
-
-# import shapefile
+  # specify the sheet to read using which (default is to read first sheet)
+  linelist_raw <- rio::import(
+    file = here::here("data", "covid_example_data", "covid_example_data.xlsx"),
+    which = "in"
+  )
+  
+  # import shapefile
   # for mapping and for extracting population counts for zipcodes
-shapefile <- read_sf(here("data", 
-                     "covid_example_data", "covid_shapefile", "FultonCountyZipCodes.shp"))
+  shapefile <- read_sf(
+    here::here("data", "covid_example_data", "covid_shapefile", "FultonCountyZipCodes.shp")
+  )
 }
 
 ```
@@ -253,12 +255,20 @@ View(linelist_raw)
 summary(linelist_raw)
 
 # get information about each variable in a dataset 
-     # nb. “POSIXct” is a type of raw date class 
+# nb. “POSIXct” is a type of raw date class 
 skim(linelist_raw)
 
-# view unique values contained in variables 
+# view unique values contained in variables - useful for categorical variables
 # you can run this for any column -- just replace the column name
 unique(linelist_raw$case_gender) 
+
+
+# we can also loop through all categorical variables to look at all possibilities
+# see later in the script for introductions to using iteration
+walk(linelist_raw %>%
+       select(is.character) %>%
+       names(),
+     ~str_c(.x, ": ", unique(linelist_raw[[.x]])))
 
 ```
 
@@ -343,15 +353,34 @@ the syntax New name = Old name.
 
 For more details see: 
 https://epirhandbook.com/cleaning-data-and-core-functions.html#column-names
+https://epirhandbook.com/cleaning-data-and-core-functions.html#clean_tidyselect
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
 ```{r clean_dates}
 
-linelist <- linelist %>%
-     
-  # convert all date columns, ymd() from lubridate
-  mutate(across(contains("date"), ymd)) %>%
-
+linelist <- linelist %>% 
+  # convert all date columns to date type 
+  # note that dates must be formatted correctly - in some cases date parsers from lubridate can be used here
+  mutate(
+    date_report =       as.Date(date_report),
+    date_dob =          as.Date(date_dob),
+    date_onset =        as.Date(date_onset)
+    # date_recovery =     as.Date(date_recovery),
+    # date_hospitalized = as.Date(date_hospitalized),
+    # date_discharge =    as.Date(date_discharge),
+    # date_died =         as.Date(date_died),
+    # date_positive =     as.Date(date_positive)
+  ) %>% 
+  
+  # we can do this in a much faster way by by using across()
+  # the apply the as.Date() function to every column with "date" in the name
+  # contains() is a tidyselect function (see the handbook for details)
+  # the top mutate can be deleted now!
+  mutate(across(
+    .cols = contains("date"),
+    .fns = ~as.Date(.x)
+  )) %>%
+  
   # remove onset dates prior to 2020
   mutate(
        across(
@@ -436,6 +465,9 @@ linelist <- linelist %>%
     days_hosp = replace(days_hosp, days_hosp > 60, NA)
   )
 
+# it's a good habit to make sure the variables you're generating seem realistic (are you calculating them correctly?)
+summary(linelist$days_hosp)
+
 ```
 
 
@@ -450,6 +482,7 @@ age groups using the {dplyr} case_when() function - but is more involved.
 For more details see: 
 https://epirhandbook.com/cleaning-data-and-core-functions.html#column-creation-and-transformation
 https://epirhandbook.com/cleaning-data-and-core-functions.html#re-code-values
+https://epirhandbook.com/characters-and-strings.html?q=regex#regular-expressions-regex
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
 ```{r clean_categories}
@@ -470,7 +503,8 @@ linelist <- linelist %>%
                                  "Unknown", died_covid), 
             confirmed_case = if_else(confirmed_case == "Pending", 
                                      "Unknown", confirmed_case), 
-            sym_myalgia = if_else(sym_myalgia == "YES", "Yes", sym_myalgia)
+            # force categorical variables to use consistent cases (this can be done for others) 
+            sym_myalgia = str_to_title(sym_myalgia),
             ) %>% 
      
      #replace one category and leave rest over multiple variables 
@@ -481,26 +515,36 @@ linelist <- linelist %>%
      # create a composite category from race and ethnicitiy  
           #  (nb. this sets those that are non-specified in eth to non-hispanic)
      mutate(eth_race = case_when(
+       # we evaluate if ethnicity is HISPANIC/LATINO **FIRST**
+       # case_when() evaluates in order (like if, else if, else)
           eth == "HISPANIC/LATINO"                            ~ "Hispanic, all races", 
-          race == "ASIAN" & 
-               eth != "HISPANIC/LATINO"                       ~ "Asian, NH", 
-          race == "BLACK" & 
-               eth != "HISPANIC/LATINO"                       ~ "Black, NH",
-          race == "WHITE" & 
-               eth != "HISPANIC/LATINO"                       ~ "White, NH",
-          race == "AMERICAN INDIAN/ALASKA NATIVE" |
-               race == "NATIVE HAWAIIAN/PACIFIC ISLANDER" |
-               race == "OTHER" & 
-               eth != "HISPANIC/LATINO"                       ~ "Other, NH", 
+          race == "ASIAN"                                     ~ "Asian, NH", 
+          race == "BLACK"                                     ~ "Black, NH",
+          race == "WHITE"                                     ~ "White, NH",
+      # find all instances of NATIVE (covers AMERICAN INDIAN/ALASKA NATIVE **AND** NATIVE HAWAIIAN/PACIFIC ISLANDER)
+          str_detect(race, "NATIVE")                          ~ "Other, NH",
+          race == "OTHER"                                     ~ "Other, NH", 
           TRUE                                                ~ "Unknown"
      )) %>% 
      
      # change from upper-case to lower case (with leading capital)
      mutate(across(c(county, state), str_to_title)) %>% 
      
-     # remove text from a string (everything after the dash)  
-     mutate(contact_id = str_remove(linelist$contact_id, "-.*")) %>% 
      
+     # recode with searching for string patterns 
+     mutate(contact_id = case_when(
+       str_detect(contact_id, "Yes")     ~ "Yes", 
+       str_detect(contact_id, "No")      ~ "No", 
+       str_detect(contact_id, "Unknown") ~ "Unknown", 
+       TRUE                                ~ "Unknown"
+     )) %>% 
+  
+     # # this section does the same as above, but takes advantage of the way the data is formatted
+     # # data is formatted as "Yes/No-A/Symptomatic"
+     # # remove text from a string (everything after the dash) - this uses regular expressions (regex)
+     # # see handbook section on regex for understanding how this works
+     # mutate(contact_id = str_remove(linelist$contact_id, "-.*")) %>% 
+
      # recode with searching for string patterns 
      mutate(sym_resolved = case_when(
           str_detect(sym_resolved, "Yes")     ~ "Yes", 
@@ -647,10 +691,13 @@ We then create use {flextable} to produce a clean output table.
 For more details see: 
 https://epirhandbook.com/descriptive-tables.html
 https://epirhandbook.com/tables-for-presentation.html
+https://epirhandbook.com/descriptive-tables.html#tbl_janitor
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
 ```{r epiweek_table, tab.cap="COVID-19 case counts by calendar week in Fulton County", tab.id="timetab"}
 
+# produce a quick descriptive table of number of cases reported by date
+# we aren't saving this, but just letting it display in the markdown
 linelist %>% 
   # get counts and percentages 
   tabyl(epiweek) %>% 
@@ -674,7 +721,7 @@ Note that tab.caps cannot have any special characters in them (e.g. "_") otherwi
 referencing as below does not work. 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
-As you can see from above in Table \@ref(tab:timetab) we saw xyz (TODO: say something meaningful)
+As you can see from above in Table \@ref(tab:timetab) we can see clear trends in reporting patterns - cases increase and peak in July 2020 and December/January 2020/2021
 
 \pagebreak 
 
@@ -750,16 +797,15 @@ zip_counts <- left_join(zip_counts,
            ~round(.x / Population * 10000, digits = 1), 
            # for each period create a new variable with _inc on the end
            .names = "{.col}_inc"), 
-    # for each of the calculated variables (percentage and incidence)
-    across(c(perc_change, recent_inc, previous_inc), 
-           # fix the outliers: set missing to 0 and infity (divided by 0) to 100
-           ~case_when(
-             is.na(.x) ~ 0,
-             .x == Inf ~ 100, 
-             TRUE      ~ .x
-             )
-           )
-    )
+    
+    # replace 0s in incidence with 0
+    across(contains("inc"), ~replace_na(.x, 0)),
+    perc_change = case_when(
+      # fix the outliers: set missing to 0 and infinity (divided by 0) to 100
+      is.na(perc_change)       ~ 0,
+      is.infinite(perc_change) ~ 100, 
+      TRUE            ~ perc_change
+    ))
 ```
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -784,7 +830,7 @@ https://colorbrewer2.org/#type=sequential&scheme=Reds&n=3
 #   scales::show_col()
 
 # choose colours to fill in cells  
-row_colour <- case_when( 
+row_colour <- case_when(
   # those less than zero will be green (decreasing cases)
   zip_counts$perc_change < 0 ~ "#91CF60", 
   # over zero red (increasing)
@@ -879,6 +925,28 @@ https://epirhandbook.com/iteration-loops-and-lists.html
 # get counts tables for measures of interest 
 ############################################
 
+# we generate 3 summary tables and bind them together
+# summary demographic table for gender
+dem_gender <- linelist %>% 
+  tabyl(gender) %>% 
+  select(Characteristic = gender, n, percent)
+
+# summary demographic table for age
+dem_age <- linelist %>% 
+  tabyl(age_group) %>% 
+  select(Characteristic = age_group, n, percent)
+
+# summary demographic table for ethnicity and race
+dem_eth_race <- linelist %>% 
+  tabyl(eth_race) %>% 
+  select(Characteristic = eth_race, n, percent)
+
+# bind all tables together
+total_cases <- bind_rows(list(dem_gender, dem_age, dem_eth_race))
+
+
+# this can be done iteratively (we are repeating code)
+# this uses the {purrr} package to iterate over each variable
 # counts of total cases 
 total_cases <- purrr::map(
   # for each variable listed
@@ -887,7 +955,7 @@ total_cases <- purrr::map(
   ~tabyl(linelist, .x) %>%
     # only keep variables of interest and rename the variable column 
       # this is so that they are all the same for merging 
-    select("Characteristic" = .x, n, percent)
+    select("Characteristic" = .x, n_cases_total = n, perc_cases_total = percent)
 ) %>% 
   # combine rows in to one dataframe
   bind_rows()
@@ -903,7 +971,7 @@ recent_cases <- purrr::map(
     # get counts based on filtered data
     tabyl(.x) %>% 
     # nb we dont keep the characteristic column because it would be duplicated
-    select(n, percent)
+    select(n_cases_recent = n, perc_cases_recent = percent)
 ) %>% 
   bind_rows()
 
@@ -916,7 +984,7 @@ total_deaths <- purrr::map(
           died_covid == "Yes") %>% 
     # get counts based on filtered data 
     tabyl(.x, show_na = TRUE) %>%
-    select(n, percent)
+    select(n_deaths_total = n, perc_deaths_total = percent)
 ) %>% 
   bind_rows()
 
@@ -930,7 +998,7 @@ recent_deaths <- purrr::map(
           date_died >= (surveillance_date - 28)) %>% 
     # get counts based on filtered data
     tabyl(.x) %>% 
-    select(n, percent) %>% 
+    select(n_deaths_recent = n, perc_deaths_recent = percent) %>% 
     # add in a variable column (used for colouring later) 
     mutate(variable = .x)
 ) %>% 
@@ -943,17 +1011,17 @@ overall <- linelist %>%
     # add in row label 
     Characteristic = "Total",
     # counts of total cases 
-    cases = n(),
+    n_cases_total = n(),
     # leave all percentages empty (would just be 100)
-    perc  = NA, 
+    perc_cases_total  = NA, 
     # counts of new cases (last 28 days) 
-    cases_recent = sum(date_report >= (surveillance_date - 28)), 
-    perc_recent  = NA, 
+    n_cases_recent = sum(date_report >= (surveillance_date - 28)), 
+    perc_cases_recent  = NA, 
     # counts of total deaths 
-    deaths = sum(died_covid == "Yes"), 
-    perc_deaths = NA, 
+    n_deaths_total = sum(died_covid == "Yes"), 
+    perc_deaths_total = NA, 
     # counts of new deaths (last 28 days)
-    deaths_recent = sum(died_covid == "Yes" & 
+    n_deaths_recent = sum(died_covid == "Yes" & 
                           date_died >= (surveillance_date - 28)),
     perc_deaths_recent = NA, 
     # add in a variable column (used for colouring later) 
@@ -968,12 +1036,9 @@ overall <- linelist %>%
 # combine all the demographic tables - side by side
 demographics_counts <- bind_cols(total_cases, recent_cases, total_deaths, recent_deaths) %>% 
   # mutate each of the proportion columns to be percentages
-  mutate(across(contains("percent"), 
+  mutate(across(contains("perc"), 
                 ~round(.x * 100, digits = 1)
                 )) 
-
-# make sure names for the totals row matches the merged demographics table
-names(overall) <- names(demographics_counts)
 
 # add in the totals row at the top of the merged demographics table
 demographics_counts <- bind_rows(overall, demographics_counts)
@@ -985,7 +1050,7 @@ demographics_counts <- bind_rows(overall, demographics_counts)
 
 # get the column numbers than are percentages (based on the name) 
 percentage_cols <- names(demographics_counts) %>% 
-  str_detect("percent") %>% 
+  str_detect("perc") %>% 
   which()
 
 # define colour cut-offs for gender column 
@@ -1027,14 +1092,14 @@ demographics_counts %>%
   ) %>%
   # redefine column names based on original names
   set_header_labels(
-    "n...2"       = "Total Confirmed Cases",
-    "percent...3" = "% of Total Cases",
-    "n...4"       = "Confirmed Cases past 28 days",
-    "percent...5" = "% of Confirmed Cases past 28 days",
-    "n...6"       = "Total Confirmed Deaths",
-    "percent...7" = "% of Total Deaths",
-    "n...8"       = "Confirmed Deaths past 28 days",
-    "percent...9" = "% of Confirmed Deaths past 28 days"
+    "n_cases_total"       = "Total Confirmed Cases",
+    "perc_cases_total" = "% of Total Cases",
+    "n_cases_recent"       = "Confirmed Cases past 28 days",
+    "perc_cases_recent" = "% of Confirmed Cases past 28 days",
+    "n_deaths_total"       = "Total Confirmed Deaths",
+    "perc_deaths_total" = "% of Total Deaths",
+    "n_deaths_recent"       = "Confirmed Deaths past 28 days",
+    "perc_deaths_recent" = "% of Confirmed Deaths past 28 days"
   ) %>%
   # move the header text to the centre
   align(align = "center", part = "header") %>%
@@ -1110,11 +1175,13 @@ rf_data <- linelist %>%
                 ~fct_recode(.x, 
                             NULL = "Unknown"))) %>% 
   # flip factor levels (so that the reference values are correct)
+  mutate(eth_race = fct_infreq(eth_race)) %>% 
   mutate(gender = fct_relevel(gender, "Female", "Male")) %>% 
   mutate(across(all_of(c("died_covid", symptom_vars, "hospitalized")), 
                 ~fct_relevel(.x, "No", "Yes")
                 )) %>% 
   # only keep rows with complete data for all variables of interest
+  # note that this will drop rows where **ANY** of the listed variables are NA
   drop_na(any_of(c("died_covid", "age", descriptive_vars)))
 
 
