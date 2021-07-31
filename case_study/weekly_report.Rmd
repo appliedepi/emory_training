@@ -1175,7 +1175,7 @@ rf_data <- linelist %>%
                 ~fct_recode(.x, 
                             NULL = "Unknown"))) %>% 
   # flip factor levels (so that the reference values are correct)
-  mutate(eth_race = fct_relevel(eth_race, "White, NH")) %>% 
+  mutate(eth_race = fct_infreq(eth_race)) %>% 
   mutate(gender = fct_relevel(gender, "Female", "Male")) %>% 
   mutate(across(all_of(c("died_covid", symptom_vars, "hospitalized")), 
                 ~fct_relevel(.x, "No", "Yes")
