@@ -955,7 +955,7 @@ total_cases <- purrr::map(
   ~tabyl(linelist, .x) %>%
     # only keep variables of interest and rename the variable column 
       # this is so that they are all the same for merging 
-    select("Characteristic" = .x, n, percent)
+    select("Characteristic" = .x, n_cases_total = n, perc_cases_total = percent)
 ) %>% 
   # combine rows in to one dataframe
   bind_rows()
@@ -971,7 +971,7 @@ recent_cases <- purrr::map(
     # get counts based on filtered data
     tabyl(.x) %>% 
     # nb we dont keep the characteristic column because it would be duplicated
-    select(n, percent)
+    select(n_cases_recent = n, perc_cases_recent = percent)
 ) %>% 
   bind_rows()
 
@@ -984,7 +984,7 @@ total_deaths <- purrr::map(
           died_covid == "Yes") %>% 
     # get counts based on filtered data 
     tabyl(.x, show_na = TRUE) %>%
-    select(n, percent)
+    select(n_deaths_total = n, perc_deaths_total = percent)
 ) %>% 
   bind_rows()
 
@@ -998,7 +998,7 @@ recent_deaths <- purrr::map(
           date_died >= (surveillance_date - 28)) %>% 
     # get counts based on filtered data
     tabyl(.x) %>% 
-    select(n, percent) %>% 
+    select(n_deaths_recent = n, perc_deaths_recent = percent) %>% 
     # add in a variable column (used for colouring later) 
     mutate(variable = .x)
 ) %>% 
@@ -1011,17 +1011,17 @@ overall <- linelist %>%
     # add in row label 
     Characteristic = "Total",
     # counts of total cases 
-    cases = n(),
+    n_cases_total = n(),
     # leave all percentages empty (would just be 100)
-    perc  = NA, 
+    perc_cases_total  = NA, 
     # counts of new cases (last 28 days) 
-    cases_recent = sum(date_report >= (surveillance_date - 28)), 
-    perc_recent  = NA, 
+    n_cases_recent = sum(date_report >= (surveillance_date - 28)), 
+    perc_cases_recent  = NA, 
     # counts of total deaths 
-    deaths = sum(died_covid == "Yes"), 
-    perc_deaths = NA, 
+    n_deaths_total = sum(died_covid == "Yes"), 
+    perc_deaths_total = NA, 
     # counts of new deaths (last 28 days)
-    deaths_recent = sum(died_covid == "Yes" & 
+    n_deaths_recent = sum(died_covid == "Yes" & 
                           date_died >= (surveillance_date - 28)),
     perc_deaths_recent = NA, 
     # add in a variable column (used for colouring later) 
@@ -1036,12 +1036,9 @@ overall <- linelist %>%
 # combine all the demographic tables - side by side
 demographics_counts <- bind_cols(total_cases, recent_cases, total_deaths, recent_deaths) %>% 
   # mutate each of the proportion columns to be percentages
-  mutate(across(contains("percent"), 
+  mutate(across(contains("perc"), 
                 ~round(.x * 100, digits = 1)
                 )) 
-
-# make sure names for the totals row matches the merged demographics table
-names(overall) <- names(demographics_counts)
 
 # add in the totals row at the top of the merged demographics table
 demographics_counts <- bind_rows(overall, demographics_counts)
@@ -1053,7 +1050,7 @@ demographics_counts <- bind_rows(overall, demographics_counts)
 
 # get the column numbers than are percentages (based on the name) 
 percentage_cols <- names(demographics_counts) %>% 
-  str_detect("percent") %>% 
+  str_detect("perc") %>% 
   which()
 
 # define colour cut-offs for gender column 
@@ -1095,14 +1092,14 @@ demographics_counts %>%
   ) %>%
   # redefine column names based on original names
   set_header_labels(
-    "n...2"       = "Total Confirmed Cases",
-    "percent...3" = "% of Total Cases",
-    "n...4"       = "Confirmed Cases past 28 days",
-    "percent...5" = "% of Confirmed Cases past 28 days",
-    "n...6"       = "Total Confirmed Deaths",
-    "percent...7" = "% of Total Deaths",
-    "n...8"       = "Confirmed Deaths past 28 days",
-    "percent...9" = "% of Confirmed Deaths past 28 days"
+    "n_cases_total"       = "Total Confirmed Cases",
+    "perc_cases_total" = "% of Total Cases",
+    "n_cases_recent"       = "Confirmed Cases past 28 days",
+    "perc_cases_recent" = "% of Confirmed Cases past 28 days",
+    "n_deaths_total"       = "Total Confirmed Deaths",
+    "perc_deaths_total" = "% of Total Deaths",
+    "n_deaths_recent"       = "Confirmed Deaths past 28 days",
+    "perc_deaths_recent" = "% of Confirmed Deaths past 28 days"
   ) %>%
   # move the header text to the centre
   align(align = "center", part = "header") %>%
