@@ -59,12 +59,12 @@ https://epirhandbook.com/r-on-network-drives.html#r-on-network-drives
 
 ```{r setup, include=FALSE}
 
-#TODO: turn off warnings and messages 
-
 # hide all code chunks in the output, but show errors 
      # nb. warnings and messages still shown
 knitr::opts_chunk$set(echo = FALSE,  # hide all code chunks in output
                       error = TRUE,  # show errors if they appear, but don't stop (produce the word doc)
+                      warning = FALSE, # do not show warnings in the output word doc 
+                      message = FALSE, # do not show  messages in the output word doc
                       fig.width = 7,  # Figure width
                       fig.height = 7,      # Figure height
                       fig.topcaption = TRUE  # show figure titles on top of plot
@@ -687,7 +687,13 @@ This section will be analysing data by time place and person to produce descript
 tables. 
 
 ## Summary 
-TODO: add in the summary bullet points as seen in the Fulton report
+
+- As of `r format(surveillance_date, format = "%B %d %Y")`, Fulton County has 
+recorded `r nrow(linelist)` confirmed cases of COVID-19.  
+- As of `r format(surveillance_date, format = "%B %d %Y")`, Fulton County has 
+recorded `r fmt_count(linelist, died == "Yes")`.  
+- Among all confirmed cases of COVID-19 in Fulton County, `r fmt_count(linelist, hospitalized == "Yes")`
+required hospitalization. 
 
 ## Time 
 
