@@ -353,7 +353,7 @@ k2 <- zipcodes %>%
 
 knitr::kables(
      list(
-          knitr::kable(k1, escape = FALSE, format = "html",padding = 5L),
+          knitr::kable(k1, escape = FALSE, format = "html"),
           knitr::kable(k2, escape = FALSE, format = "html")
      ), format = "html"
 )
