@@ -1311,6 +1311,26 @@ linelist_sf <- linelist %>%
 
 ```
 
+```{r basemap}
+
+bbox <- st_bbox(shapefile)
+
+# Fit basemap by range of lat/long coordinates. Choose tile type
+map <- openmap(
+  upperLeft = c(max(linelist_sf$lat, na.rm=T), max(linelist_sf$lon, na.rm=T)),   # limits of basemap tile
+  lowerRight = c(min(linelist_sf$lat, na.rm=T), min(linelist_sf$lon, na.rm=T)),
+  zoom = NULL,
+  type = "osm")
+
+# Projection WGS84
+map_latlon <- openproj(map, projection = "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs")
+
+autoplot.OpenStreetMap(map_latlon)  + 
+  geom_sf(data = shapefile)
+
+
+```
+
 
 
 
@@ -1337,20 +1357,8 @@ ggplot() +
 # combine counts data with shapefile 
 shapefile <- left_join(shapefile, 
                        select(zip_counts, -Population), 
-                       by = c("ZipCode" = "zip"))
-
-# fix the groupings 
-shapefile <- shapefile %>% 
-  mutate(
-    incidence = case_when(
-      recent        < 10     ~ NA_character_, 
-      recent_inc   <= 18.6  ~ "≤18.6", 
-      recent_inc   <= 21.3  ~ "≤21.3", 
-      recent_inc   <= 22.7  ~ "≤22.7",
-      recent_inc   <= 34.2  ~ "≤34.2", 
-      TRUE                  ~ NA_character_
-    ))
-
+                       by = c("ZipCode" = "zip")) %>% 
+  rename(incidence = recent_inc)
 ```
  
 ```{r choropleth_map_over}
@@ -1366,10 +1374,10 @@ shapefile <- shapefile %>%
 
 shapefile <- shapefile %>% 
   mutate(
-    incidence = round(cases / Population * 100000, digits = 1),
+    incidence = round(cases / Population * 100000, digits = 1), 
     incidence = case_when(
-           # fix the outliers: set missing to 0 and infinity (divided by 0) to 100
-           is.na(incidence)       ~ 0,
+           # fix the outliers: set infity to NA and cases less than 10 to NA
+           cases < 10             ~ NA_real_,
            is.infinite(incidence) ~ NA_real_, 
            TRUE                   ~ incidence)
     )
@@ -1381,36 +1389,21 @@ breakers <- shapefile %>%
   filter(cases > 10) %>% 
   select(incidence) %>% 
   quantile(probs = seq(0, 1, 0.25), na.rm = TRUE) 
-## TODO need to pull this out so age_categories works 
-
-
 
 
 shapefile <- shapefile %>% 
   mutate(
-    # create a categorical variable using the age_categories function 
-    # (we aren't using ages - but it functions the same way!)
-    incidence_cats = age_categories(incidence, breakers = breakers)
+    # create a categorical variable using the cut function 
+    incidence_cats = cut(incidence, breaks = c(0, breakers), 
+                         labels = str_glue("<={breakers}"))
   )
 
-
-## create a categorical variable using the age_categories function 
-## (we aren't using ages - but it functions the same way!)
-afro_shp <- afro_shp %>% 
-  mutate(prop_reps_cat = age_categories(prop_reps, breakers = breakers))
-## fix NA and 100+ category 
-afro_shp <- afro_shp %>% 
-  mutate(prop_reps_cat = fct_recode(prop_reps_cat, 
-                                    "0"   = "0-0",
-                                    "100" = "100+"))
-         
-
-
-
-
 ggplot(shapefile) + 
-  geom_sf(aes(fill = incidence)) + 
-  scale_fill_brewer()
+  geom_sf(aes(fill = incidence_cats), colour = "black") + 
+  scale_fill_brewer(palette = "YlGn", 
+                    labels = c(levels(shapefile$incidence_cats), "Fewer than 10 cases")) + 
+  geom_sf_text(aes(label = ZipCode), check_overlap = TRUE) + 
+  labs(fill = "Confirmed cases per \n 100,000 by Zip code")
 
 ```
  
