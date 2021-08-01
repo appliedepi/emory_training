@@ -310,12 +310,6 @@ zipcodes <- sf::read_sf(
       border: none
     }
 
-    /* Change the background color to white for shaded rows (even rows) */
-
-    .remark-slide thead, .remark-slide tr:nth-child(2n) {
-        background-color: white;
-    }
-
     .remark-slide-table {
       
     }
@@ -341,13 +335,13 @@ zipcodes <- sf::read_sf(
 
 k1 <- cases_by_zip %>% 
      mutate(zip_code = kableExtra::cell_spec(zip_code, 
-                                             background = ifelse(str_detect(zip_code, "zip"), "#d73027", "#91bfdb"),
+                                             background = ifelse(str_detect(zip_code, "zip"), "#d73027", "#31a354"),
                                              color = "white"))
      # knitr::kable(format = 'html', escape = FALSE)
 
 k2 <- zipcodes %>% 
      mutate(ZipCode = kableExtra::cell_spec(ZipCode, 
-                                            background = "#91bfdb",
+                                            background = "#31a354",
                                             color = "white"))  
      # knitr::kable(format = 'html', escape = FALSE)
 
@@ -389,8 +383,60 @@ cases_by_zip %>%
 ```
 
 ---
+# Descriptive analysis
+
+- We want to produce descriptive *tables* and plots
+
+--
+
+- Group over key variable(s) to:
+ + Calculate totals
+ + Calculate percents
+
+--
+
+- Key packages:
+ + `janitor`
+ + `dplyr`
+ 
+.footnote[
+
+[1] [EpiRHandbook section on descriptive tables](https://epirhandbook.com/descriptive-tables.html)
+
+]
+---
+
+# Descriptive analysis
+#### Example code 
+
+```{r, eval = FALSE, echo = TRUE, message = FALSE, warning = FALSE}
+
+linelist %>% 
+  # get counts and percentages 
+  tabyl(gender) %>% 
+  # add the overall counts as a row
+  adorn_totals() %>%  
+  # change from proportions to percentages (do not add a % sign)
+  adorn_pct_formatting(affix_sign = FALSE)
+
+```
 
 
+```{r, eval = TRUE, echo = FALSE, message = FALSE, warning = FALSE}
+
+linelist_raw %>% 
+  mutate(gender = replace_na(case_gender, "Unknown")) %>% 
+  # get counts and percentages 
+  tabyl(gender) %>% 
+  # add the overall counts as a row
+  adorn_totals() %>%  
+  # change from proportions to percentages (do not add a % sign)
+  adorn_pct_formatting(affix_sign = FALSE) %>% 
+  knitr::kable()
+
+```
+
+---
 class: inverse, center, middle
 
 # This is a section header slide
