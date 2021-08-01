@@ -710,13 +710,16 @@ https://epirhandbook.com/descriptive-tables.html#tbl_janitor
 
 # produce a quick descriptive table of number of cases reported by date
 # we aren't saving this, but just letting it display in the markdown
-linelist %>% 
+epiweek_table <- linelist %>% 
   # get counts and percentages 
   tabyl(epiweek) %>% 
   # add the overall counts as a row
   adorn_totals() %>%  
   # change from proportions to percentages (do not add a % sign)
-  adorn_pct_formatting(affix_sign = FALSE) %>% 
+  adorn_pct_formatting(affix_sign = FALSE)
+  
+
+epiweek_table %>% 
   # rename columns 
   select("Calendar Week" = epiweek, 
          "Cases (n)" = n, 
@@ -733,7 +736,7 @@ Note that tab.caps cannot have any special characters in them (e.g. "_") otherwi
 referencing as below does not work. 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
-As you can see from above in Table \@ref(tab:timetab) we can see clear trends in reporting patterns - cases increase and peak in July 2020 and December/January 2020/2021
+As you can see from above in Table \@ref(tab:timetab) we can see clear trends in reporting patterns - cases increase in waves and peak in `r filter(epiweek_table, epiweek != "Total") %>% summarise(which.max(n)) %>% pull() %>% epiweek_table[., "epiweek"] %>% as.Date() %>%  format(., format = "%B %Y")`. 
 
 \pagebreak 
 
@@ -1286,7 +1289,6 @@ https://epirhandbook.com/survival-analysis.html
 https://epirhandbook.com/tables-for-presentation.html
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
-
 ```{r regression, tab.cap = "Univariate regression investigating associations with mortality among COVID-19 cases", tab.id = "regrtab"}
 
 # produce table with regression estimates
@@ -1344,8 +1346,9 @@ tbl_merge(list(cross_tab, regress_tab)) %>%
   set_table_properties(layout = "autofit")
 ```
 
-
-TODO: Demonstrate in-line functions from {gtsummary} 
+As seen in Table \@ref(tab:regrtab), mortality was associated with being male 
+`r inline_text(regress_tab, variable = gender, level = "Male", pattern = "(OR {estimate}; 95% CI {conf.low}, {conf.high})")`, being white `r inline_text(regress_tab, variable = eth_race, level = "White, NH", pattern = "(OR {estimate}; 95% CI {conf.low}, {conf.high})")`and longer 
+hospital stays `r inline_text(regress_tab, variable = days_hosp, pattern = "(OR {estimate}; 95% CI {conf.low}, {conf.high})")`.
 
 # Visualisation 
 
