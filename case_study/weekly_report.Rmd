@@ -477,8 +477,8 @@ linelist <- linelist %>%
     days_hosp = replace(days_hosp, days_hosp > 60, NA)
   )
 
-# it's a good habit to make sure the variables you're generating seem realistic (are you calculating them correctly?)
-summary(linelist$days_hosp)
+## it's a good habit to make sure the variables you're generating seem realistic (are you calculating them correctly?)
+# summary(linelist$days_hosp)
 
 ```
 
@@ -694,6 +694,8 @@ recorded `r nrow(linelist)` confirmed cases of COVID-19.
 recorded `r fmt_count(linelist, died == "Yes")`.  
 - Among all confirmed cases of COVID-19 in Fulton County, `r fmt_count(linelist, hospitalized == "Yes")`
 required hospitalization. 
+
+\pagebreak 
 
 ## Time 
 
@@ -1356,6 +1358,8 @@ As seen in Table \@ref(tab:regrtab), mortality was associated with being male
 `r inline_text(regress_tab, variable = gender, level = "Male", pattern = "(OR {estimate}; 95% CI {conf.low}, {conf.high})")`, being white `r inline_text(regress_tab, variable = eth_race, level = "White, NH", pattern = "(OR {estimate}; 95% CI {conf.low}, {conf.high})")`and longer 
 hospital stays `r inline_text(regress_tab, variable = days_hosp, pattern = "(OR {estimate}; 95% CI {conf.low}, {conf.high})")`.
 
+\pagebreak 
+
 # Visualisation 
 
 This is a reference to figure \@ref(fig:epicurve) below which shows xyz (TODO: say something meaningful)
@@ -1372,8 +1376,9 @@ ggplot(data = linelist,
 
 
 
+\pagebreak 
 
-## geospatial 
+## Geospatial 
 
 
 TODO: gifs for maps projections to put in slides (consider just recreating w code)
@@ -1501,7 +1506,7 @@ For more details see:
 https://epirhandbook.com/gis-basics.html#contoured-density-heatmaps
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
-```{r points_map, fig.cap = str_c("New COVID-19 cases (", recent_period_labels, ") by  ethnicity in Fulton County", fig.id  = "pointmap"}
+```{r points_map, fig.cap = str_c("New COVID-19 cases (", recent_period_labels, ") by  ethnicity in Fulton County"), fig.id  = "pointmap"}
 
 # plot the basemap 
 basemap + 
@@ -1527,6 +1532,8 @@ basemap +
 
 ```
  
+ 
+\pagebreak 
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 /// choropleth_map_join \\\
@@ -1646,9 +1653,11 @@ basemap +
 
 ```
  
+ 
+\pagebreak 
 
  <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/// choropleth_map_over \\\
+/// bivar_map \\\
 --------------------------------------------------------------------------------
 
 Here we demonstrate how to create a bivariate map with {ggplot2} for investigating
@@ -1777,6 +1786,8 @@ bivar_map + legend + plot_layout(design = layout)
 
 ```
 
+
+\pagebreak 
 
  <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 /// heatmap \\\
