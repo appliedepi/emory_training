@@ -104,8 +104,8 @@ We also assume you have reviewed the Handbook pages on [R Basics](https://epirha
 1. Setting the scene (project directory & Rmarkdown)  
 2. Rmarkdown parametrisation  
 3. File paths & importing data  
-4. Merging data  
-5. Data cleaning  
+4. Data cleaning  
+5. Merging data  
 6. Descriptive analysis  
 7. If time allows:  
   a. Statistical analysis  
@@ -140,9 +140,7 @@ Prioritised report generation -> simpler code in the Handbook
 ## This is a subheader
 
 
-- Hello our name is 
-  + blabla
-  + blabla
+## TODO do rmd slide
 
 .footnote[
 [1] Something _super_ important to say 
@@ -151,14 +149,6 @@ Prioritised report generation -> simpler code in the Handbook
 
 [3] bla
 ]
-
-
-???
-
-- I think these are presenter notes 
-- You can see them in presenter mode 
-  + Keyboard shortcut is 'p' 
----
 
 ---
 # File paths & importing data  
@@ -194,6 +184,7 @@ raw_linelist <- rio::import(
 
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
 
+# not sure we ACTUALLY need the data in but we'll see
 linelist_raw <- here::here("case_study", "data",
                      "covid_example_data", "covid_example_data.xlsx") %>%
      # specify the sheet to read using which (default is to read first sheet)
@@ -243,9 +234,6 @@ linelist_raw <- here::here("case_study", "data",
 ]
 
 ---
-
-
----
 # Cleaning data
 #### Example code
 
@@ -254,9 +242,9 @@ linelist_raw <- here::here("case_study", "data",
 
 linelist <- raw_linelist %>% 
   # choose variables
-  select(date_birth, age, gender, date_onset) %>% 
+  select(date_birth, age, gender, zip_code, date_onset) %>% 
   # parse dates, clean gender, clean erroneous ages
-  mutate(dob = ymd(dob),
+  mutate(date_birth = ymd(dob),
          date_onset = ymd(date_onset),
          gender = str_to_title(gender),
          age = ifelse(age < 0, NA_integer_, age)) %>% 
@@ -271,34 +259,138 @@ linelist <- raw_linelist %>%
 [2] [EpiRHandbook section on dates](https://epirhandbook.com/working-with-dates.html)
 ]
 
-
 ---
+# Merging data  
 
-???
-
-- I think these are presenter notes 
-- You can see them in presenter mode 
-  + Keyboard shortcut is 'p' 
----
-
-# Sequential reveal of bullet points
-
-You can reveal stuff bit by bit using to dashes between sections 
+- We want to combine two tables (dataframes) with *common columns*
 
 --
 
-- This is my first point 
+- Make sure values in common columns are aligned
+  + Follow the principles of categorical variable cleaning
+  + Use `unique()`
 
 --
 
-- Then I move on to this fascinating point 
+- Use the correct join type from `tidyr` package
+  + `left_join()`
+  + `right_join()`
+  + `full_join()`
+  + `inner_join()`
 
---
 
-- And finish with this blabla
+.footnote[
+[1] [EpiRHandbook section on joining data](https://epirhandbook.com/joining-data.html)
+]
+
+---
+# Merging data
+#### Example code (1)
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+
+cases_by_zip <- tibble(
+     date_report = ymd("2020-12-20", "2020-12-21", "2020-12-20", "2020-12-20"),
+     zip_code = c("30326", "30326", "30311", "zip: 30312"),
+     new_cases = c(20, 16, 10, 43)
+)
+
+
+zipcodes <- sf::read_sf(
+     here::here("case_study", "data", "covid_example_data", "covid_shapefile", "FultonCountyZipCodes.shp")
+) %>% 
+     as_tibble() %>% 
+     select(ZipCode, Population) %>% 
+     mutate(ZipCode = as.double(ZipCode)) %>% 
+     filter(ZipCode %in% c(30311, 30326, 30312, 30213, 30304))
+
+```
+```{css, echo=F}
+    .remark-slide table{
+      border: none
+    }
+
+    /* Change the background color to white for shaded rows (even rows) */
+
+    .remark-slide thead, .remark-slide tr:nth-child(2n) {
+        background-color: white;
+    }
+
+    .remark-slide-table {
+      
+    }
+
+    tr:first-child {
+      border-top: none;
+  }
+    tr:last-child {
+    border-bottom: none;
+  }
+
+```
+
+
+
+```{r, echo = FALSE}
+# cases_by_zip %>% 
+#   mutate(zip_code = kableExtra::cell_spec(zip_code, 
+#                               background = ifelse(str_detect(zip_code, "zip"), "#d73027", "#91bfdb"),
+#                               color = "white")) %>% 
+#   knitr::kable(format = 'html', escape = FALSE)
+
+
+k1 <- cases_by_zip %>% 
+     mutate(zip_code = kableExtra::cell_spec(zip_code, 
+                                             background = ifelse(str_detect(zip_code, "zip"), "#d73027", "#91bfdb"),
+                                             color = "white"))
+     # knitr::kable(format = 'html', escape = FALSE)
+
+k2 <- zipcodes %>% 
+     mutate(ZipCode = kableExtra::cell_spec(ZipCode, 
+                                            background = "#91bfdb",
+                                            color = "white"))  
+     # knitr::kable(format = 'html', escape = FALSE)
+
+knitr::kables(
+     list(
+          knitr::kable(k1, escape = FALSE, format = "html",padding = 5L),
+          knitr::kable(k2, escape = FALSE, format = "html")
+     ), format = "html"
+)
+
+```
+
+
+
+```{r, eval = TRUE, echo = TRUE}
+cases_by_zip <- cases_by_zip %>% 
+  # clean the column we are merging by
+  mutate(zip_code = as.numeric(str_remove(zip_code, "zip: ")))
+```
 
 
 ---
+# Merging data
+#### Example code (2)
+
+
+```{r, echo = TRUE, message = FALSE, message = TRUE}
+cases_by_zip <- cases_by_zip %>% 
+  # merge zipcodes with aggregated case data
+  left_join(zipcodes, by = c("zip_code" = "ZipCode")) %>% 
+  # calculate case incidence
+  mutate(cases_per_10k = new_cases / Population * 10000)
+
+```
+
+```{r, echo = FALSE}
+cases_by_zip %>% 
+  knitr::kable(format = 'html')
+```
+
+---
+
+
 class: inverse, center, middle
 
 # This is a section header slide
