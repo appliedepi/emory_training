@@ -1779,9 +1779,11 @@ cases per kilometer or mile squared) we need to calculate how many latitute/long
 units correspond to one kilometre (or mile). 
 We do this based on the extent of our bounding box and the {sf} st_distance() 
 function. 
+We demonstrate colouring based on viridis palettes. 
 
 For more details see: 
 https://epirhandbook.com/gis-basics.html#contoured-density-heatmaps
+https://bids.github.io/colormap/
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
 ```{r heatmap, fig.cap = str_c("Density map - New COVID-19 cases (", recent_period_labels, ") in Fulton County"), fig.id  = "bivarmap"}
