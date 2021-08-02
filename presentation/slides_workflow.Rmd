@@ -1,6 +1,6 @@
 ---
 title: "Emory COVID-19 Response Collaborative"
-subtitle: "Data workflow with R: an overview and demonstration"
+subtitle: "Data workflow with R:<br> an overview and demonstration"
 author: '[EpiRhandbook Team](https:://epirhandbook.com) <br><br> `r icons::icon_style(icons::fontawesome("twitter"), fill = "white")` [epiRhandbook](https://twitter.com/epiRhandbook) <br> `r icons::icon_style(icons::fontawesome("paper-plane"), fill = "white")` [epirhandbook@gmail.com](mailto:epirhandbook@gmail.com)'
 date: "August 2021"
 output:
@@ -67,20 +67,39 @@ style_mono_accent(
 ```
 
 
-# About us  
 
-## Providing R support for applied epis  
+# We are Applied Epi  
 
 ![](https://github.com/appliedepi/epiRhandbook_eng/raw/master/images/Epi%20R%20Handbook%20Banner%20Beige%201500x500.png)
 
 * We are a grassroots collaborative of applied epidemiologists  
-* The (free) Epi R Handbook has been used by 40,000 people worldwide
+* Our (free) **Epi R Handbook** has been used by 40,000 people worldwide
 * Now we offer customized training to health departments and NGOs  
 
-[1] Bookmark www.epiRhandbook.com  
+
+.footnote[Bookmark [www.epiRhandbook.com](www.epirhandbook.com)!]  
+
 
 ???
 - What makes us different is that we focus on the challenges of applied epi, not academic epi. We emphasize the skills used every day by ground-level epidemiologists. 
+
+
+---
+# Introducing ourselves  
+
+* Neale Batra  
+ - Founder of Epi R Handbook. Previously epi and preparedness at Philly and Santa Clara County health departments. Currently working for WHO Geneva COVID-19 analytics team  
+* Alex Spina  
+ - Alum of EPIET (European EIS). MSF Epi. WHO AFRO. Med Student. 
+* Mathilde Mousset  
+ - Epicentre (MSF). Ecology. 
+* Henry Laurenson-Schafer
+ - 
+* Wen Lin 
+ - 
+
+(PHOTOS AND BIOS)  
+
 
 ---
 # Today's session   
@@ -101,19 +120,67 @@ We also assume you have reviewed the Handbook pages on [R Basics](https://epirha
 ---
 # Outline
   
-1. Setting the scene (project directory & Rmarkdown)  
-2. Rmarkdown parametrisation  
-3. File paths & importing data  
-4. Data cleaning  
-5. Merging data  
-6. Descriptive analysis  
-7. If time allows:  
+1. Why R? 
+2. Setting the scene (project directory & Rmarkdown)  
+3. Rmarkdown parametrisation  
+4. File paths & importing data  
+5. Data cleaning  
+6. Merging data  
+7. Descriptive analysis  
+8. If time allows:  
   a. Statistical analysis  
   b. Logistic regression  
     
 Prioritised report generation -> simpler code in the Handbook 
 
+
 ---
+class: inverse, center, middle
+
+# Why R? 
+### An appetizer for motivation 
+
+---
+# Flexibility 
+
+![](https://github.com/appliedepi/emory_training/blob/master/presentation/images/interoperability.png?raw=true)  
+
+---
+# Popularity 
+
+![](https://github.com/appliedepi/emory_training/blob/master/presentation/images/r_popularity.png?raw=true)  
+
+---
+# Learning curve 
+
+
+.pull-left[
+- R has become easier to learn in last 5 years
+  - Intuitive & friendly user interface (Rstudio)
+  - Clean, logical & simple syntax ("tidyverse")
+  - Free resources & interactive tutorials available  
+      - **Epidemiology R Handbook**
+      - **R epidemiology case studies (EPIET)**
+]
+
+.pull-right[
+![](https://shotwell.ca/posts/r_for_excel_users_files/figure-html/unnamed-chunk-2-1.png)
+]
+
+.footnote[
+Source: [https://shotwell.ca/posts/r_for_excel_users/](https://shotwell.ca/posts/r_for_excel_users/)
+]
+
+---
+# User community 
+
+![](https://github.com/appliedepi/emory_training/blob/master/presentation/images/user_community.png?raw=true)
+
+---
+
+
+
+--- 
 # Setting the scene  
 ### Start with a new R project
 
