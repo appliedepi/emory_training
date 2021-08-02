@@ -19,7 +19,9 @@ automated outbreak situation report for COVID-19 in Fulton county, USA.
 - We demonstrate how to import, clean and analyse your data.  
 - Analysis is organised by time, place and person.  
      - For the purpose of the case study we separate this by descriptive analysis
-     and visualisation (normally this would be mixed together of course)  
+     and visualisation (normally this would be mixed together of course)    
+          - The visualisation section is organised in to place, time and person.
+          This is to simplify flow for didactic delivery.  
      - Analysis is loosely based off the monthly [epidemiology reports](https://www.fultoncountyga.gov/covid-19/epidemiology-reports) 
      for Fulton county  
 - Text within <! > will not show in your final document.  
@@ -91,7 +93,9 @@ pacman::p_load(
   gtsummary,  # summary statistics, tests and regressions 
   labelled,   # create variable labels to be displayed in table outputs
   ggspatial,  # basemaps and scalebars 
-  patchwork   # combining multiple ggplots 
+  patchwork,  # combining multiple ggplots 
+  apyramid,   # plotting age pyramids 
+  incidence2  # plotting epicurves
 )
 
 
@@ -181,7 +185,6 @@ full_period_labels <- str_c(
   "-", 
   format(surveillance_week, format = "%B %d, %Y")
 )
-
 
 ```
 
@@ -691,7 +694,7 @@ tables.
 - As of `r format(surveillance_date, format = "%B %d %Y")`, Fulton County has 
 recorded `r nrow(linelist)` confirmed cases of COVID-19.  
 - As of `r format(surveillance_date, format = "%B %d %Y")`, Fulton County has 
-recorded `r fmt_count(linelist, died == "Yes")`.  
+recorded `r fmt_count(linelist, died == "Yes")` deaths.  
 - Among all confirmed cases of COVID-19 in Fulton County, `r fmt_count(linelist, hospitalized == "Yes")`
 required hospitalization. 
 
@@ -1278,7 +1281,9 @@ rf_data %>%
   # make header text bold (using {flextable})
   bold(part = "header")
 ```
+  
 
+\pagebreak 
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 /// regression \\\
@@ -1362,29 +1367,247 @@ hospital stays `r inline_text(regress_tab, variable = days_hosp, pattern = "(OR 
 
 # Visualisation 
 
-This is a reference to figure \@ref(fig:epicurve) below which shows xyz (TODO: say something meaningful)
 
-```{r epicurve, fig.cap = "this is a plot", fig.id = "epicurve"}
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/// ggplot_theme \\\
+--------------------------------------------------------------------------------
 
-ggplot(data = linelist,
-       mapping = aes(
-         x = age,
-         y = days_onset_hosp))+
-   geom_point()
+Here we define a {ggplot2} theme (which is applied to all plots) and then define 
+some details for theme which can be applied to plots when needed. 
+
+For more details see: 
+https://epirhandbook.com/ggplot-basics.html#ggplot_basics_themes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+```{r ggplot_theme}
+
+# Set default options for plots and charts
+  # set default text size for plots (base_size)
+  # give classic black/white axes for plots
+ggplot2::theme_set(theme_classic(base_size = 18))
+
+# sets the theme in ggplot for how plots should appear
+epicurve_theme <- theme(
+  axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1), 
+  panel.grid.major.x = element_line(color = "grey60", linetype = 3),
+  panel.grid.major.y = element_line(color = "grey60", linetype = 3), 
+  axis.line = element_line(colour = "black"))
+```
+
+
+## Person 
+
+As we see below in Figure \@ref(fig:agehospplot) there appears to be an 
+association between older age, length of hospital stay and mortality. 
+We saw this in Table \@ref(tab:regrtab) as well for the individual associations, 
+although we did not check for interaction and confounding. 
+
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/// age_hosp_died \\\
+--------------------------------------------------------------------------------
+
+Here we demonstrate how to plot points with {ggplot2}. 
+
+For more details see: 
+https://epirhandbook.com/ggplot-basics.html#geoms
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+```{r age_hosp_died, fig.cap = "Duration of admission among hospitalized COVID-19 patients", fig.id = "agehospplot"}
+
+# open a plot with the linelist data
+ggplot(data = linelist) +
+  # add points 
+  geom_point(
+    mapping = aes(
+      # plot age on the x and days hospitalised on the y axis 
+      x = age,
+      y = days_hosp,
+      # color points by outcome
+      color = died),  
+    # all points 3x size
+    size = 3, 
+    # opacity of 30% (i.e. relatively see-through)
+    alpha = 0.3) +      
+  # make the x and y axes start at the origin 
+  scale_y_continuous(expand = c(0, 0)) + 
+  scale_x_continuous(expand = c(0, 0)) + 
+  # add in labels 
+  labs(
+    x = "Age (years)",
+    y = "Duration (days)",
+    caption = "Fictional COVID-19 data",
+    color = "Deceased"
+    ) + 
+  # apply the theme we defined in ggplot_theme code chunk above 
+  epicurve_theme
+```
+
+\pagebreak 
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/// ethnicity_counts \\\
+--------------------------------------------------------------------------------
+
+Here we demonstrate how to plot bar charts with {ggplot2}. 
+
+For more details see: 
+https://epirhandbook.com/ggplot-basics.html#geoms
+https://epirhandbook.com/ggplot-tips.html
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+```{r ethnicity_counts, fig.cap = "COVID-19 cases by ethnicity", fig.id = "ethnicityplot"}
+
+# open a plot with the linelist data
+ggplot(linelist) +
+  # add bars 
+  geom_bar(
+    mapping = aes(
+      # plot the number of cases by ethnicity (ordered in reverse frequency)
+      x = fct_rev(fct_infreq(eth_race)),
+      # stack bars and colour by died (ordered in reverse frequency)
+      fill = fct_rev(fct_infreq(died))
+    )
+  ) +
+  # flip the x and y axes 
+  coord_flip() +
+  # make the x axes start at the origin (nb axes flipped)
+  scale_y_continuous(expand = c(0, 0), 
+                     # define where to label xaxis (nb axes flipped )
+                     breaks = seq(from = 0,
+                                  to = 35000,
+                                  by = 5000)) + 
+  # add in labels 
+  labs(
+    # set the axes titles (nb axes flipped)
+    x = "Race and Ethnicity",
+    y = "Cases (n)",
+    caption = "Fictional COVID-19 data",
+    fill = "Deceased"
+    ) + 
+  # apply the theme we defined in ggplot_theme code chunk above 
+  epicurve_theme
 
 ```
 
 
+\pagebreak 
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/// age_pyramid \\\
+--------------------------------------------------------------------------------
+
+Here we demonstrate how to plot age pyramids using the {apyramid} package and edit
+it with {ggplot2]. 
+
+For more details see: 
+https://epirhandbook.com/demographic-pyramids-and-likert-scales.html
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+```{r age_pyramid, fig.cap = "Age and Gender of COVID-19 cases, Fulton County", fig.id = "agepyramid"}
+
+# prepare dataset
+
+# start a new dataframe (as dont want to overwrite the original)
+linelist_2g <- linelist %>% 
+  # update the gender and age_group columns
+  mutate(across(.cols = c(gender, age_group), 
+                .fns = ~{
+                  # replace "Unknown" with NA
+                  .x = na_if(.x, "Unknown") 
+                  # drop "Unknown" from the factor levels 
+                  .x = fct_drop(.x)
+                }))
+
+# plot age pyramid 
+age_pyramid(
+  data = linelist_2g,
+  age_group = "age_group",
+  split_by = "gender",
+  # Show as percentages of total cases
+  proportional = TRUE,
+  # remove guide line for mid-point
+  show_midpoint = FALSE) +
+  # set theme to basic 
+  theme_minimal() +
+  # add labels 
+  labs(
+    title = "",
+    subtitle = ,
+    x = "Age group",
+    y = "Percent of total",
+    fill = "Gender",
+    # use str_glue to set dynamic captions 
+    # {missing} is defined in the second argument below
+    caption = str_glue(
+      "{missing} cases missing either age or gender are not shown. \n Fictional COVID-19 data",
+      missing = linelist_2g %>%
+        filter(is.na(gender) | is.na(age_group)) %>%
+        nrow()
+      )
+    )
+
+```
+
 
 \pagebreak 
 
-## Geospatial 
+## Time 
+
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/// epicurve \\\
+--------------------------------------------------------------------------------
+
+Here we demonstrate how to plot epicurves using the {incidence2} package and edit
+it with {ggplot2]. 
+
+For more details see: 
+https://epirhandbook.com/epidemic-curves.html
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+```{r epicurve, fig.cap = "COVID-19 cases by week and race/ethnicity in Fulton County", fig.id = "epicurve"}
+
+# create an "incidence" object (with number of cases by week)
+SunWeeks <- incidence(
+  # define dataset
+  x = linelist,    
+  # date column
+  date_index = date_onset,   
+  # bin interval (day which week starts on)
+  interval = "Sunday weeks", 
+  # grouping variable
+  groups = eth_race,
+  # wether to include missings as a group (or drop) 
+  na_as_group = TRUE)
 
 
-TODO: gifs for maps projections to put in slides (consider just recreating w code)
-https://twitter.com/mbostock/status/1292887409474994176
-https://twitter.com/Amazing_Maps/status/456921227068968960/photo/1
+# plot epicurve 
+plot(SunWeeks,
+  fill = eth_race,
+  date_format = "%a %d %b %Y\n (Week %W)",
+  # how many axis labels to include 
+  n.breaks = 24,
+  # angle of date labels)
+  angle = 30) +
+  scale_y_continuous(
+    # make the y axis start at the origin
+    expand = c(0, 0),
+    # define where to label y axis 
+    breaks = seq(0, 2000, 250)) +
+  # update legend label 
+  labs(fill = "Race and\nEthnicity") + 
+  # move the legend to the bottom 
+  theme(legend.position = "bottom", 
+        # remove the outside box (axes added back in via epicurve_theme)
+        panel.border = element_blank()) +
+  # apply the theme we defined in ggplot_theme code chunk above
+  epicurve_theme
+```
 
+
+\pagebreak 
+
+## Place  
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 /// crs \\\
@@ -1486,7 +1709,11 @@ basemap <- ggplot() +
     legend.box.background = element_rect(
       fill = "white",
       colour = NA)
-    )
+    ) + 
+  # add in a note at the bottom of plots to show it is fake data
+  labs(
+    caption = "Fictional COVID-19 data",
+  )
 ```
 
 
@@ -1862,7 +2089,7 @@ basemap +
         # bandwith (distance squared) 
         h = c(xfact, yfact)
         ) + 
-  # define fill palette
+  # define fill palette (viridis continuous) 
   scale_fill_viridis_c(option = "C")
 
 ```
