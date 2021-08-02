@@ -299,7 +299,6 @@ linelist <- raw_linelist %>%
 
 ---
 # Merging data
-#### Example code (1)
 
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
 
@@ -338,49 +337,52 @@ zipcodes <- sf::read_sf(
 ```
 
 
+.pull-left[
+**Table 1**
 
 ```{r, echo = FALSE}
-# cases_by_zip %>% 
-#   mutate(zip_code = kableExtra::cell_spec(zip_code, 
-#                               background = ifelse(str_detect(zip_code, "zip"), "#d73027", "#91bfdb"),
-#                               color = "white")) %>% 
-#   knitr::kable(format = 'html', escape = FALSE)
-
-
-k1 <- cases_by_zip %>% 
+cases_by_zip %>% 
      mutate(zip_code = kableExtra::cell_spec(zip_code, 
                                              background = ifelse(str_detect(zip_code, "zip"), "#d73027", "#31a354"),
-                                             color = "white"))
-     # knitr::kable(format = 'html', escape = FALSE)
-
-k2 <- zipcodes %>% 
-     mutate(ZipCode = kableExtra::cell_spec(ZipCode, 
-                                            background = "#31a354",
-                                            color = "white"))  
-     # knitr::kable(format = 'html', escape = FALSE)
-
-knitr::kables(
-     list(
-          knitr::kable(k1, escape = FALSE, format = "html"),
-          knitr::kable(k2, escape = FALSE, format = "html")
-     ), format = "html"
-)
-
+                                             color = "white")) %>% 
+     knitr::kable(format = 'html', escape = FALSE)
 ```
 
+]
 
+.pull-right[
+**Table 2**
 
+```{r, echo = FALSE}
+zipcodes %>% 
+     mutate(ZipCode = kableExtra::cell_spec(ZipCode, 
+                                            background = "#31a354",
+                                            color = "white"))  %>% 
+     knitr::kable(format = 'html', escape = FALSE)
+
+# knitr::kables(
+#      list(
+#           knitr::kable(k1, escape = FALSE, format = "html"),
+#           knitr::kable(k2, escape = FALSE, format = "html")
+#      ), format = "html"
+# )
+
+```
+]
+
+<br> </br>
+
+.center[
 ```{r, eval = TRUE, echo = TRUE}
 cases_by_zip <- cases_by_zip %>% 
   # clean the column we are merging by
   mutate(zip_code = as.numeric(str_remove(zip_code, "zip: ")))
 ```
+]
 
 
 ---
 # Merging data
-#### Example code (2)
-
 
 ```{r, echo = TRUE, message = FALSE, message = TRUE}
 cases_by_zip <- cases_by_zip %>% 
@@ -412,6 +414,7 @@ cases_by_zip %>%
 - Key packages:
  + `janitor`
  + `dplyr`
+ + `gtsummary`
  
 .footnote[
 
@@ -421,7 +424,6 @@ cases_by_zip %>%
 ---
 
 # Descriptive analysis
-#### Example code 
 
 ```{r, eval = FALSE, echo = TRUE, message = FALSE, warning = FALSE}
 
@@ -449,11 +451,6 @@ linelist_raw %>%
   knitr::kable()
 
 ```
-
----
-class: inverse, center, middle
-
-# This is a section header slide
 
 ---
 class: center, middle
