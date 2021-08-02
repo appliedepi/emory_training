@@ -111,7 +111,7 @@ We also assume you have reviewed the Handbook pages on [R Basics](https://epirha
   a. Statistical analysis  
   b. Logistic regression  
     
-Prioritised report generation -> simpler code in the Handbook  
+Prioritised report generation -> simpler code in the Handbook 
 
 ---
 # Setting the scene  
@@ -133,21 +133,35 @@ Prioritised report generation -> simpler code in the Handbook
 
 - Create a Rmarkdown file to get started!
 
----
 
 ---
 # Rmarkdown parameterisation  
-## This is a subheader
 
+- Rmd files use YAML header
 
-## TODO do rmd slide
+- Use parameters to generalise reports for different scenarios
+ + different dates
+ + different counties
+ 
+```{r, eval = FALSE, echo = TRUE}
+params:
+  as_of_date: 2021-08-01
+  county: "Fulton"
+```
+
+- Acess parameters with `params$...`
+
+```{r, eval = FALSE, echo = TRUE}
+# filter linelist for county of choice
+linelist <- linelist %>% 
+  filter(county == params$county)
+```
+
 
 .footnote[
-[1] Something _super_ important to say 
 
-[2] Some **other** stuff 
+[1] [EpiRHandbook section on Rmarkdown](https://epirhandbook.com/reports-with-r-markdown.html?q=rmark#reports-with-r-markdown)
 
-[3] bla
 ]
 
 ---
