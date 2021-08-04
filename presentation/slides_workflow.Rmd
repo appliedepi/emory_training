@@ -35,6 +35,7 @@ pacman::p_load(
   lubridate,  # working with dates
   tidyverse,  # data management and visualization
   gtsummary,  # summary tables
+  kableExtra, # for output tables
   xaringanthemer  # for styling presentation 
 )
 
@@ -450,7 +451,7 @@ linelist_raw %>%
 # Simple statistics
 
 - R can perform many simple statistical tests out of the box
-
+  
 --
 
 - Examples:
