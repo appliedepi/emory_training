@@ -1,6 +1,6 @@
 ---
 title: "Emory COVID-19 Response Collaborative"
-subtitle: "Data workflow with R: an overview and demonstration"
+subtitle: "Data workflow with R:<br> an overview and demonstration"
 author: '[EpiRhandbook Team](https:://epirhandbook.com) <br><br> `r icons::icon_style(icons::fontawesome("twitter"), fill = "white")` [epiRhandbook](https://twitter.com/epiRhandbook) <br> `r icons::icon_style(icons::fontawesome("paper-plane"), fill = "white")` [epirhandbook@gmail.com](mailto:epirhandbook@gmail.com)'
 date: "August 2021"
 output:
@@ -69,20 +69,39 @@ style_mono_accent(
 ```
 
 
-# About us  
 
-## Providing R support for applied epis  
+# We are Applied Epi  
 
 ![](https://github.com/appliedepi/epiRhandbook_eng/raw/master/images/Epi%20R%20Handbook%20Banner%20Beige%201500x500.png)
 
 * We are a grassroots collaborative of applied epidemiologists  
-* The (free) Epi R Handbook has been used by 40,000 people worldwide
+* Our (free) **Epi R Handbook** has been used by 40,000 people worldwide
 * Now we offer customized training to health departments and NGOs  
 
-[1] Bookmark www.epiRhandbook.com  
+
+.footnote[Bookmark [www.epiRhandbook.com](www.epirhandbook.com)!]  
+
 
 ???
 - What makes us different is that we focus on the challenges of applied epi, not academic epi. We emphasize the skills used every day by ground-level epidemiologists. 
+
+
+---
+# Introducing ourselves  
+
+* Neale Batra  
+ - Founder of Epi R Handbook. Previously epi and preparedness at Philly and Santa Clara County health departments. Currently working for WHO Geneva COVID-19 analytics team  
+* Alex Spina  
+ - Alum of EPIET (European EIS). MSF Epi. WHO AFRO. Med Student. 
+* Mathilde Mousset  
+ - Epicentre (MSF). Ecology. 
+* Henry Laurenson-Schafer
+ - 
+* Wen Lin 
+ - 
+
+(PHOTOS AND BIOS)  
+
 
 ---
 # Today's session   
@@ -103,17 +122,189 @@ We also assume you have reviewed the Handbook pages on [R Basics](https://epirha
 ---
 # Outline
   
-1. Setting the scene (project directory & Rmarkdown)  
-2. Rmarkdown parametrisation  
-3. File paths & importing data  
-4. Data cleaning  
-5. Merging data  
-6. Descriptive analysis  
-7. If time allows:  
+1. Why R? 
+2. Setting the scene (project directory & Rmarkdown)  
+3. Rmarkdown parametrisation  
+4. File paths & importing data  
+5. Data cleaning  
+6. Merging data  
+7. Descriptive analysis  
+8. If time allows:  
   a. Statistical analysis  
   b. Logistic regression  
     
 Prioritised report generation -> simpler code in the Handbook 
+
+
+---
+class: inverse, center, middle
+
+# Why R? 
+### An appetizer for motivation 
+
+---
+# Flexibility 
+
+![](https://github.com/appliedepi/emory_training/blob/master/presentation/images/interoperability.png?raw=true)  
+
+
+???
+- R can read and write to loads of different software/databases.  
+- Can also produce many different outputs  
+- Save you time and headache (automated and reproducible workflows)  
+
+---
+# Popularity 
+
+![](https://github.com/appliedepi/emory_training/blob/master/presentation/images/r_popularity.png?raw=true)  
+
+
+???
+- R is free - and yet can do more than what expensive licensed software can  
+- Most students in the US will have learnt SAS (but changing)  
+- Previously limited to academic statisticians - R was not "trusted"  
+- But now even pharma companies (e.g. GSK) and regulators are making the switch  
+- It is the most widely used statistical programming language. 
+
+---
+# Learning curve 
+
+R has become easier to learn in the last 5 years
+
+.pull-left[
+- Friendlier user interface (Rstudio)
+- Simpler syntax ("tidyverse")
+- Free resources & interactive tutorials available  
+    - **Epidemiology R Handbook**
+    - **R epidemiology case studies (EPIET)**
+]
+
+.pull-right[
+
+```{r difficulty_plot, warning = FALSE, message = FALSE}
+
+exp <- function(x){x^2}
+lgr <- function(x){log(x) + 4}
+num <- 10000
+linwid <- 2
+
+ggplot() + 
+  geom_function(fun = exp,
+                n = num, 
+                size = linwid,
+                aes(colour = "Excel")) +
+  geom_function(fun = lgr, 
+                n = num, 
+                size = linwid,
+                aes(colour = "R")) + 
+  scale_y_continuous(expand = c(0, 0), 
+                     limits = c(0, 10)) + 
+  scale_x_continuous(expand = c(0, 0), 
+                     limits = c(0, 5)) + 
+  labs(x = "Code complexity", 
+       y = "Task difficulty") + 
+  theme_classic(base_size = 24) + 
+  theme(axis.text = element_blank(),
+        axis.ticks = element_blank(), 
+        legend.position = "bottom", 
+        legend.title = element_blank())
+
+```
+
+]
+
+???
+- There is a bit of a learning curve - as with any software.  
+- But we are here to get you over that initial hump so you can keep developing. 
+
+---
+# User community 
+
+![](https://github.com/appliedepi/emory_training/blob/master/presentation/images/user_community.png?raw=true)
+
+???
+- **The internet is your friend.**  
+- Once you get to grips with the basics - people answer literally any question on **stackoverflow!**  
+- **Epi R Handbook**  
+
+---
+# Data visualization 
+
+![](https://github.com/appliedepi/emory_training/blob/master/presentation/images/visualization.png?raw=true)
+
+.footnote[
+Slide source: Paula Bianca Blomquist  
+]
+
+???
+- Data viz essential to understand disease surveillance trends and outbreaks  
+- **One of R's strongest features**  
+- Network diagrams, maps, heat maps, integrated figures, the list goes on...  
+
+---
+# Automated surveillance reports 
+
+.pull-left[
+- Daily COVID-19 reports by Public Health England  
+  - Reports sent to 317 local authorities  
+  - Guide local investigations  
+  - *R* bringing together data on:  
+      - cases, testing, mortality & many others  
+  - Caters to authorities needs  
+      - MS word to be editable  
+      - Integrated in to local reports  
+]
+
+.pull-right[
+![](https://github.com/appliedepi/emory_training/blob/master/presentation/images/automated_reports.png?raw=true)
+]
+
+.footnote[
+Slide source: Paula Bianca Blomquist  
+
+See [Epi R Handbook chapter](https://epirhandbook.com/organizing-routine-reports.html) on organizing routine reports
+]
+
+???
+- Producing reports at scale, an example from our EpiRHandbook colleague Paula
+- Not a fancy report, flat word document but caters to specific needs! 
+- **Key example of local intelligence and no way could do without the power of R**
+
+---
+# Automated surveillance outputs 
+### WHO COVID-19 interactive {shiny} dashboard
+
+![](https://github.com/appliedepi/emory_training/blob/master/presentation/images/automated_dashboard.png?raw=true)
+
+.footnote[
+Slide source: Paula Bianca Blomquist & [World Health Organization](https://worldhealthorg.shinyapps.io/covid/)  
+
+See [Epi R Handbook chapter](https://epirhandbook.com/dashboards-with-shiny.html) on organizing shiny dashboards
+]
+
+???
+- WHO COVID-19 public-facing dashboard  
+- Made with a package called {shiny} to build interactive web apps/dashboard  
+- Can see toggles and interactive tabs here  
+- Pulls from dozens of data sources to displace data by countries/regions 
+- There is a section in the handbook on shiny
+
+---
+class: inverse, center, middle
+
+# Case study 
+### COVID-19 epidemiological report for Fulton County
+
+---
+# Setting the scene 
+
+- You are the local epi tasked with automating the weekly situation report  
+  - We are going to reproduce [Fulton County epidemiology reports](https://www.fultoncountyga.gov/covid-19/epidemiology-reports)  
+  - We have pre-packaged an example **R-project** folder 
+  - Walk-through from start to finish 
+
+![](https://github.com/appliedepi/emory_training/blob/master/presentation/images/fulton_report.png?raw=true)
+
 
 ---
 # Setting the scene  
@@ -300,6 +491,35 @@ linelist <- raw_linelist %>%
 ]
 
 ---
+# Merging data
+
+### `left_join()`
+
+![](https://github.com/appliedepi/emory_training/blob/master/presentation/images/left-join.gif?raw=true)
+
+---
+# Merging data
+
+### `right_join()`
+
+![](https://github.com/appliedepi/emory_training/blob/master/presentation/images/right-join.gif?raw=true)
+
+---
+# Merging data
+
+### `full_join()`
+
+![](https://github.com/appliedepi/emory_training/blob/master/presentation/images/full-join.gif?raw=true)
+
+---
+# Merging data
+
+### `full_join()`
+
+![](https://github.com/appliedepi/emory_training/blob/master/presentation/images/inner-join.gif?raw=true)
+
+---
+
 # Merging data
 
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
