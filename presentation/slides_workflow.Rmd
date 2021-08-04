@@ -449,18 +449,15 @@ linelist_raw %>%
 ---
 # Simple statistics
 
-- Perform simple stats with `rstatix` or base R 
-
- + Base R usage: `t.test()`
- + `rstatix` usage: `t_test()`
+- R can perform many simple statistical tests out of the box
 
 --
 
 - Examples:
- + `t_test()` - _T-test_
- + `shapiro_test()` - _Shapiro-Wilk test_
- + `kruskal_test()` - _Kruskal-Wallis/Mann-Whitney U test_
- + `chisq_test()` - _Chi-Squared test_
+ + `t.test()` - _T-test_
+ + `shapiro.test()` - _Shapiro-Wilk test_
+ + `kruskal.test()` - _Kruskal-Wallis/Mann-Whitney U test_
+ + `chisq.test()` - _Chi-Squared test_
 
 
 .footnote[
