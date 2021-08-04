@@ -491,6 +491,35 @@ linelist <- raw_linelist %>%
 ---
 # Merging data
 
+### `left_join()`
+
+![](https://github.com/appliedepi/emory_training/blob/master/presentation/images/left-join.gif?raw=true)
+
+---
+# Merging data
+
+### `right_join()`
+
+![](https://github.com/appliedepi/emory_training/blob/master/presentation/images/right-join.gif?raw=true)
+
+---
+# Merging data
+
+### `full_join()`
+
+![](https://github.com/appliedepi/emory_training/blob/master/presentation/images/full-join.gif?raw=true)
+
+---
+# Merging data
+
+### `full_join()`
+
+![](https://github.com/appliedepi/emory_training/blob/master/presentation/images/inner-join.gif?raw=true)
+
+---
+
+# Merging data
+
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
 
 cases_by_zip <- tibble(
@@ -563,13 +592,13 @@ zipcodes %>%
 
 <br> </br>
 
-.center[
+
 ```{r, eval = TRUE, echo = TRUE}
 cases_by_zip <- cases_by_zip %>% 
   # clean the column we are merging by
   mutate(zip_code = as.numeric(str_remove(zip_code, "zip: ")))
 ```
-]
+
 
 
 ---
