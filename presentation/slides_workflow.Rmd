@@ -34,6 +34,8 @@ pacman::p_load(
   janitor,    # data cleaning and tables
   lubridate,  # working with dates
   tidyverse,  # data management and visualization
+  gtsummary,  # summary tables
+  kableExtra, # for output tables
   xaringanthemer  # for styling presentation 
 )
 
@@ -580,18 +582,11 @@ zipcodes %>%
                                             color = "white"))  %>% 
      knitr::kable(format = 'html', escape = FALSE)
 
-# knitr::kables(
-#      list(
-#           knitr::kable(k1, escape = FALSE, format = "html"),
-#           knitr::kable(k2, escape = FALSE, format = "html")
-#      ), format = "html"
-# )
 
 ```
 ]
 
 <br> </br>
-
 
 ```{r, eval = TRUE, echo = TRUE}
 cases_by_zip <- cases_by_zip %>% 
@@ -669,6 +664,60 @@ linelist_raw %>%
   # change from proportions to percentages (do not add a % sign)
   adorn_pct_formatting(affix_sign = FALSE) %>% 
   knitr::kable()
+
+```
+
+---
+# Simple statistics
+
+- R can perform many simple statistical tests out of the box
+  
+--
+
+- Examples:
+ + `t.test()` - _T-test_
+ + `shapiro.test()` - _Shapiro-Wilk test_
+ + `kruskal.test()` - _Kruskal-Wallis/Mann-Whitney U test_
+ + `chisq.test()` - _Chi-Squared test_
+
+
+.footnote[
+
+[1] [EpiRHandbook section on simple statistics](https://epirhandbook.com/simple-statistical-tests.html?q=stati#simple-statistical-tests)
+
+]
+
+---
+# Simple stats
+
+- Use `gtsummary`:
+ + create summary tables, and add simple stats
+ + use **base R** versions of stats functions
+
+
+```{r, eval = FALSE, echo = TRUE}
+
+linelist %>% 
+  # select variables of interest
+  select(outcome, gender) %>% 
+  # create summary table
+  tbl_summary(by = outcome) %>%
+  # add p-values from Chi-Sq test for gender
+  add_p(gender ~ "chisq.test")
+
+```
+
+
+---
+# Simple stats
+
+```{r, echo = FALSE}
+linelist_raw %>% 
+  filter(!is.na(died_covid), !is.na(case_gender)) %>% 
+  mutate(outcome = ifelse(died_covid == "Yes", "Died", "Recovered")) %>% 
+  select(outcome, gender = case_gender) %>% 
+  tbl_summary(by = outcome) %>% 
+  add_p(gender ~ "chisq.test") 
 
 ```
 
