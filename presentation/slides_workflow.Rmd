@@ -230,6 +230,10 @@ ggplot() +
 
 ![](https://github.com/appliedepi/emory_training/blob/master/presentation/images/visualization.png?raw=true)
 
+.footnote[
+Slide source: Paula Bianca Blomquist  
+]
+
 ???
 - Data viz essential to understand disease surveillance trends and outbreaks  
 - **One of R's strongest features**  
@@ -254,7 +258,8 @@ ggplot() +
 ]
 
 .footnote[
-Source: Paula Bianca Blomquist, Public Health England  
+Slide source: Paula Bianca Blomquist  
+
 See [Epi R Handbook chapter](https://epirhandbook.com/organizing-routine-reports.html) on organizing routine reports
 ]
 
@@ -268,6 +273,12 @@ See [Epi R Handbook chapter](https://epirhandbook.com/organizing-routine-reports
 ### WHO COVID-19 interactive {shiny} dashboard
 
 ![](https://github.com/appliedepi/emory_training/blob/master/presentation/images/automated_dashboard.png?raw=true)
+
+.footnote[
+Slide source: Paula Bianca Blomquist & [World Health Organization](https://worldhealthorg.shinyapps.io/covid/)  
+
+See [Epi R Handbook chapter](https://epirhandbook.com/dashboards-with-shiny.html) on organizing shiny dashboards
+]
 
 ???
 - WHO COVID-19 public-facing dashboard  
