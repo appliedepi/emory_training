@@ -68,7 +68,23 @@ style_mono_accent(
 
 ```
 
+```{css, echo=F}
+    .remark-slide table{
+      border: none
+    }
 
+    .remark-slide-table {
+      
+    }
+
+    tr:first-child {
+      border-top: none;
+  }
+    tr:last-child {
+    border-bottom: none;
+  }
+
+```
 
 # We are Applied Epi  
 
@@ -96,7 +112,7 @@ style_mono_accent(
 * Mathilde Mousset  
  - Epicentre (MSF). Ecology. 
 * Henry Laurenson-Schafer
- - 
+ - WHO HQ Covid Analytics. Previously Molecular Biology/Bioinformatics
 * Wen Lin 
  - 
 
@@ -413,7 +429,7 @@ linelist_raw <- here::here("case_study", "data",
 ---
 # Cleaning data  
 
-#### Use `dplyr` to clean data
+#### Use `{dplyr}` to clean data
 
 1. Visually inspect data (`summary()`, `glimpse()`)
 
@@ -424,7 +440,7 @@ linelist_raw <- here::here("case_study", "data",
 --
 
 3. Parse and clean fields
- + parse dates (using `lubridate`)
+ + parse dates (using `{lubridate}`)
  + clean categorical variables
  + clean numeric variables
 
@@ -467,6 +483,40 @@ linelist <- raw_linelist %>%
 ]
 
 ---
+# Cleaning data
+#### Using `across()`
+
+- We can use `dplyr::across()` to generalize cleaning operations
+
+--
+
+- Use within `dplyr::mutate()` and `dplyr::summarise()`
+
+--
+- General principle:
+  + **Select** columns to work with
+  + **Apply** generalised function
+
+--
+
+```{r, eval = FALSE, echo = TRUE}
+
+linelist <- raw_linelist %>% 
+  # choose variables
+  select(date_birth, age, gender, zip_code, date_onset) %>% 
+  # parse dates, clean gender, clean erroneous ages
+  mutate(
+    # apply to columns containing the string 'date'
+    .cols = across(.cols = contains("date")),
+    # apply as.Date() function to all selected columns
+    .fns = ~as.Date(.x)
+  ) 
+
+```
+
+
+
+---
 # Merging data  
 
 - We want to combine two tables (dataframes) with *common columns*
@@ -475,15 +525,15 @@ linelist <- raw_linelist %>%
 
 - Make sure values in common columns are aligned
   + Follow the principles of categorical variable cleaning
-  + Use `unique()`
+  + Use `dplyr::unique()`
 
 --
 
-- Use the correct join type from `tidyr` package
-  + `left_join()`
-  + `right_join()`
-  + `full_join()`
-  + `inner_join()`
+- Use the correct join type from `{tidyr}` package
+  + `tidyr::left_join()`
+  + `tidyr::right_join()`
+  + `tidyr::full_join()`
+  + `tidyr::inner_join()`
 
 
 .footnote[
@@ -540,23 +590,7 @@ zipcodes <- sf::read_sf(
      filter(ZipCode %in% c(30311, 30326, 30312, 30213, 30304))
 
 ```
-```{css, echo=F}
-    .remark-slide table{
-      border: none
-    }
 
-    .remark-slide-table {
-      
-    }
-
-    tr:first-child {
-      border-top: none;
-  }
-    tr:last-child {
-    border-bottom: none;
-  }
-
-```
 
 
 .pull-left[
@@ -627,9 +661,9 @@ cases_by_zip %>%
 --
 
 - Key packages:
- + `janitor`
- + `dplyr`
- + `gtsummary`
+ + `{janitor}`
+ + `{dplyr}`
+ + `{gtsummary}`
  
 .footnote[
 
@@ -680,6 +714,9 @@ linelist_raw %>%
  + `kruskal.test()` - _Kruskal-Wallis/Mann-Whitney U test_
  + `chisq.test()` - _Chi-Squared test_
 
+--
+
+- See results of tests with `summary()`
 
 .footnote[
 
@@ -690,20 +727,27 @@ linelist_raw %>%
 ---
 # Simple stats
 
-- Use `gtsummary`:
- + create summary tables, and add simple stats
- + use **base R** versions of stats functions
+
+
+- In the context of summary tables we recommend `{gtsummary}`:
+
+- We produce a HTML table
+
+- Create summary tables, and add simple stats
 
 
 ```{r, eval = FALSE, echo = TRUE}
 
 linelist %>% 
   # select variables of interest
-  select(outcome, gender) %>% 
+  select(outcome, gender, age) %>% 
   # create summary table
   tbl_summary(by = outcome) %>%
-  # add p-values from Chi-Sq test for gender
-  add_p(gender ~ "chisq.test")
+  # add p-values from Chi-Sq test for gender and Kruskal-Wallis for age
+  add_p(list(
+    gender ~ "chisq.test",
+    age ~ "kruskal.test")
+  )
 
 ```
 
@@ -711,13 +755,17 @@ linelist %>%
 ---
 # Simple stats
 
+### `{gtsummary}` example output
 ```{r, echo = FALSE}
 linelist_raw %>% 
-  filter(!is.na(died_covid), !is.na(case_gender)) %>% 
+  filter(!is.na(died_covid), !is.na(case_gender), !is.na(case_age)) %>% 
   mutate(outcome = ifelse(died_covid == "Yes", "Died", "Recovered")) %>% 
-  select(outcome, gender = case_gender) %>% 
+  select(outcome, gender = case_gender, age = case_age) %>% 
   tbl_summary(by = outcome) %>% 
-  add_p(gender ~ "chisq.test") 
+  add_p(list(
+    gender ~ "chisq.test",
+    age ~ "kruskal.test")
+  )
 
 ```
 
@@ -733,85 +781,11 @@ background-position: 50% 0%
 
 ---
 
-# Tables with Knitr 
-
-Tables need to be in HTML format  
-So either Knitter or flextable
-
-```{r knitr_tabble}
-head(mtcars) %>% 
-  knitr::kable(format = 'html')
-```
-
----
-
-# Tables with Flextable 
-
-You can colour in rows directly with flextable
-
-```{r flextable}
-head(mtcars) %>%
-  flextable::flextable() %>% 
-  flextable::bg(., 
-        i = c(2, 4), 
-        part = "body", 
-        bg = "yellow")
-```
-
----
-
-
-
-# Table highlighting
-
-- Use  chunk option `highlight.output` to highlight specific lines of the text output. 
-  + For example, `highlight.output = TRUE` means highlighting all lines
-  + `highlight.output = c(1, 3)` means highlighting the first and third line.
-
-
-```{r, highlight.output=c(1, 3), echo=FALSE}
-head(mtcars)
-```
-
----
-
 ## Visualisation 
 
 Note to selves: 
 I think the way [this presentation](https://www.cedricscherer.com/slides/2019-08-28-intro-ggplot-statsizw#20) 
 breaks down ggplots line by line is probably the way to go! 
-
----
-
-## A ggplot code example
-
-- see [extras slide](#references) for alt side-by-side option in twitter feed
-
-
-.pull-left[
-
-Highlight code lines using #<<
-
-```{r ggplot_code, echo = TRUE, eval = FALSE, tidy = FALSE}
-ggplot(mtcars) + 
-  aes(mpg, disp) + 
-  geom_point() +  #<<
-  geom_smooth()   #<<
-```
-] 
-
-.pull-right[
-```{r ggplot_code_plot}
-ggplot(mtcars) + 
-  aes(mpg, disp) + 
-  geom_point() +
-  geom_smooth() + 
-  ## NB have to fiddle with sizes a bit to make look good on output
-  theme_gray(base_size = 24)
-```
-]
-
-
 
 ---
 name: imageslide
