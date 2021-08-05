@@ -327,21 +327,35 @@ class: inverse, center, middle
 ### Start with a new R project
 
 - Create a project directory
---
-
   + File -> New Directory...
 
 --
 
+- R project directories can be shared easily
+
+--
 ## TODO ADD IMG TO MASTER
 
 ![](https://github.com/appliedepi/emory_training/blob/master/presentation/images/make_proj.png?raw=true)  
 
-
 --
 
-- Create a Rmarkdown file to get started!
+- Create a Rmarkdown file in your file structure to get started!
 
+---
+# Setting the scene  
+#### Download our example R project!
+
+
+![](https://github.com/appliedepi/emory_training/blob/master/presentation/images/repo_picture.png?raw=true)  
+
+
+.footnote[
+
+See [our github repository](https://github.com/appliedepi/emory_training)
+
+Download the project [directly](https://minhaskamal.github.io/DownGit/#/home?url=https://github.com/appliedepi/emory_training/tree/master/case_study)
+]
 
 ---
 # Rmarkdown parameterisation  
@@ -369,20 +383,17 @@ linelist <- linelist %>%
 
 .footnote[
 
-[1] [EpiRHandbook section on Rmarkdown](https://epirhandbook.com/reports-with-r-markdown.html?q=rmark#reports-with-r-markdown)
+See the [EpiRHandbook section on Rmarkdown](https://epirhandbook.com/reports-with-r-markdown.html?q=rmark#reports-with-r-markdown)
 
 ]
 
 ---
 # File paths & importing data  
 
-#### Use the `here` and `rio` packages to import data
+#### Use the `{here}` and `{rio}` packages to import data
 
-- `here::set_here()` to establish root directory
- 
---
 
-- `here::here()` to see current directory
+- `here::here()` to navigate working environment
  
 --
 
@@ -416,15 +427,10 @@ linelist_raw <- here::here("case_study", "data",
 ```
 
 .footnote[
-[1] [EpiRHandbook section on here package](https://epirhandbook.com/import-and-export.html?q=here#here)
+See the [EpiRHandbook section on here package](https://epirhandbook.com/import-and-export.html?q=here#here)
 
-[2] [EpiRHandbook section on importing](https://epirhandbook.com/cleaning-data-and-core-functions.html?q=import#import)
+and the [EpiRHandbook section on importing](https://epirhandbook.com/cleaning-data-and-core-functions.html?q=import#import)
 ]
-
----
-
-
-
 
 ---
 # Cleaning data  
@@ -451,9 +457,9 @@ linelist_raw <- here::here("case_study", "data",
 
 
 .footnote[
-[1] [EpiRHandbook section on cleaning](https://epirhandbook.com/cleaning-data-and-core-functions.html)
+See the [EpiRHandbook section on cleaning](https://epirhandbook.com/cleaning-data-and-core-functions.html)
 
-[2] [EpiRHandbook section on dates](https://epirhandbook.com/working-with-dates.html)
+and the [EpiRHandbook section on dates](https://epirhandbook.com/working-with-dates.html)
 ]
 
 ---
@@ -477,9 +483,9 @@ linelist <- raw_linelist %>%
 ```
 
 .footnote[
-[1] [EpiRHandbook section on cleaning](https://epirhandbook.com/cleaning-data-and-core-functions.html)
+See the [EpiRHandbook section on cleaning](https://epirhandbook.com/cleaning-data-and-core-functions.html)
 
-[2] [EpiRHandbook section on dates](https://epirhandbook.com/working-with-dates.html)
+and the [EpiRHandbook section on dates](https://epirhandbook.com/working-with-dates.html)
 ]
 
 ---
@@ -537,7 +543,7 @@ linelist <- raw_linelist %>%
 
 
 .footnote[
-[1] [EpiRHandbook section on joining data](https://epirhandbook.com/joining-data.html)
+See the [EpiRHandbook section on joining data](https://epirhandbook.com/joining-data.html)
 ]
 
 ---
@@ -665,9 +671,10 @@ cases_by_zip %>%
  + `{dplyr}`
  + `{gtsummary}`
  
+
 .footnote[
 
-[1] [EpiRHandbook section on descriptive tables](https://epirhandbook.com/descriptive-tables.html)
+See the [EpiRHandbook section on descriptive tables](https://epirhandbook.com/descriptive-tables.html)
 
 ]
 ---
@@ -714,13 +721,10 @@ linelist_raw %>%
  + `kruskal.test()` - _Kruskal-Wallis/Mann-Whitney U test_
  + `chisq.test()` - _Chi-Squared test_
 
---
-
-- See results of tests with `summary()`
 
 .footnote[
 
-[1] [EpiRHandbook section on simple statistics](https://epirhandbook.com/simple-statistical-tests.html?q=stati#simple-statistical-tests)
+See the [EpiRHandbook section on simple statistics](https://epirhandbook.com/simple-statistical-tests.html?q=stati#simple-statistical-tests)
 
 ]
 
@@ -755,7 +759,7 @@ linelist %>%
 ---
 # Simple stats
 
-### `{gtsummary}` example output
+#### An example output from `{gtsummary}`:
 ```{r, echo = FALSE}
 linelist_raw %>% 
   filter(!is.na(died_covid), !is.na(case_gender), !is.na(case_age)) %>% 
