@@ -112,7 +112,7 @@ style_mono_accent(
 * Mathilde Mousset  
  - Epicentre (MSF). Ecology. 
 * Henry Laurenson-Schafer
- - WHO HQ Covid Analytics. Previously Molecular Biology/Bioinformatics
+ - WHO Geneva COVID-19 analytics team. Previously Molecular Biology/Bioinformatics.
 * Wen Lin 
  - 
 
@@ -735,8 +735,6 @@ See the [EpiRHandbook section on simple statistics](https://epirhandbook.com/sim
 
 - In the context of summary tables we recommend `{gtsummary}`:
 
-- We produce a HTML table
-
 - Create summary tables, and add simple stats
 
 
@@ -759,7 +757,7 @@ linelist %>%
 ---
 # Simple stats
 
-#### An example output from `{gtsummary}`:
+#### An example output from previous code:
 ```{r, echo = FALSE}
 linelist_raw %>% 
   filter(!is.na(died_covid), !is.na(case_gender), !is.na(case_age)) %>% 
@@ -772,6 +770,90 @@ linelist_raw %>%
   )
 
 ```
+
+---
+# Logistic regression
+
+- We can also calculate ***odds ratios** via logistic regression
+
+- It's crucial to establish reference values for each field!
+
+```{r, eval = FALSE, echo = TRUE}
+
+linelist_reg <- linelist %>% 
+  # select variables of interest
+  select(outcome, gender, age, fever) %>% 
+    # We don't want to consider 'Unknown' here
+  mutate(across(where(is.factor), 
+                ~fct_recode(.x, 
+                            NULL = "Unknown"))) %>% 
+  # set reference values
+  mutate(
+    outcome = fct_relevel(outcome, c("Recovered", "Died")),
+    gender = fct_relevel(gender, c("Female", "Male", "Unknown")),
+    fever = fct_relevel(fever, c("No", "Yes"))
+  )
+  
+```
+
+.footnote[
+
+See the [EpiRHandbook section on logistic regresssion](https://epirhandbook.com/univariate-and-multivariable-regression.html?q=logistic#logistic-regression)
+
+]
+---
+# Logistic rergression 
+
+We recommend using `gtsummary::tbl_uvregression()` for this case:
+
+```{r, eval = FALSE, echo = TRUE}
+linelist_reg %>% 
+  # create summary table
+  tbl_uvregression(
+    # define outcome variable
+    y = outcome, 
+    # define regression want to run (generalised linear model)
+    method = glm, 
+    # define what type of glm want to run (logistic)
+    method.args = list(family = binomial), 
+    # exponentiate to produce odds ratios (rather than log odds)
+    exponentiate = TRUE, 
+    # do not show the overall counts (this is done in cross_tab below)
+    hide_n = TRUE
+  )
+```
+
+---
+# Logistic regression 
+
+#### An example output from our previous code:
+
+```{r, echo = FALSE, eval = TRUE}
+linelist_raw %>% 
+  filter(!is.na(died_covid), !is.na(case_gender), !is.na(case_age), !is.na(sym_fever),
+         case_gender != "Unknown", sym_fever %in% c("Yes", "No")) %>% 
+  mutate(outcome = ifelse(died_covid == "Yes", "Died", "Recovered")) %>% 
+  select(outcome, gender = case_gender, age = case_age, fever = sym_fever) %>% 
+  mutate(
+    outcome = fct_relevel(outcome, c("Recovered", "Died")),
+    gender = fct_relevel(gender, c("Female", "Male", "Unknown")),
+    fever = fct_relevel(fever, c("No", "Yes"))
+  ) %>% 
+  tbl_uvregression(
+    # define outcome variable
+    y = outcome, 
+    # define regression want to run (generalised linear model)
+    method = glm, 
+    # define what type of glm want to run (logistic)
+    method.args = list(family = binomial), 
+    # exponentiate to produce odds ratios (rather than log odds)
+    exponentiate = TRUE, 
+    # do not show the overall counts (this is done in cross_tab below)
+    hide_n = TRUE
+  )
+
+```
+
 
 ---
 class: center, middle
