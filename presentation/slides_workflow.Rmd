@@ -139,13 +139,14 @@ We also assume you have reviewed the Handbook pages on [R Basics](https://epirha
 # Outline
   
 1. Why R? 
-2. Setting the scene (project directory & Rmarkdown)  
-3. Rmarkdown parametrisation  
-4. File paths & importing data  
-5. Data cleaning  
-6. Merging data  
-7. Descriptive analysis  
-8. If time allows:  
+2. Introduction to R
+3. Setting the scene (project directory & Rmarkdown)  
+4. Rmarkdown parametrisation  
+5. File paths & importing data  
+6. Data cleaning  
+7. Merging data  
+8. Descriptive analysis  
+9. If time allows:  
   a. Statistical analysis  
   b. Logistic regression  
     
@@ -308,6 +309,129 @@ See [Epi R Handbook chapter](https://epirhandbook.com/dashboards-with-shiny.html
 ---
 class: inverse, center, middle
 
+# R Basics 
+### A (very) quick introduction
+
+---
+# Key terminology
+
+- **Objects** - everything in R
+
+  + a table
+  + a graph
+  + a list of names
+  + etc...
+
+--
+
+- **Functions** - a generalised operation
+  + takes input(s)
+  + returns output(s)
+  
+--
+
+- **Packages**
+  + A bundle of new functions!
+  
+.footer[
+
+See the [EpiRHandbook section on R basics](https://epirhandbook.com/r-basics.html)
+
+]
+
+---
+# Classes of objects
+
+Objects have different **classes**:
+
+- **Numerics** - numbers
+
+--
+
+- **Characters** - chunks of text enclosed in "quotes"
+
+--
+
+- **Dataframes** - tables with named columns
+
+--
+
+- We assign objects with the `<-` operator
+
+```{r, eval = TRUE, echo = TRUE}
+my_object <- 1 + 2
+
+# print the value of my_object
+print(my_object)
+```
+
+---
+# Packages
+
+- R has a rich set of packages to increase its functionality
+
+--
+
+- Load packages with `library()`
+
+```{r, eval = FALSE, echo = TRUE}
+library(dplyr)
+```
+
+--
+
+- Or access functions within packages with `::`
+
+```{r, eval = FALSE, echo = TRUE}
+# get the first row of my table
+table_first_row <- dplyr::slice(my_table, 1)
+```
+
+--
+
+- For this presentation:
+ + `{packages}`
+ + `package::function()` or `function()`
+
+.footnote[
+
+See the [EpiRHandbook section on R packages](https://epirhandbook.com/r-basics.html#packages)
+
+]
+
+---
+# Piping
+
+- Piping passes an intermediate output to another function
+
+ + do this **then** that 
+
+--
+
+- Access the pipe operator with `%>%`
+
+--
+
+- A (fake) example:
+```{r, eval = FALSE, echo = TRUE}
+clean_linelist <- linelist %>%
+  # FIRST we discard some data
+  discard_bad_data() %>% 
+  # THEN we add an age group column
+  # We want to use the age column to calculate these
+  make_age_groups(col = age) 
+```
+
+.footnote[
+
+See the [EpiRHandbook section on pipes](https://epirhandbook.com/r-basics.html?q=pipe#pipes)
+
+]
+
+---
+
+class: inverse, center, middle
+
 # Case study 
 ### COVID-19 epidemiological report for Fulton County
 
@@ -315,9 +439,12 @@ class: inverse, center, middle
 # Setting the scene 
 
 - You are the local epi tasked with automating the weekly situation report  
-  - We are going to reproduce [Fulton County epidemiology reports](https://www.fultoncountyga.gov/covid-19/epidemiology-reports)  
-  - We have pre-packaged an example **R-project** folder 
-  - Walk-through from start to finish 
+
+  + We are going to reproduce [Fulton County epidemiology reports](https://www.fultoncountyga.gov/covid-19/epidemiology-reports)  
+  
+  + We have pre-packaged an example **R-project** folder 
+  
+  + Walk-through from start to finish 
 
 ![](https://github.com/appliedepi/emory_training/blob/master/presentation/images/fulton_report.png?raw=true)
 
@@ -327,6 +454,7 @@ class: inverse, center, middle
 ### Start with a new R project
 
 - Create a project directory
+
   + File -> New Directory...
 
 --
@@ -344,6 +472,7 @@ class: inverse, center, middle
 
 ---
 # Setting the scene  
+
 #### Download our example R project!
 
 
@@ -360,9 +489,9 @@ Download the project [directly](https://minhaskamal.github.io/DownGit/#/home?url
 ---
 # Rmarkdown parameterisation  
 
-- Rmd files use YAML header
+- Rmd files use YAML headers
 
-- Use parameters to generalise reports for different scenarios
+- Use parameters to generalise reports for different scenarios:
  + different dates
  + different counties
  
@@ -372,7 +501,7 @@ params:
   county: "Fulton"
 ```
 
-- Acess parameters with `params$...`
+- Access parameters with `params$...`
 
 ```{r, eval = FALSE, echo = TRUE}
 # filter linelist for county of choice
@@ -437,11 +566,11 @@ and the [EpiRHandbook section on importing](https://epirhandbook.com/cleaning-da
 
 #### Use `{dplyr}` to clean data
 
-1. Visually inspect data (`summary()`, `glimpse()`)
+1. Visually inspect data (`summary()`, `dplyr::glimpse()`)
 
 --
 
-2. Rename and choose fields (`select()`)
+2. Rename and choose fields (`dplyr::select()`)
 
 --
 
@@ -785,8 +914,7 @@ linelist_reg <- linelist %>%
   select(outcome, gender, age, fever) %>% 
     # We don't want to consider 'Unknown' here
   mutate(across(where(is.factor), 
-                ~fct_recode(.x, 
-                            NULL = "Unknown"))) %>% 
+                ~fct_recode(.x, NULL = "Unknown"))) %>% 
   # set reference values
   mutate(
     outcome = fct_relevel(outcome, c("Recovered", "Died")),
@@ -831,7 +959,7 @@ linelist_reg %>%
 ```{r, echo = FALSE, eval = TRUE}
 linelist_raw %>% 
   filter(!is.na(died_covid), !is.na(case_gender), !is.na(case_age), !is.na(sym_fever),
-         case_gender != "Unknown", sym_fever %in% c("Yes", "No")) %>% 
+         sym_fever %in% c("Yes", "No")) %>% 
   mutate(outcome = ifelse(died_covid == "Yes", "Died", "Recovered")) %>% 
   select(outcome, gender = case_gender, age = case_age, fever = sym_fever) %>% 
   mutate(
