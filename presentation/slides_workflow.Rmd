@@ -1,6 +1,6 @@
 ---
 title: "Emory COVID-19 Response Collaborative"
-subtitle: "Data workflow with R: an overview and demonstration"
+subtitle: "Data workflow with R:<br> an overview and demonstration"
 author: '[EpiRhandbook Team](https:://epirhandbook.com) <br><br> `r icons::icon_style(icons::fontawesome("twitter"), fill = "white")` [epiRhandbook](https://twitter.com/epiRhandbook) <br> `r icons::icon_style(icons::fontawesome("paper-plane"), fill = "white")` [epirhandbook@gmail.com](mailto:epirhandbook@gmail.com)'
 date: "August 2021"
 output:
@@ -34,6 +34,8 @@ pacman::p_load(
   janitor,    # data cleaning and tables
   lubridate,  # working with dates
   tidyverse,  # data management and visualization
+  gtsummary,  # summary tables
+  kableExtra, # for output tables
   xaringanthemer  # for styling presentation 
 )
 
@@ -66,21 +68,56 @@ style_mono_accent(
 
 ```
 
+```{css, echo=F}
+    .remark-slide table{
+      border: none
+    }
 
-# About us  
+    .remark-slide-table {
+      
+    }
 
-## Providing R support for applied epis  
+    tr:first-child {
+      border-top: none;
+  }
+    tr:last-child {
+    border-bottom: none;
+  }
+
+```
+
+# We are Applied Epi  
 
 ![](https://github.com/appliedepi/epiRhandbook_eng/raw/master/images/Epi%20R%20Handbook%20Banner%20Beige%201500x500.png)
 
 * We are a grassroots collaborative of applied epidemiologists  
-* The (free) Epi R Handbook has been used by 40,000 people worldwide
+* Our (free) **Epi R Handbook** has been used by 40,000 people worldwide
 * Now we offer customized training to health departments and NGOs  
 
-[1] Bookmark www.epiRhandbook.com  
+
+.footnote[Bookmark [www.epiRhandbook.com](www.epirhandbook.com)!]  
+
 
 ???
 - What makes us different is that we focus on the challenges of applied epi, not academic epi. We emphasize the skills used every day by ground-level epidemiologists. 
+
+
+---
+# Introducing ourselves  
+
+* Neale Batra  
+ - Founder of Epi R Handbook. Previously epi and preparedness at Philly and Santa Clara County health departments. Currently working for WHO Geneva COVID-19 analytics team  
+* Alex Spina  
+ - Alum of EPIET (European EIS). MSF Epi. WHO AFRO. Med Student. 
+* Mathilde Mousset  
+ - Epicentre (MSF). Ecology. 
+* Henry Laurenson-Schafer
+ - WHO Geneva COVID-19 analytics team. Previously Molecular Biology/Bioinformatics.
+* Wen Lin 
+ - 
+
+(PHOTOS AND BIOS)  
+
 
 ---
 # Today's session   
@@ -101,64 +138,722 @@ We also assume you have reviewed the Handbook pages on [R Basics](https://epirha
 ---
 # Outline
   
-1. Setting the scene (project directory & Rmarkdown)  
-2. Rmarkdown parametrisation  
-3. File paths & importing data  
-4. Merging data  
+1. Why R? 
+2. Setting the scene (project directory & Rmarkdown)  
+3. Rmarkdown parametrisation  
+4. File paths & importing data  
 5. Data cleaning  
-6. Descriptive analysis  
-7. If time allows:  
+6. Merging data  
+7. Descriptive analysis  
+8. If time allows:  
   a. Statistical analysis  
   b. Logistic regression  
     
-Prioritised report generation -> simpler code in the Handbook  
-
----
-# Header  
-## This is a subheader
-
-
-- Hello our name is 
-  + blabla
-  + blabla
-
-.footnote[
-[1] Something _super_ important to say 
-
-[2] Some **other** stuff 
-
-[3] bla
-]
-
-
-???
-
-- I think these are presenter notes 
-- You can see them in presenter mode 
-  + Keyboard shortcut is 'p' 
----
-
-# Sequential reveal of bullet points
-
-You can reveal stuff bit by bit using to dashes between sections 
-
---
-
-- This is my first point 
-
---
-
-- Then I move on to this fascinating point 
-
---
-
-- And finish with this blabla
+Prioritised report generation -> simpler code in the Handbook 
 
 
 ---
 class: inverse, center, middle
 
-# This is a section header slide
+# Why R? 
+### An appetizer for motivation 
+
+---
+# Flexibility 
+
+![](https://github.com/appliedepi/emory_training/blob/master/presentation/images/interoperability.png?raw=true)  
+
+
+???
+- R can read and write to loads of different software/databases.  
+- Can also produce many different outputs  
+- Save you time and headache (automated and reproducible workflows)  
+
+---
+# Popularity 
+
+![](https://github.com/appliedepi/emory_training/blob/master/presentation/images/r_popularity.png?raw=true)  
+
+
+???
+- R is free - and yet can do more than what expensive licensed software can  
+- Most students in the US will have learnt SAS (but changing)  
+- Previously limited to academic statisticians - R was not "trusted"  
+- But now even pharma companies (e.g. GSK) and regulators are making the switch  
+- It is the most widely used statistical programming language. 
+
+---
+# Learning curve 
+
+R has become easier to learn in the last 5 years
+
+.pull-left[
+- Friendlier user interface (Rstudio)
+- Simpler syntax ("tidyverse")
+- Free resources & interactive tutorials available  
+    - **Epidemiology R Handbook**
+    - **R epidemiology case studies (EPIET)**
+]
+
+.pull-right[
+
+```{r difficulty_plot, warning = FALSE, message = FALSE}
+
+exp <- function(x){x^2}
+lgr <- function(x){log(x) + 4}
+num <- 10000
+linwid <- 2
+
+ggplot() + 
+  geom_function(fun = exp,
+                n = num, 
+                size = linwid,
+                aes(colour = "Excel")) +
+  geom_function(fun = lgr, 
+                n = num, 
+                size = linwid,
+                aes(colour = "R")) + 
+  scale_y_continuous(expand = c(0, 0), 
+                     limits = c(0, 10)) + 
+  scale_x_continuous(expand = c(0, 0), 
+                     limits = c(0, 5)) + 
+  labs(x = "Code complexity", 
+       y = "Task difficulty") + 
+  theme_classic(base_size = 24) + 
+  theme(axis.text = element_blank(),
+        axis.ticks = element_blank(), 
+        legend.position = "bottom", 
+        legend.title = element_blank())
+
+```
+
+]
+
+???
+- There is a bit of a learning curve - as with any software.  
+- But we are here to get you over that initial hump so you can keep developing. 
+
+---
+# User community 
+
+![](https://github.com/appliedepi/emory_training/blob/master/presentation/images/user_community.png?raw=true)
+
+???
+- **The internet is your friend.**  
+- Once you get to grips with the basics - people answer literally any question on **stackoverflow!**  
+- **Epi R Handbook**  
+
+---
+# Data visualization 
+
+![](https://github.com/appliedepi/emory_training/blob/master/presentation/images/visualization.png?raw=true)
+
+.footnote[
+Slide source: Paula Bianca Blomquist  
+]
+
+???
+- Data viz essential to understand disease surveillance trends and outbreaks  
+- **One of R's strongest features**  
+- Network diagrams, maps, heat maps, integrated figures, the list goes on...  
+
+---
+# Automated surveillance reports 
+
+.pull-left[
+- Daily COVID-19 reports by Public Health England  
+  - Reports sent to 317 local authorities  
+  - Guide local investigations  
+  - *R* bringing together data on:  
+      - cases, testing, mortality & many others  
+  - Caters to authorities needs  
+      - MS word to be editable  
+      - Integrated in to local reports  
+]
+
+.pull-right[
+![](https://github.com/appliedepi/emory_training/blob/master/presentation/images/automated_reports.png?raw=true)
+]
+
+.footnote[
+Slide source: Paula Bianca Blomquist  
+
+See [Epi R Handbook chapter](https://epirhandbook.com/organizing-routine-reports.html) on organizing routine reports
+]
+
+???
+- Producing reports at scale, an example from our EpiRHandbook colleague Paula
+- Not a fancy report, flat word document but caters to specific needs! 
+- **Key example of local intelligence and no way could do without the power of R**
+
+---
+# Automated surveillance outputs 
+### WHO COVID-19 interactive {shiny} dashboard
+
+![](https://github.com/appliedepi/emory_training/blob/master/presentation/images/automated_dashboard.png?raw=true)
+
+.footnote[
+Slide source: Paula Bianca Blomquist & [World Health Organization](https://worldhealthorg.shinyapps.io/covid/)  
+
+See [Epi R Handbook chapter](https://epirhandbook.com/dashboards-with-shiny.html) on organizing shiny dashboards
+]
+
+???
+- WHO COVID-19 public-facing dashboard  
+- Made with a package called {shiny} to build interactive web apps/dashboard  
+- Can see toggles and interactive tabs here  
+- Pulls from dozens of data sources to displace data by countries/regions 
+- There is a section in the handbook on shiny
+
+---
+class: inverse, center, middle
+
+# Case study 
+### COVID-19 epidemiological report for Fulton County
+
+---
+# Setting the scene 
+
+- You are the local epi tasked with automating the weekly situation report  
+  - We are going to reproduce [Fulton County epidemiology reports](https://www.fultoncountyga.gov/covid-19/epidemiology-reports)  
+  - We have pre-packaged an example **R-project** folder 
+  - Walk-through from start to finish 
+
+![](https://github.com/appliedepi/emory_training/blob/master/presentation/images/fulton_report.png?raw=true)
+
+
+---
+# Setting the scene  
+### Start with a new R project
+
+- Create a project directory
+  + File -> New Directory...
+
+--
+
+- R project directories can be shared easily
+
+--
+## TODO ADD IMG TO MASTER
+
+![](https://github.com/appliedepi/emory_training/blob/master/presentation/images/make_proj.png?raw=true)  
+
+--
+
+- Create a Rmarkdown file in your file structure to get started!
+
+---
+# Setting the scene  
+#### Download our example R project!
+
+
+![](https://github.com/appliedepi/emory_training/blob/master/presentation/images/repo_picture.png?raw=true)  
+
+
+.footnote[
+
+See [our github repository](https://github.com/appliedepi/emory_training)
+
+Download the project [directly](https://minhaskamal.github.io/DownGit/#/home?url=https://github.com/appliedepi/emory_training/tree/master/case_study)
+]
+
+---
+# Rmarkdown parameterisation  
+
+- Rmd files use YAML header
+
+- Use parameters to generalise reports for different scenarios
+ + different dates
+ + different counties
+ 
+```{r, eval = FALSE, echo = TRUE}
+params:
+  as_of_date: 2021-08-01
+  county: "Fulton"
+```
+
+- Acess parameters with `params$...`
+
+```{r, eval = FALSE, echo = TRUE}
+# filter linelist for county of choice
+linelist <- linelist %>% 
+  filter(county == params$county)
+```
+
+
+.footnote[
+
+See the [EpiRHandbook section on Rmarkdown](https://epirhandbook.com/reports-with-r-markdown.html?q=rmark#reports-with-r-markdown)
+
+]
+
+---
+# File paths & importing data  
+
+#### Use the `{here}` and `{rio}` packages to import data
+
+
+- `here::here()` to navigate working environment
+ 
+--
+
+- `rio::import()` to import a file
+ 
+--
+
+
+
+
+
+```{r, eval=FALSE, echo = TRUE}
+
+# import excel file from data folder
+# use  sheet named **in**
+raw_linelist <- rio::import(
+  here::here("data", "covid_linelist.xlsx"), 
+  which = "in"
+)
+
+```
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+
+# not sure we ACTUALLY need the data in but we'll see
+linelist_raw <- here::here("case_study", "data",
+                     "covid_example_data", "covid_example_data.xlsx") %>%
+     # specify the sheet to read using which (default is to read first sheet)
+     import(which = "in")
+
+```
+
+.footnote[
+See the [EpiRHandbook section on here package](https://epirhandbook.com/import-and-export.html?q=here#here)
+
+and the [EpiRHandbook section on importing](https://epirhandbook.com/cleaning-data-and-core-functions.html?q=import#import)
+]
+
+---
+# Cleaning data  
+
+#### Use `{dplyr}` to clean data
+
+1. Visually inspect data (`summary()`, `glimpse()`)
+
+--
+
+2. Rename and choose fields (`select()`)
+
+--
+
+3. Parse and clean fields
+ + parse dates (using `{lubridate}`)
+ + clean categorical variables
+ + clean numeric variables
+
+--
+
+4. Filter data and remove duplicates
+
+
+
+.footnote[
+See the [EpiRHandbook section on cleaning](https://epirhandbook.com/cleaning-data-and-core-functions.html)
+
+and the [EpiRHandbook section on dates](https://epirhandbook.com/working-with-dates.html)
+]
+
+---
+# Cleaning data
+#### Example code
+
+
+```{r, eval=FALSE, echo = TRUE}
+
+linelist <- raw_linelist %>% 
+  # choose variables
+  select(date_birth, age, gender, zip_code, date_onset) %>% 
+  # parse dates, clean gender, clean erroneous ages
+  mutate(date_birth = ymd(dob),
+         date_onset = ymd(date_onset),
+         gender = str_to_title(gender),
+         age = ifelse(age < 0, NA_integer_, age)) %>% 
+  # remove recent data to account for lag
+  filter(date_onset < Sys.Date() - weeks(2))
+
+```
+
+.footnote[
+See the [EpiRHandbook section on cleaning](https://epirhandbook.com/cleaning-data-and-core-functions.html)
+
+and the [EpiRHandbook section on dates](https://epirhandbook.com/working-with-dates.html)
+]
+
+---
+# Cleaning data
+#### Using `across()`
+
+- We can use `dplyr::across()` to generalize cleaning operations
+
+--
+
+- Use within `dplyr::mutate()` and `dplyr::summarise()`
+
+--
+- General principle:
+  + **Select** columns to work with
+  + **Apply** generalised function
+
+--
+
+```{r, eval = FALSE, echo = TRUE}
+
+linelist <- raw_linelist %>% 
+  # choose variables
+  select(date_birth, age, gender, zip_code, date_onset) %>% 
+  # parse dates, clean gender, clean erroneous ages
+  mutate(
+    # apply to columns containing the string 'date'
+    .cols = across(.cols = contains("date")),
+    # apply as.Date() function to all selected columns
+    .fns = ~as.Date(.x)
+  ) 
+
+```
+
+
+
+---
+# Merging data  
+
+- We want to combine two tables (dataframes) with *common columns*
+
+--
+
+- Make sure values in common columns are aligned
+  + Follow the principles of categorical variable cleaning
+  + Use `dplyr::unique()`
+
+--
+
+- Use the correct join type from `{tidyr}` package
+  + `tidyr::left_join()`
+  + `tidyr::right_join()`
+  + `tidyr::full_join()`
+  + `tidyr::inner_join()`
+
+
+.footnote[
+See the [EpiRHandbook section on joining data](https://epirhandbook.com/joining-data.html)
+]
+
+---
+# Merging data
+
+### `left_join()`
+
+![](https://github.com/appliedepi/emory_training/blob/master/presentation/images/left-join.gif?raw=true)
+
+---
+# Merging data
+
+### `right_join()`
+
+![](https://github.com/appliedepi/emory_training/blob/master/presentation/images/right-join.gif?raw=true)
+
+---
+# Merging data
+
+### `full_join()`
+
+![](https://github.com/appliedepi/emory_training/blob/master/presentation/images/full-join.gif?raw=true)
+
+---
+# Merging data
+
+### `full_join()`
+
+![](https://github.com/appliedepi/emory_training/blob/master/presentation/images/inner-join.gif?raw=true)
+
+---
+
+# Merging data
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+
+cases_by_zip <- tibble(
+     date_report = ymd("2020-12-20", "2020-12-21", "2020-12-20", "2020-12-20"),
+     zip_code = c("30326", "30326", "30311", "zip: 30312"),
+     new_cases = c(20, 16, 10, 43)
+)
+
+
+zipcodes <- sf::read_sf(
+     here::here("case_study", "data", "covid_example_data", "covid_shapefile", "FultonCountyZipCodes.shp")
+) %>% 
+     as_tibble() %>% 
+     select(ZipCode, Population) %>% 
+     mutate(ZipCode = as.double(ZipCode)) %>% 
+     filter(ZipCode %in% c(30311, 30326, 30312, 30213, 30304))
+
+```
+
+
+
+.pull-left[
+**Table 1**
+
+```{r, echo = FALSE}
+cases_by_zip %>% 
+     mutate(zip_code = kableExtra::cell_spec(zip_code, 
+                                             background = ifelse(str_detect(zip_code, "zip"), "#d73027", "#31a354"),
+                                             color = "white")) %>% 
+     knitr::kable(format = 'html', escape = FALSE)
+```
+
+]
+
+.pull-right[
+**Table 2**
+
+```{r, echo = FALSE}
+zipcodes %>% 
+     mutate(ZipCode = kableExtra::cell_spec(ZipCode, 
+                                            background = "#31a354",
+                                            color = "white"))  %>% 
+     knitr::kable(format = 'html', escape = FALSE)
+
+
+```
+]
+
+<br> </br>
+
+```{r, eval = TRUE, echo = TRUE}
+cases_by_zip <- cases_by_zip %>% 
+  # clean the column we are merging by
+  mutate(zip_code = as.numeric(str_remove(zip_code, "zip: ")))
+```
+
+
+
+---
+# Merging data
+
+```{r, echo = TRUE, message = FALSE, message = TRUE}
+cases_by_zip <- cases_by_zip %>% 
+  # merge zipcodes with aggregated case data
+  left_join(zipcodes, by = c("zip_code" = "ZipCode")) %>% 
+  # calculate case incidence
+  mutate(cases_per_10k = new_cases / Population * 10000)
+
+```
+
+```{r, echo = FALSE}
+cases_by_zip %>% 
+  knitr::kable(format = 'html')
+```
+
+---
+# Descriptive analysis
+
+- We want to produce descriptive *tables* and plots
+
+--
+
+- Group over key variable(s) to:
+ + Calculate totals
+ + Calculate percents
+
+--
+
+- Key packages:
+ + `{janitor}`
+ + `{dplyr}`
+ + `{gtsummary}`
+ 
+
+.footnote[
+
+See the [EpiRHandbook section on descriptive tables](https://epirhandbook.com/descriptive-tables.html)
+
+]
+---
+
+# Descriptive analysis
+
+```{r, eval = FALSE, echo = TRUE, message = FALSE, warning = FALSE}
+
+linelist %>% 
+  # get counts and percentages 
+  tabyl(gender) %>% 
+  # add the overall counts as a row
+  adorn_totals() %>%  
+  # change from proportions to percentages (do not add a % sign)
+  adorn_pct_formatting(affix_sign = FALSE)
+
+```
+
+
+```{r, eval = TRUE, echo = FALSE, message = FALSE, warning = FALSE}
+
+linelist_raw %>% 
+  mutate(gender = replace_na(case_gender, "Unknown")) %>% 
+  # get counts and percentages 
+  tabyl(gender) %>% 
+  # add the overall counts as a row
+  adorn_totals() %>%  
+  # change from proportions to percentages (do not add a % sign)
+  adorn_pct_formatting(affix_sign = FALSE) %>% 
+  knitr::kable()
+
+```
+
+---
+# Simple statistics
+
+- R can perform many simple statistical tests out of the box
+  
+--
+
+- Examples:
+ + `t.test()` - _T-test_
+ + `shapiro.test()` - _Shapiro-Wilk test_
+ + `kruskal.test()` - _Kruskal-Wallis/Mann-Whitney U test_
+ + `chisq.test()` - _Chi-Squared test_
+
+
+.footnote[
+
+See the [EpiRHandbook section on simple statistics](https://epirhandbook.com/simple-statistical-tests.html?q=stati#simple-statistical-tests)
+
+]
+
+---
+# Simple stats
+
+
+
+- In the context of summary tables we recommend `{gtsummary}`:
+
+- Create summary tables, and add simple stats
+
+
+```{r, eval = FALSE, echo = TRUE}
+
+linelist %>% 
+  # select variables of interest
+  select(outcome, gender, age) %>% 
+  # create summary table
+  tbl_summary(by = outcome) %>%
+  # add p-values from Chi-Sq test for gender and Kruskal-Wallis for age
+  add_p(list(
+    gender ~ "chisq.test",
+    age ~ "kruskal.test")
+  )
+
+```
+
+
+---
+# Simple stats
+
+#### An example output from previous code:
+```{r, echo = FALSE}
+linelist_raw %>% 
+  filter(!is.na(died_covid), !is.na(case_gender), !is.na(case_age)) %>% 
+  mutate(outcome = ifelse(died_covid == "Yes", "Died", "Recovered")) %>% 
+  select(outcome, gender = case_gender, age = case_age) %>% 
+  tbl_summary(by = outcome) %>% 
+  add_p(list(
+    gender ~ "chisq.test",
+    age ~ "kruskal.test")
+  )
+
+```
+
+---
+# Logistic regression
+
+- We can also calculate ***odds ratios** via logistic regression
+
+- It's crucial to establish reference values for each field!
+
+```{r, eval = FALSE, echo = TRUE}
+
+linelist_reg <- linelist %>% 
+  # select variables of interest
+  select(outcome, gender, age, fever) %>% 
+    # We don't want to consider 'Unknown' here
+  mutate(across(where(is.factor), 
+                ~fct_recode(.x, 
+                            NULL = "Unknown"))) %>% 
+  # set reference values
+  mutate(
+    outcome = fct_relevel(outcome, c("Recovered", "Died")),
+    gender = fct_relevel(gender, c("Female", "Male", "Unknown")),
+    fever = fct_relevel(fever, c("No", "Yes"))
+  )
+  
+```
+
+.footnote[
+
+See the [EpiRHandbook section on logistic regresssion](https://epirhandbook.com/univariate-and-multivariable-regression.html?q=logistic#logistic-regression)
+
+]
+---
+# Logistic rergression 
+
+We recommend using `gtsummary::tbl_uvregression()` for this case:
+
+```{r, eval = FALSE, echo = TRUE}
+linelist_reg %>% 
+  # create summary table
+  tbl_uvregression(
+    # define outcome variable
+    y = outcome, 
+    # define regression want to run (generalised linear model)
+    method = glm, 
+    # define what type of glm want to run (logistic)
+    method.args = list(family = binomial), 
+    # exponentiate to produce odds ratios (rather than log odds)
+    exponentiate = TRUE, 
+    # do not show the overall counts (this is done in cross_tab below)
+    hide_n = TRUE
+  )
+```
+
+---
+# Logistic regression 
+
+#### An example output from our previous code:
+
+```{r, echo = FALSE, eval = TRUE}
+linelist_raw %>% 
+  filter(!is.na(died_covid), !is.na(case_gender), !is.na(case_age), !is.na(sym_fever),
+         case_gender != "Unknown", sym_fever %in% c("Yes", "No")) %>% 
+  mutate(outcome = ifelse(died_covid == "Yes", "Died", "Recovered")) %>% 
+  select(outcome, gender = case_gender, age = case_age, fever = sym_fever) %>% 
+  mutate(
+    outcome = fct_relevel(outcome, c("Recovered", "Died")),
+    gender = fct_relevel(gender, c("Female", "Male", "Unknown")),
+    fever = fct_relevel(fever, c("No", "Yes"))
+  ) %>% 
+  tbl_uvregression(
+    # define outcome variable
+    y = outcome, 
+    # define regression want to run (generalised linear model)
+    method = glm, 
+    # define what type of glm want to run (logistic)
+    method.args = list(family = binomial), 
+    # exponentiate to produce odds ratios (rather than log odds)
+    exponentiate = TRUE, 
+    # do not show the overall counts (this is done in cross_tab below)
+    hide_n = TRUE
+  )
+
+```
+
 
 ---
 class: center, middle
@@ -172,85 +867,11 @@ background-position: 50% 0%
 
 ---
 
-# Tables with Knitr 
-
-Tables need to be in HTML format  
-So either Knitter or flextable
-
-```{r knitr_tabble}
-head(mtcars) %>% 
-  knitr::kable(format = 'html')
-```
-
----
-
-# Tables with Flextable 
-
-You can colour in rows directly with flextable
-
-```{r flextable}
-head(mtcars) %>%
-  flextable::flextable() %>% 
-  flextable::bg(., 
-        i = c(2, 4), 
-        part = "body", 
-        bg = "yellow")
-```
-
----
-
-
-
-# Table highlighting
-
-- Use  chunk option `highlight.output` to highlight specific lines of the text output. 
-  + For example, `highlight.output = TRUE` means highlighting all lines
-  + `highlight.output = c(1, 3)` means highlighting the first and third line.
-
-
-```{r, highlight.output=c(1, 3), echo=FALSE}
-head(mtcars)
-```
-
----
-
 ## Visualisation 
 
 Note to selves: 
 I think the way [this presentation](https://www.cedricscherer.com/slides/2019-08-28-intro-ggplot-statsizw#20) 
 breaks down ggplots line by line is probably the way to go! 
-
----
-
-## A ggplot code example
-
-- see [extras slide](#references) for alt side-by-side option in twitter feed
-
-
-.pull-left[
-
-Highlight code lines using #<<
-
-```{r ggplot_code, echo = TRUE, eval = FALSE, tidy = FALSE}
-ggplot(mtcars) + 
-  aes(mpg, disp) + 
-  geom_point() +  #<<
-  geom_smooth()   #<<
-```
-] 
-
-.pull-right[
-```{r ggplot_code_plot}
-ggplot(mtcars) + 
-  aes(mpg, disp) + 
-  geom_point() +
-  geom_smooth() + 
-  ## NB have to fiddle with sizes a bit to make look good on output
-  theme_gray(base_size = 24)
-```
-]
-
-
 
 ---
 name: imageslide
