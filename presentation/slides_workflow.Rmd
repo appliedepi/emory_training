@@ -171,8 +171,12 @@ class: inverse, center, middle
 
 ---
 # Popularity 
+.center[
+```{r, eval = TRUE, echo = FALSE, out.width = "60%"}
+knitr::include_graphics("https://github.com/appliedepi/emory_training/blob/master/presentation/images/r_popularity.png?raw=true")
+```
+]
 
-![](https://github.com/appliedepi/emory_training/blob/master/presentation/images/r_popularity.png?raw=true)  
 
 
 ???
@@ -289,8 +293,11 @@ See [Epi R Handbook chapter](https://epirhandbook.com/organizing-routine-reports
 ---
 # Automated surveillance outputs 
 ### WHO COVID-19 interactive {shiny} dashboard
-
-![](https://github.com/appliedepi/emory_training/blob/master/presentation/images/automated_dashboard.png?raw=true)
+.center[
+```{r, eval = TRUE, echo = FALSE, out.width = "75%"}
+knitr::include_graphics("https://github.com/appliedepi/emory_training/blob/master/presentation/images/automated_dashboard.png?raw=true")
+```
+]
 
 .footnote[
 Slide source: Paula Bianca Blomquist & [World Health Organization](https://worldhealthorg.shinyapps.io/covid/)  
@@ -327,6 +334,7 @@ class: inverse, center, middle
 ### Start with a new R project
 
 - Create a project directory
+
   + File -> New Directory...
 
 --
@@ -334,10 +342,11 @@ class: inverse, center, middle
 - R project directories can be shared easily
 
 --
-## TODO ADD IMG TO MASTER
-
-![](https://github.com/appliedepi/emory_training/blob/master/presentation/images/make_proj.png?raw=true)  
-
+.center[
+```{r, eval = TRUE, echo = FALSE, out.width = "30%"}
+# knitr::include_graphics("https://github.com/appliedepi/emory_training/blob/master/presentation/images/make_proj.png?raw=true")
+```
+]
 --
 
 - Create a Rmarkdown file in your file structure to get started!
@@ -347,7 +356,7 @@ class: inverse, center, middle
 #### Download our example R project!
 
 
-![](https://github.com/appliedepi/emory_training/blob/master/presentation/images/repo_picture.png?raw=true)  
+![](https://github.com/appliedepi/epiRhandbook_eng/raw/master/images/Epi%20R%20Handbook%20Banner%20Beige%201500x500.png)
 
 
 .footnote[
@@ -547,32 +556,45 @@ See the [EpiRHandbook section on joining data](https://epirhandbook.com/joining-
 ]
 
 ---
+name: left_join_slide
+background-image: url(https://github.com/appliedepi/emory_training/blob/master/presentation/images/left-join.gif?raw=true)
+background-size: 400px
+background-position: 50% 50%
+
 # Merging data
 
 ### `left_join()`
 
-![](https://github.com/appliedepi/emory_training/blob/master/presentation/images/left-join.gif?raw=true)
-
 ---
+name: right_join_slide
+background-image: url(https://github.com/appliedepi/emory_training/blob/master/presentation/images/right-join.gif?raw=true)
+background-size: 400px
+background-position: 50% 50%
+
 # Merging data
 
 ### `right_join()`
 
-![](https://github.com/appliedepi/emory_training/blob/master/presentation/images/right-join.gif?raw=true)
-
 ---
+name: full_join_slide
+background-image: url(https://github.com/appliedepi/emory_training/blob/master/presentation/images/full-join.gif?raw=true)
+background-size: 400px
+background-position: 50% 65%
+
 # Merging data
 
 ### `full_join()`
 
-![](https://github.com/appliedepi/emory_training/blob/master/presentation/images/full-join.gif?raw=true)
 
 ---
+name: inner_join_slide
+background-image: url(https://github.com/appliedepi/emory_training/blob/master/presentation/images/inner-join.gif?raw=true)
+background-size: 400px
+background-position: 50% 65%
+
 # Merging data
 
 ### `full_join()`
-
-![](https://github.com/appliedepi/emory_training/blob/master/presentation/images/inner-join.gif?raw=true)
 
 ---
 
