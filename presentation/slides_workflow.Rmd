@@ -696,7 +696,6 @@ cases_by_zip <- cases_by_zip %>%
   left_join(zipcodes, by = c("zip_code" = "ZipCode")) %>% 
   # calculate case incidence
   mutate(cases_per_10k = new_cases / Population * 10000)
-
 ```
 
 ```{r, echo = FALSE}
@@ -737,8 +736,10 @@ See the [EpiRHandbook section on descriptive tables](https://epirhandbook.com/de
 linelist %>% 
   # get counts and percentages 
   janitor::tabyl(gender) %>% 
+  
   # add the overall counts as a row
   janitor::adorn_totals() %>%  
+  
   # change from proportions to percentages (do not add a % sign)
   janitor::adorn_pct_formatting(affix_sign = FALSE)
 
@@ -749,10 +750,13 @@ linelist %>%
 
 linelist_raw %>% 
   mutate(gender = replace_na(case_gender, "Unknown")) %>% 
+  
   # get counts and percentages 
   tabyl(gender) %>% 
+  
   # add the overall counts as a row
   adorn_totals() %>%  
+  
   # change from proportions to percentages (do not add a % sign)
   adorn_pct_formatting(affix_sign = FALSE) %>% 
   knitr::kable()
@@ -794,8 +798,10 @@ See the [EpiRHandbook section on simple statistics](https://epirhandbook.com/sim
 linelist %>% 
   # select variables of interest
   select(outcome, gender, age) %>% 
+  
   # create summary table
   tbl_summary(by = outcome) %>%
+  
   # add p-values from Chi-Sq test for gender and Kruskal-Wallis for age
   add_p(list(
     gender ~ "chisq.test",
@@ -834,6 +840,7 @@ linelist_raw %>%
 linelist_reg <- linelist %>% 
   # select variables of interest
   select(outcome, gender, age, fever) %>% 
+  
   # We don't want to consider 'Unknown' here
   mutate(across(where(is.factor), 
                 ~fct_recode(.x, 
