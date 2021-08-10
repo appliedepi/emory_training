@@ -833,7 +833,7 @@ linelist_raw %>%
 
 - We can also calculate **odds ratios** via logistic regression
 
-- It's crucial to establish reference values for each field!
+- It's crucial to establish **reference values** for each field!
 
 ```{r, eval = FALSE, echo = TRUE}
 
@@ -847,9 +847,9 @@ linelist_reg <- linelist %>%
                             NULL = "Unknown"))) %>% 
   # set reference values
   mutate(
-    outcome = fct_relevel(outcome, c("Recovered", "Died")),
-    gender  = fct_relevel(gender, c("Female", "Male", "Unknown")),
-    fever   = fct_relevel(fever, c("No", "Yes"))
+    outcome = fct_relevel(outcome, c("Recovered", "Died")), #<<
+    gender  = fct_relevel(gender, c("Female", "Male", "Unknown")), #<<
+    fever   = fct_relevel(fever, c("No", "Yes")) #<<
   )
   
 ```
