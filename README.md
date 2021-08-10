@@ -11,8 +11,9 @@
 **WORK IN PROGRESS**
 
 [This website](https://appliedepi.github.io/emory_training) hosts
-training materials for the R demonstrations delivered by **Applied Epi**
-to 40 fellows and colleagues from the [Emory COVID-19 Response
+training materials for the R demonstrations first delivered by **Applied
+Epi** to 40 Rollins COVID-19 Epidemiology fellows and colleagues from
+the [Emory COVID-19 Response
 Collaborative](https://emorycovidcollaborative.org/) in August 2021.
 
 # Applied Epi
@@ -32,13 +33,20 @@ from R experts who know applied epi!
 
 <img src = "https://emorycovidcollaborative.org/wp-content/uploads/mark_ecrc_color.png" height = "200" align = "right">
 
-Blurb here  
-Blurb here  
-Blurb here
-
-Blurb here  
-Blurb here  
-Blurb here
+The [Emory COVID-19 Response
+Collaborative](https://emorycovidcollaborative.org/projects/georgia-department-of-public-health/)
+is an initiative led by the Emory Rollins School of Public Health in
+collaboration with the Georgia Department of Public Health (GDPH). Its
+mission is to provide academic support to state and local health
+department partners during the COVID-19 crisis. One of its seminal
+programs is the Rollins Epidemiology Fellows Program, a 2-year
+fellowship designed to attract, place and support early-career
+epidemiologists across Georgia’s 18 health districts and GDPH. With
+assistance from ECRC leadership and the Fulton County Board of Health,
+Applied Epi designed this tailored training session to build the
+fellows’ analytic capabilities in R through examples tailored to their
+applied needs in preparing jurisdictional COVID-19 outbreak reports and
+maps.
 
 # Training materials
 
@@ -82,9 +90,10 @@ data (anonymized and scrambled) for the case study.
 
 Representatives from the Emory COVID-19 Response Collaborative included:
 
--   Dr. Zena Belay  
+-   Zena Belay  
 -   Dr. Allison Chamberlain  
--   Shelby Rentmeester
+-   Shelby Rentmeester  
+-   Eve Rose
 
 # Terms of Use and License
 
