@@ -822,7 +822,7 @@ linelist_raw %>%
 ---
 # Logistic regression
 
-- We can also calculate ***odds ratios** via logistic regression
+- We can also calculate **odds ratios** via logistic regression
 
 - It's crucial to establish reference values for each field!
 
@@ -831,15 +831,15 @@ linelist_raw %>%
 linelist_reg <- linelist %>% 
   # select variables of interest
   select(outcome, gender, age, fever) %>% 
-    # We don't want to consider 'Unknown' here
+  # We don't want to consider 'Unknown' here
   mutate(across(where(is.factor), 
                 ~fct_recode(.x, 
                             NULL = "Unknown"))) %>% 
   # set reference values
   mutate(
     outcome = fct_relevel(outcome, c("Recovered", "Died")),
-    gender = fct_relevel(gender, c("Female", "Male", "Unknown")),
-    fever = fct_relevel(fever, c("No", "Yes"))
+    gender  = fct_relevel(gender, c("Female", "Male", "Unknown")),
+    fever   = fct_relevel(fever, c("No", "Yes"))
   )
   
 ```
@@ -860,9 +860,9 @@ linelist_reg %>%
   tbl_uvregression(
     # define outcome variable
     y = outcome, 
-    # define regression want to run (generalised linear model)
+    # define regression to run (generalised linear model)
     method = glm, 
-    # define what type of glm want to run (logistic)
+    # define what type of glm to run (logistic)
     method.args = list(family = binomial), 
     # exponentiate to produce odds ratios (rather than log odds)
     exponentiate = TRUE, 
