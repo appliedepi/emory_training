@@ -111,7 +111,7 @@ style_mono_accent(
 * Alex Spina  
  - Alum of EPIET (European EIS). Med student and epi consultant for @MSF and @WHO.  
 * Mathilde Mousset  
- - With Epicentre (MSF). Former specialization in ecology.  
+ - R programmer / Data manager at Epicentre (@MSF). PhD in evolutionary ecology.  
 * Henry Laurenson-Schafer  
  - Epi/data scientist with WHO Geneva on COVID response. PhD in molecular biology/bioinformatics.  
 * Wen Lin 
