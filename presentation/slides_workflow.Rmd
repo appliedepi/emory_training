@@ -551,9 +551,9 @@ linelist <- raw_linelist %>%
   # parse dates, clean gender, clean erroneous ages
   mutate(
     # apply to columns containing the string 'date'
-    .cols = across(.cols = contains("date")),
+    .cols = across(.cols = contains("date")),  #<<
     # apply as.Date() function to all selected columns
-    .fns = ~as.Date(.x)
+    .fns = ~as.Date(.x)  #<<
   ) 
 
 ```
