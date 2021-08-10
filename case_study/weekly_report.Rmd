@@ -208,34 +208,20 @@ https://epirhandbook.com/import-and-export.html
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
 ```{r import}
-
-## TODO: at the end remove "case_study" from path - so that can be used within case_study.Rproj (also delete the if statement [keep the else])
-
-if (str_detect(here::here(), "emory_training$")) {
-
-linelist_raw <- here::here("case_study", "data",
-                     "covid_example_data", "covid_example_data.xlsx") %>%
-     # specify the sheet to read using which (default is to read first sheet)
-     import(which = "in")
-
-shapefile <- read_sf(here::here("case_study", "data",
-                     "covid_example_data", "covid_shapefile", "FultonCountyZipCodes.shp"))
-} else {
   
-# import the raw case data set 
+# import the raw case data set
   # define the path using {here} then pass that to the {rio} import function
   # specify the sheet to read using which (default is to read first sheet)
-  linelist_raw <- rio::import(
-    file = here::here("data", "covid_example_data", "covid_example_data.xlsx"),
-    which = "in"
-  )
-  
-  # import shapefile
+linelist_raw <- rio::import(
+  file = here::here("data", "covid_example_data", "covid_example_data.xlsx"),
+  which = "in"
+)
+
+# import shapefile
   # for mapping and for extracting population counts for zipcodes
-  shapefile <- read_sf(
-    here::here("data", "covid_example_data", "covid_shapefile", "FultonCountyZipCodes.shp")
-  )
-}
+shapefile <- read_sf(
+  here::here("data", "covid_example_data", "covid_shapefile", "FultonCountyZipCodes.shp")
+)
 
 ```
 
@@ -1712,9 +1698,8 @@ basemap <- ggplot() +
   annotation_map_tile(
     # define what map tiles to use
     type =  "cartolight",
-    ## TODO remove case_study from path at end
     # define folder to store tile images 
-    cachedir = here::here("case_study","data", "map_tiles"),
+    cachedir = here::here("data", "map_tiles"),
     # define if should download tiles each time
     forcedownload = FALSE,
     # hide messages about download status and zoom
