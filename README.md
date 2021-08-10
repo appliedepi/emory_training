@@ -29,7 +29,7 @@ from R experts who know applied epi!
 
 # The Emory COVID-19 Response Collaborative
 
-<img src = "https://github.com/appliedepi/emory_training/blob/master/presentation/images/ECRC_full%20color.png" width = "800" height="200">
+<img src = "https://github.com/appliedepi/emory_training/raw/master/presentation/images/ECRC_full%20color.png" width = "800" height="200">
 
 The [Emory COVID-19 Response
 Collaborative](https://emorycovidcollaborative.org/projects/georgia-department-of-public-health/)
