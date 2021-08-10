@@ -2457,8 +2457,13 @@ plot(weekly, fill = eth_race)+
 
 
 
+---
 
+# Epicurve - aggregated counts  
 
+You can also use **incidence2** on data that are aggregated counts...  
+
+TO DO
 
 
 
@@ -2931,7 +2936,7 @@ linelist %>%
   facet_grid(gender ~ eth_race) 
 ```
 
-Note above we pipe the adjusted data frame into `ggplot()` 
+Note above we pipe the adjusted data frame into `ggplot()`, for ease 
 ] 
 
 
@@ -3004,7 +3009,7 @@ Add `gghighlight()` to other plots, and specify specific values (or criteria) to
 ```{r, echo=T, eval=F}
 linelist %>% 
   # get daily counts by zip code
-  group_by(zip, date_report) %>%
+  group_by(age_group, date_report) %>%
   count() %>% 
   
   # plot
@@ -3012,10 +3017,10 @@ linelist %>%
     mapping = aes(
       x = date_report,
       y = n,
-      color = zip))+
+      color = age_group))+
   geom_line()+
-* gghighlight::gghighlight(zip == "30004")+
-  theme(legend.position = "none") # too many zip codes to show
+* gghighlight::gghighlight(age_group %in% "40-49")+
+  theme(legend.position = "none")
   
 ```
 
@@ -3052,12 +3057,16 @@ linelist %>%
 
 `geom_col()` and `geom_bar()` are used to make general bar plots (non-epicurves).
 
+--
+
 Use `geom_bar()` if bar height should reflect the number of rows in the data (e.g. a case linelist).  
 
 ```{r, echo=T, eval=F}
 ggplot(linelist)+                        # begin with linelist       
 *  geom_bar(mapping = aes(x = eth_race)) # one bar per race/ethnicity. No y= argument. 
 ```
+
+--
 
 Use `geom_col()` if the data have a numeric column containing the desired bar height (i.e. aggregated count data).  
 
@@ -3325,7 +3334,7 @@ Changes can be made outside ggplot (a lasting change to the dataset), or inside 
 ggplot(linelist)+             
   geom_bar(              # column height by number of rows
     mapping = aes(
-      x = eth_race,           # one bar per ethnicity. No y= argument. 
+      x = eth_race,      # one bar per ethnicity. No y= argument. 
       fill = died))+     # divide into stacked bars by outcome
   coord_flip()           # flip x and y axes
 ```
@@ -3347,8 +3356,8 @@ Below, to order by frequency, `fct_infreq()` is applied to the x-axis column `et
 ggplot(linelist)+          # begin with case linelist    
   geom_bar(                # column height by number of rows
     mapping = aes(
-*     x = fct_infreq(eth_race), # one bar per ethnicity. No y= argument. 
-*     fill = fct_infreq(died)))+       # stacked bars by outcome
+*     x = fct_infreq(eth_race),  # bars ordered by frequency 
+*     fill = fct_infreq(died)))+ # stacks ordered by frequency
  coord_flip()              # flip x and y axes
 ```
 
@@ -3362,8 +3371,8 @@ You will need to clean up the legend title now, with `labs(fill=)`.
 ggplot(linelist)+             
   geom_bar(              # column height by number of rows
     mapping = aes(
-      x = fct_infreq(eth_race),           # one bar per ethnicity. No y= argument. 
-      fill = fct_infreq(died)))+     # divide into stacked bars by outcome
+      x = fct_infreq(eth_race),    # bars ordered by frequency 
+      fill = fct_infreq(died)))+   # stacks ordered by frequency
   coord_flip()           # flip x and y axes
 ```
 ]
@@ -3376,7 +3385,7 @@ ggplot(linelist)+
 
 .pull-left[
 
-To *reverse* bar order, use `fct_rev()` from the **forcats** package. it can be wrapped around other functions. 
+To *reverse* bar order, use `fct_rev()` from the **forcats** package. It can be wrapped around other functions. 
 
 The below reverses the previous frequency ordering from `fct_infreq()`.  
 
@@ -3385,8 +3394,8 @@ The below reverses the previous frequency ordering from `fct_infreq()`.
 ggplot(linelist)+              
   geom_bar(                
     mapping = aes(
-*     x = fct_rev(fct_infreq(eth_race)),  # ordered in reverse frequency
-*     fill = fct_rev(fct_infreq(died))))+       
+*     x = fct_rev(fct_infreq(eth_race)),  # reverse frequency
+*     fill = fct_rev(fct_infreq(died))))+ # reverse frequency      
  coord_flip()              
 ```
 
@@ -3654,6 +3663,8 @@ You should get familiar with `pivot_longer()` from **dyplr**. We cannot go in-de
 
 # Labeling  
 
+class: medium-table
+
 .pull-left[
  
 To demonstrate labeling points, we create a new dataset that summarizes CFR and median age by race/ethnicity
@@ -3703,7 +3714,7 @@ ggplot(
     y = CFR,
     size = cases,
 *   label = eth_race))+
-geom_point(alpha = 0.5)+
+geom_point()+
 *geom_text()
 ```
 
@@ -3720,7 +3731,7 @@ ggplot(
     y = CFR,
     size = cases,
     label = eth_race))+
-  geom_point(alpha = 0.5)+
+  geom_point()+
   geom_text()
 ```
 
@@ -3752,7 +3763,7 @@ ggplot(
     y = CFR,
     size = cases,
 *   label = eth_race))+     # text to display
-geom_point(alpha = 0.5)+
+geom_point()+
 *geom_label_repel(         # add labels
 *   size = 5,               # text size
 *   min.segment.length = 0) # show connector lines
@@ -3771,7 +3782,7 @@ ggplot(
     y = CFR,
     size = cases,
     label = eth_race))+
-  geom_point(alpha = 0.5)+
+  geom_point()+
  geom_label_repel(
     size = 5,
     min.segment.length = 0)
@@ -3804,7 +3815,7 @@ ggplot(
     y = CFR,
     size = cases,
 *   label = str_glue("{eth_race}\n{cases} cases")))+
-geom_point(alpha = 0.5)+
+geom_point()+
 geom_label_repel(
     size = 5,
     min.segment.length = 0)
@@ -3823,7 +3834,7 @@ ggplot(
     y = CFR,
     size = cases,
     label = str_glue("{eth_race}\n{cases} cases")))+
-  geom_point(alpha = 0.5)+
+  geom_point()+
  geom_label_repel(
    size = 5,
    min.segment.length = 0)
@@ -3852,7 +3863,7 @@ ggplot(
     y = CFR,
     size = cases,
 *   label = str_glue("{eth_race}\n{scales::comma(cases)} cases")))+
-geom_point(alpha = 0.5)+
+geom_point()+
 geom_label_repel(
     size = 4,
     min.segment.length = 0)
@@ -3872,7 +3883,7 @@ ggplot(
     y = CFR,
     size = cases,
     label = str_glue("{eth_race}\n{scales::comma(cases)} cases")))+
-geom_point(alpha = 0.5)+
+geom_point()+
 geom_label_repel(
    size = 4,
    min.segment.length = 0)
@@ -3982,13 +3993,15 @@ See [https://scales.r-lib.org/](https://scales.r-lib.org/).
 
 
 ---
-# **scales** package - simplify date axis  
+# **scales** - simplify date axis  
+
+class: small-table
 
 .pull-left[
 
-`scales::label_date_short()` instantly makes easy date labels, and reduces the number of times year appears.
+We make a new dataset to demonstrate use of `scales::label_date_short()`.  
 
-```{r, echo=F, eval=T}
+```{r, echo=T, eval=T}
 # no lag accounted for, for simplicity
 CFR_data <- linelist %>% 
   group_by(month = floor_date(date_report, "month")) %>% 
@@ -3999,63 +4012,25 @@ CFR_data <- linelist %>%
 
 ```
 
-First 6 rows:  
-
-```{r, echo=T, eval=T}
-CFR_data %>% 
-  head(6) %>%
-  knitr::kable()
-```
-
-```{r , echo = TRUE, eval = FALSE, tidy = FALSE}
-ggplot(
-  data = CFR_data,
-  mapping = aes(
-    x = month,
-    y = CFR))+
-  geom_line()+
-  scale_x_date(date_breaks = "3 months")
-```
 
 ] 
 
 .pull-right[
-```{r, eval = T, echo=F}
-ggplot(
-  data = CFR_data,
-  mapping = aes(
-    x = month,
-    y = CFR))+
-  scale_x_date(date_breaks = "3 months")
+
+These are the first 6 rows:  
+
+```{r, echo=F, eval=T}
+CFR_data %>% 
+  head(6) %>%
+  knitr::kable()
 ```
 ]
 
 
 ---
-# **scales** package - simplify date axis  
+# **scales** - simplify date axis  
 
 .pull-left[
-
-`scales::label_date_short()` instantly makes easy date labels, and reduces the number of times year appears.
-
-```{r, echo=F, eval=T}
-# no lag accounted for, for simplicity
-CFR_data <- linelist %>% 
-  group_by(month = floor_date(date_report, "month")) %>% 
-  summarise(
-    cases = n(),
-    deaths = sum(died_covid == "Yes", na.rm=T),
-    CFR = deaths / cases)
-
-```
-
-First 6 rows:  
-
-```{r, echo=T, eval=T}
-CFR_data %>% 
-  head(6) %>%
-  knitr::kable()
-```
 
 ```{r , echo = TRUE, eval = FALSE, tidy = FALSE}
 ggplot(
@@ -4066,6 +4041,10 @@ ggplot(
   geom_line(size = 2)+
   scale_x_date(date_breaks = "3 months")
 ```
+
+`scales::label_date_short()` will instantly make nice date labels, and reduces the number of times the "year" appears.
+
+
 
 ] 
 
@@ -4081,19 +4060,16 @@ ggplot(
   scale_x_date(date_breaks = "3 months")
 ```
 
-Default date labels... not great.  
+The default date labels... not great.  
 
 ]
 
 
 
 ---
-# **scales** package - date axis  
+# **scales** - date axis  
 
 .pull-left[
-
-`scales::label_date_short()` instantly makes easy date labels, and reduces the number of times year appears.
-
 
 ```{r , echo = TRUE, eval = FALSE, tidy = FALSE}
 ggplot(
@@ -4106,6 +4082,8 @@ ggplot(
     date_breaks = "3 months",
 *   date_labels = "%d %b \n %Y")
 ```
+
+You can manually adjust the date labels this way, as we know, but the year appears multiple times.  
 
 Note use of `date_labels=` here, not `labels=`.  
 
@@ -4131,11 +4109,9 @@ Better... but the years are redundant.
 
 
 ---
-# **scales** package - date axis  
+# **scales** - date axis  
 
 .pull-left[
-
-`scales::label_date_short()` instantly makes easy date labels, and reduces the number of times year appears.
 
 
 ```{r , echo = TRUE, eval = FALSE, tidy = FALSE}
@@ -4149,6 +4125,8 @@ ggplot(
     date_breaks = "3 months",
 *   labels = scales::label_date_short())
 ```
+
+`scales::label_date_short()` instantly makes nice date labels, and reduces the number of times the "year" appears.
 
 Note use of `labels=` here, not `date_labels=`.
 
@@ -4172,11 +4150,10 @@ ggplot(
 
 
 ---
-# **scales** package - percents axis  
+# **scales** - percents axis  
 
 .pull-left[
 
-`scales::percent()` converts decimal proportions into percents. Note that if you converted to percent in advance the values would be characters and would not plot correctly.  
 
 ```{r , echo = TRUE, eval = FALSE, tidy = FALSE}
 ggplot(
@@ -4191,7 +4168,7 @@ geom_label_repel(
  size = 4)
 ```
 
-Note use of `scales::comma()` in the `str_glue()` labels to add commas.  
+`scales::percent()` converts proportions into percents maintaining a numeric axis. If you otherwise add "%" the class will convert to character.
 
 ] 
 
