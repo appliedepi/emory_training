@@ -733,11 +733,11 @@ See the [EpiRHandbook section on descriptive tables](https://epirhandbook.com/de
 
 linelist %>% 
   # get counts and percentages 
-  tabyl(gender) %>% 
+  janitor::tabyl(gender) %>% 
   # add the overall counts as a row
-  adorn_totals() %>%  
+  janitor::adorn_totals() %>%  
   # change from proportions to percentages (do not add a % sign)
-  adorn_pct_formatting(affix_sign = FALSE)
+  janitor::adorn_pct_formatting(affix_sign = FALSE)
 
 ```
 
