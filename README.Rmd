@@ -20,7 +20,6 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
-**WORK IN PROGRESS**
 
 [This website](https://appliedepi.github.io/emory_training) hosts training materials for the R demonstrations first delivered by **Applied Epi** to 40 Rollins COVID-19 Epidemiology fellows and colleagues from the [Emory COVID-19 Response Collaborative](https://emorycovidcollaborative.org/) in August 2021. 
 

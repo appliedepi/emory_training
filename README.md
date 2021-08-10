@@ -8,8 +8,6 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-**WORK IN PROGRESS**
-
 [This website](https://appliedepi.github.io/emory_training) hosts
 training materials for the R demonstrations first delivered by **Applied
 Epi** to 40 Rollins COVID-19 Epidemiology fellows and colleagues from
