@@ -420,7 +420,7 @@ See the [EpiRHandbook section on Rmarkdown](https://epirhandbook.com/reports-wit
   - Better than `setwd()` for sharing
 - Finds root directory automatically 
 - Open `.Rproj` file first
-- package::function() to avoid clashes
+- package::function() to avoid conflicts
   - `here::here()`
 ]
 
@@ -505,13 +505,16 @@ and the [EpiRHandbook section on dates](https://epirhandbook.com/working-with-da
 ```{r, eval=FALSE, echo = TRUE}
 
 linelist <- raw_linelist %>% 
+  
   # choose variables
   select(date_birth, age, gender, zip_code, date_onset) %>% 
+  
   # parse dates, clean gender, clean erroneous ages
   mutate(date_birth = ymd(dob),
          date_onset = ymd(date_onset),
          gender = str_to_title(gender),
          age = ifelse(age < 0, NA_integer_, age)) %>% 
+  
   # remove recent data to account for lag
   filter(date_onset < Sys.Date() - weeks(2))
 
@@ -858,14 +861,19 @@ We recommend using `gtsummary::tbl_uvregression()` for this case:
 linelist_reg %>% 
   # create summary table
   tbl_uvregression(
+    
     # define outcome variable
     y = outcome, 
+    
     # define regression to run (generalised linear model)
     method = glm, 
+    
     # define what type of glm to run (logistic)
     method.args = list(family = binomial), 
+    
     # exponentiate to produce odds ratios (rather than log odds)
     exponentiate = TRUE, 
+    
     # do not show the overall counts (this is done in cross_tab below)
     hide_n = TRUE
   )
