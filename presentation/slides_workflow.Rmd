@@ -106,18 +106,19 @@ style_mono_accent(
 # Introducing ourselves  
 
 * Neale Batra  
- - Founder of Epi R Handbook. Previously epi and preparedness at Philly and Santa Clara County health departments. Currently working for WHO Geneva COVID-19 analytics team  
+ - Founder of the Epi R Handbook.  
+ - Previously @Philly, @SantaClaraCounty, and @USAID/PEPFAR. Internationally with @MSF and @WHO.  
 * Alex Spina  
- - Alum of EPIET (European EIS). MSF Epi. WHO AFRO. Med Student. 
+ - Alum of EPIET (European EIS). Med student and epi consultant for @MSF and @WHO.  
 * Mathilde Mousset  
- - Epicentre (MSF). Ecology. 
-* Henry Laurenson-Schafer
- - WHO Geneva COVID-19 analytics team. Previously Molecular Biology/Bioinformatics.
+ - With Epicentre (MSF). Former specialization in ecology.  
+* Henry Laurenson-Schafer  
+ - Epi/data scientist with WHO Geneva on COVID response. PhD in molecular biology/bioinformatics.  
 * Wen Lin 
- - 
+ - Epi @SantaClaraCounty, **Resident SAS expert**. 
 
-(PHOTOS AND BIOS)  
-
+???
+We have Wen available for answering any questions on translating SAS to R 
 
 ---
 # Today's session   
@@ -333,38 +334,51 @@ class: inverse, center, middle
 # Setting the scene  
 ### Start with a new R project
 
+
+.pull-left[
 - Create a project directory
 
   + File -> New Directory...
 
---
-
-- R project directories can be shared easily
-
---
-.center[
-```{r, eval = TRUE, echo = FALSE, out.width = "30%"}
-# knitr::include_graphics("https://github.com/appliedepi/emory_training/blob/master/presentation/images/make_proj.png?raw=true")
-```
-]
---
+- R project directories shared easily
 
 - Create a Rmarkdown file in your file structure to get started!
+]
+
+.pull-right[
+
+![](https://github.com/appliedepi/emory_training/blob/master/presentation/images/make_proj.png?raw=true)
+
+]
+
+
+---
+# Setting the scene 
+### Using [Rmarkdown](https://epirhandbook.com/reports-with-r-markdown.html?q=rmark#reports-with-r-markdown) for reports
+
+![](https://epirhandbook.com/images/markdown/rmarkdown_translation.png)
+
 
 ---
 # Setting the scene  
-#### Download our example R project!
+#### Download our [example R project](https://minhaskamal.github.io/DownGit/#/home?url=https://github.com/appliedepi/emory_training/tree/master/case_study)!
 
 
-![](https://github.com/appliedepi/epiRhandbook_eng/raw/master/images/Epi%20R%20Handbook%20Banner%20Beige%201500x500.png)
+We created a dedicated R project, a directory containing:  
 
-
-.footnote[
-
-See [our github repository](https://github.com/appliedepi/emory_training)
-
-Download the project [directly](https://minhaskamal.github.io/DownGit/#/home?url=https://github.com/appliedepi/emory_training/tree/master/case_study)
-]
+R project file (`case_study.Rproj`)  
+  * `data/` folder  
+    * `covid_example_data/` folder 
+        * `covid_example_data.xlsx`  
+        * `covid_shapefile/` folder  
+          - `FultonCountryZipCode.shp`...
+    * `map_tiles/` folder 
+        * base map images for Fulton County...
+  * `weekly_report.Rmd` (R markdown script)  
+    * `template_style.docx`
+    * `weekly_report.docx`
+    * `weekly_report.md`
+    * `weekly_report_files/` folder 
 
 ---
 # Rmarkdown parameterisation  
@@ -381,7 +395,7 @@ params:
   county: "Fulton"
 ```
 
-- Acess parameters with `params$...`
+- Access parameters with `params$...`
 
 ```{r, eval = FALSE, echo = TRUE}
 # filter linelist for county of choice
@@ -397,21 +411,33 @@ See the [EpiRHandbook section on Rmarkdown](https://epirhandbook.com/reports-wit
 ]
 
 ---
-# File paths & importing data  
+# File paths
 
-#### Use the `{here}` and `{rio}` packages to import data
+#### Use the `{here}` package to find files
 
+.pull-left[
+- *Relative* rather than *absolute* file-paths 
+  - Better than `setwd()` for sharing
+- Finds root directory automatically 
+- Open `.Rproj` file first
+- package::function() to avoid clashes
+  - `here::here()`
+]
 
-- `here::here()` to navigate working environment
+.pull-right[
+![source: Alison Horst](https://raw.githubusercontent.com/allisonhorst/stats-illustrations/master/rstats-artwork/here.png)
+]
+
  
---
+.footnote[
+See the [EpiRHandbook section on here package](https://epirhandbook.com/import-and-export.html?q=here#here)
+]
 
+---
+# Importing data  
+#### Using the `{rio}` package for important data 
 - `rio::import()` to import a file
- 
---
-
-
-
+  - wrapper package able to import wide variety of file formats
 
 
 ```{r, eval=FALSE, echo = TRUE}
@@ -427,7 +453,7 @@ raw_linelist <- rio::import(
 
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
 
-# not sure we ACTUALLY need the data in but we'll see
+# import actual data for use in this slide deck
 linelist_raw <- here::here("case_study", "data",
                      "covid_example_data", "covid_example_data.xlsx") %>%
      # specify the sheet to read using which (default is to read first sheet)
@@ -436,9 +462,9 @@ linelist_raw <- here::here("case_study", "data",
 ```
 
 .footnote[
-See the [EpiRHandbook section on here package](https://epirhandbook.com/import-and-export.html?q=here#here)
 
-and the [EpiRHandbook section on importing](https://epirhandbook.com/cleaning-data-and-core-functions.html?q=import#import)
+See the [EpiRHandbook section on importing](https://epirhandbook.com/cleaning-data-and-core-functions.html?q=import#import)
+
 ]
 
 ---
@@ -824,7 +850,7 @@ See the [EpiRHandbook section on logistic regresssion](https://epirhandbook.com/
 
 ]
 ---
-# Logistic rergression 
+# Logistic regression 
 
 We recommend using `gtsummary::tbl_uvregression()` for this case:
 
@@ -879,207 +905,11 @@ linelist_raw %>%
 
 ---
 class: center, middle
-background-image: url(https://github.com/appliedepi/epiRhandbook_eng/raw/master/images/Epi%20R%20Handbook%20Banner%20Beige%201500x500.png)
-background-size: 75%
-background-position: 50% 0%
 
-# Alternative section header slide
+# Questions?
 
-### Include epirhandbook banner (see [images slides](#imageslide))
-
----
-
-## Visualisation 
-
-Note to selves: 
-I think the way [this presentation](https://www.cedricscherer.com/slides/2019-08-28-intro-ggplot-statsizw#20) 
-breaks down ggplots line by line is probably the way to go! 
-
----
-name: imageslide
-background-image: url(https://github.com/appliedepi/epiRhandbook_eng/raw/master/images/epiRhandbook_HexSticker_500x500.png)
-background-size: 250px
-background-position: 90% 50%
-
-
-# Including images
-
-.pull-left[
-- Text displayed along side an image 
-- May need to fiddle with sizes
-  + position is %accross and %down 
-  + size .... just flip a coin and see what comes out 
-  + can also use % for images (see layout chunk just below YAML) 
-    + i.e. in layout section up top to adds logos to each page (as per the twitter feed in [extras slide](#references))
-- Can also include images with usual Rmarkdown or knitr code (e.g. next slide)
+.footnote[
+Slides created via the [{xaringan}](https://github.com/yihui/xaringan) R package
 ]
----
 
-# Including images 2.0 
 
-![](https://github.com/appliedepi/epiRhandbook_eng/raw/master/images/Epi%20R%20Handbook%20Banner%20Beige%201500x500.png)
-
-
----
-name: references 
-
-# Xaringan extra & fancy stuff 
-
-- This is a good [tutorial](https://presentable-user2021.netlify.app/) from useR conference.
-- You can include fancier code tabs i.e. this [pres](https://xaringan.gallery/examples.html) 
-- Theres other fancy stuff in this [gallery](https://xaringan.gallery/examples.html)
-- There is tips in this [twitter feed](https://twitter.com/apreshill/status/1085659933238976513)
-  + e.g. if you name slides you can link back to them (nb. name needs to be first thing defined on slide)
-  + keyboard shortcuts for presenting 
-  + better side-by-side code example 
-  + title page 
-  + logos (have included this)
-  + background images 
-- Can set theme using [{xaringanthemer}](https://pkg.garrickadenbuie.com/xaringanthemer/articles/xaringanthemer.html) package 
-  + seems easier than messing around with css
-
-
----
-
-
-class: center
-
-# Keyboard shortcuts when presenting
-
-Press `h` or `?` to see the possible ninjutsu you can use in remark.js.
-
-![](https://upload.wikimedia.org/wikipedia/commons/7/7e/Mudra-Naruto-KageBunshin.svg)
-
----
-
-class: center, middle
-
-# Thanks!
-
-Slides created via the R package [**xaringan**](https://github.com/yihui/xaringan).
-
-
-
-
----
-
-# Some Tips
-
-- The title slide is created automatically by **xaringan**, but it is just another remark.js slide added before your other slides.
-
-    The title slide is set to `class: center, middle, inverse, title-slide` by default. You can change the classes applied to the title slide with the `titleSlideClass` option of `nature` (`title-slide` is always applied).
-
-    ```yaml
-    output:
-      xaringan::moon_reader:
-        nature:
-          titleSlideClass: [top, left, inverse]
-    ```
-    
---
-
-- If you'd like to create your own title slide, disable **xaringan**'s title slide with the `seal = FALSE` option of `moon_reader`.
-
-    ```yaml
-    output:
-      xaringan::moon_reader:
-        seal: false
-    ```
-
-
----
-
-# Some Tips
-
-- To make slides work offline, you need to download a copy of remark.js in advance, because **xaringan** uses the online version by default (see the help page `?xaringan::moon_reader`).
-
-- You can use `xaringan::summon_remark()` to download the latest or a specified version of remark.js. By default, it is downloaded to `libs/remark-latest.min.js`.
-
-- Then change the `chakra` option in YAML to point to this file, e.g.
-
-    ```yaml
-    output:
-      xaringan::moon_reader:
-        chakra: libs/remark-latest.min.js
-    ```
-
-- If you used Google fonts in slides (the default theme uses _Yanone Kaffeesatz_, _Droid Serif_, and _Source Code Pro_), they won't work offline unless you download or install them locally. The Heroku app [google-webfonts-helper](https://google-webfonts-helper.herokuapp.com/fonts) can help you download fonts and generate the necessary CSS.
-
-
----
-
-# CSS
-
-Among all options in `xaringan::moon_reader`, the most challenging but perhaps also the most rewarding one is `css`, because it allows you to customize the appearance of your slides using any CSS rules or hacks you know.
-
-You can see the default CSS file [here](https://github.com/yihui/xaringan/blob/master/inst/rmarkdown/templates/xaringan/resources/default.css). You can completely replace it with your own CSS files, or define new rules to override the default. See the help page `?xaringan::moon_reader` for more information.
-
----
-
-# CSS
-
-For example, suppose you want to change the font for code from the default "Source Code Pro" to "Ubuntu Mono". You can create a CSS file named, say, `ubuntu-mono.css`:
-
-```css
-@import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
-
-.remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
-```
-
-Then set the `css` option in the YAML metadata:
-
-```yaml
-output:
-  xaringan::moon_reader:
-    css: ["default", "ubuntu-mono.css"]
-```
-
-Here I assume `ubuntu-mono.css` is under the same directory as your Rmd.
-
-See [yihui/xaringan#83](https://github.com/yihui/xaringan/issues/83) for an example of using the [Fira Code](https://github.com/tonsky/FiraCode) font, which supports ligatures in program code.
-
----
-
-# CSS (with Sass)
-
-**xaringan** also supports Sass support via **rmarkdown**. Suppose you want to use the same color for different elements, e.g., first heading and bold text. You can create a `.scss` file, say `mytheme.scss`, using the [sass](https://sass-lang.com/) syntax with variables:
-
-```scss
-$mycolor: #ff0000; 
-.remark-slide-content > h1 { color: $mycolor; }
-.remark-slide-content strong { color: $mycolor; }
-```
-
-Then set the `css` option in the YAML metadata using this file placed under the same directory as your Rmd:
-
-```yaml
-output:
-  xaringan::moon_reader:
-    css: ["default", "mytheme.scss"]
-```
-
-This requires **rmarkdown** >= 2.8 and the [**sass**](https://rstudio.github.io/sass/) package. You can learn more about **rmarkdown** and **sass** support in [this blog post](https://blog.rstudio.com/2021/04/15/2021-spring-rmd-news/#sass-and-scss-support-for-html-based-output) and in [**sass** overview vignette](https://rstudio.github.io/sass/articles/sass.html).
-
----
-
-# Themes
-
-Don't want to learn CSS? Okay, you can use some user-contributed themes. A theme typically consists of two CSS files `foo.css` and `foo-fonts.css`, where `foo` is the theme name. Below are some existing themes:
-
-```{r, R.options=list(width = 70)}
-names(xaringan:::list_css())
-```
-
----
-
-# Themes
-
-To use a theme, you can specify the `css` option as an array of CSS filenames (without the `.css` extensions), e.g.,
-
-```yaml
-output:
-  xaringan::moon_reader:
-    css: [default, metropolis, metropolis-fonts]
-```
-
-If you want to contribute a theme to **xaringan**, please read [this blog post](https://yihui.org/en/2017/10/xaringan-themes).
