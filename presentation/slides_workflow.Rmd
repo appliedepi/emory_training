@@ -475,7 +475,7 @@ See the [EpiRHandbook section on importing](https://epirhandbook.com/cleaning-da
 
 #### Use `{dplyr}` to clean data
 
-1. Visually inspect data (`View()`, `summary()`, `glimpse()`)
+1. Visually inspect data (`View()`, `summary()`, `glimpse()`, `unique()`)
 
 --
 
