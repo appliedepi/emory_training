@@ -918,6 +918,20 @@ linelist_raw %>%
 ```
 
 
+
+---
+
+# Thank you for your service  
+
+We know personally how exhausting it is to work on COVID-19 response.  
+
+**Thank you** for your dedication to public service and epidemiology in these trying and historic times.  
+
+???
+We are seeking to make small improvements to the lives of epidemiologists 
+
+
+
 ---
 class: center, middle
 
