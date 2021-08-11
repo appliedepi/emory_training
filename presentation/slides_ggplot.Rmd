@@ -136,15 +136,14 @@ style_mono_accent(
 ---
 # Introducing ourselves  
 
-* Neale Batra  
+* **Neale Batra**  
  - Founder of the Epi R Handbook.  
  - Previously @Philly, @SantaClaraCounty, and @USAID/PEPFAR. Internationally with @MSF and @WHO.  
-* Alex Spina  
+* **Alex Spina**  
  - Alum of EPIET (European EIS). Med student and epi consultant for @MSF and @WHO.  
-* Mathilde Mousset  
- - With Epicentre (MSF). Former specialization in ecology.  
-* Henry Laurenson-Schafer  
+* **Mathilde Mousset**  
  - R programmer / Data manager at Epicentre (@MSF). PhD in evolutionary ecology. 
+* **Henry Laurenson-Schafer**  
  - Epi/data scientist with WHO Geneva on COVID response. PhD in molecular biology/bioinformatics.  
  
 
