@@ -1135,17 +1135,20 @@ cowplot::plot_grid(shape_3, shape_died,
 
 .pull-left[
 
+An aesthetic is *static* if it applies to all data points in the geom or in the graph.
+
+Static aesthetics are defined *outside* `aes()` to a **number or character value**. 
+
 ```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
 ggplot(
   data = linelist,
   mapping = aes(
     x = age,
-    y = days_hosp))+ 
-*geom_point(color = "seagreen")
+    y = days_hosp)) + 
+* geom_point(color = "seagreen")
 ```
 
 
-An aesthetic is *static*, applying the same display to all data points, if it is assigned to a number or character value and written *outside* `aes()`.  
 
 Other examples:  
 `size = 3`  
@@ -1161,7 +1164,7 @@ ggplot(
   data = linelist,
   mapping = aes(
      x = age,
-     y = days_hosp))+
+     y = days_hosp)) +
 geom_point(color = "seagreen")
 ```
 ] 
