@@ -1135,9 +1135,9 @@ cowplot::plot_grid(shape_3, shape_died,
 
 .pull-left[
 
-An aesthetic is *static* if it applies to all data points in the geom or in the graph.
+An aesthetic is *static* if it applies to all data points in the geom or in the graph.  
 
-Static aesthetics are defined *outside* `aes()` to a **number or character value**. 
+Static aesthetics are defined *outside* `aes()` to a **number or character value**.   
 
 ```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
 ggplot(
@@ -1179,20 +1179,22 @@ geom_point(color = "seagreen")
 
 .pull-left[
 
+An aesthetis is *dynamic* if it varies between data points, based on the values of another column/variable.  
+
+Dynamic aesthetics are defined *inside* the `aes()` and are assigned to a **colum name**.  
+
 ```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
 ggplot(
   data = linelist,
   mapping = aes(
     x = age,
     y = days_hosp,
-*   color = died))+
+*   color = died)) +
 geom_point()
 ```
 
 
-An aesthetic is *dynamic*, varying for each data point, if it assigned to a *column name* and written *inside* an `aes()`.  
-
-Above, `color=` is mapped to column `died`, and is inherited by `geom_point()`.  
+Above, `color` is mapped to column `died`, and is inherited by `geom_point()`.  
 
 ]
 
@@ -1204,7 +1206,7 @@ ggplot(
   mapping = aes(
     x = age,
     y = days_hosp,
-    color = died))+   
+    color = died)) +   
 geom_point()
 ```
 ]
