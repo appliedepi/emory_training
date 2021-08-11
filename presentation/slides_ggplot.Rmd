@@ -815,24 +815,23 @@ long style can enable informative comments/annotations
 ---
 # Aesthetic mapping placement  
 
-* Mappings written in `ggplot()` apply to all geoms (e.g. axes)  
+* Mappings written in the initial `ggplot()` call apply to all following instructions (e.g. axes), *except instructed otherwise*  
 * Mappings written within one geom apply only to it  
 
 ```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
-ggplot(                     # open the plot 
-  data = linelist,            # set dataset 
-* mapping = aes(              # map axes to columns
+ggplot(data = linelist,     # open the plot andset dataset 
+* mapping = aes(            # map axes to columns
 *   x = age,
-*   y = days_hosp))+
+*   y = days_hosp)) +
   geom_point()              # plot points
 ```
 
 is the same as:  
 
 ```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
-ggplot(data = linelist)+    # open plot and set dataset
-  geom_point(               # plot points
-*    mapping = aes(           # map axes to columns
+ggplot(data = linelist) +    # open plot and set dataset
+  geom_point(                # plot points
+*    mapping = aes(          # map axes to columns
 *      x = age,
 *      y = days_hosp))
 ```
@@ -842,6 +841,7 @@ ggplot(data = linelist)+    # open plot and set dataset
 
 ???
 - Explain why you might use one or the other  
+Or do we use an exemple later in the presentation to illustrate it?
 
 
 
