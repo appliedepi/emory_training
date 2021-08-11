@@ -772,15 +772,14 @@ cowplot::plot_grid(top, lines, ncol = 1)
 Indentations, spaces, and newlines do not impact code execution, and can be varied to improve readability.  
 
 ```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
-ggplot(data = linelist, mapping = aes(x = age, y = days_hosp))+
-  geom_point()
+ggplot(data=linelist, mapping=aes(x=age,y=days_hosp))+geom_point()
 ```
 
 is the same as:  
 
 ```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
 ggplot(data = linelist,
-       mapping = aes(x = age, y = days_hosp))+
+       mapping = aes(x = age, y = days_hosp)) +
   geom_point()
 ```
 
@@ -791,7 +790,7 @@ ggplot(
   data = linelist,        # use case linelist
   mapping = aes(          # make aesthetic mappings for all geoms
     x = age,              # assign x-axis to age column
-    y = days_hosp))+      # assign y-axis to duration of hospitalization
+    y = days_hosp)) +     # assign y-axis to duration of hospitalization
 geom_point()              # display data as points
 ```
 
