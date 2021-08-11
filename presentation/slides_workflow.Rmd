@@ -323,8 +323,11 @@ class: inverse, center, middle
 # Setting the scene 
 
 - You are the local epi tasked with automating the weekly situation report  
+
   - We are going to reproduce [Fulton County epidemiology reports](https://www.fultoncountyga.gov/covid-19/epidemiology-reports)  
+  
   - We have pre-packaged an example **R-project** folder 
+  
   - Walk-through from start to finish 
 
 ![](https://github.com/appliedepi/emory_training/blob/master/presentation/images/fulton_report.png?raw=true)
@@ -472,7 +475,7 @@ See the [EpiRHandbook section on importing](https://epirhandbook.com/cleaning-da
 
 #### Use `{dplyr}` to clean data
 
-1. Visually inspect data (`summary()`, `glimpse()`)
+1. Visually inspect data (`View()`, `summary()`, `glimpse()`, `unique()`)
 
 --
 
@@ -507,16 +510,16 @@ and the [EpiRHandbook section on dates](https://epirhandbook.com/working-with-da
 linelist <- raw_linelist %>% 
   
   # choose variables
-  select(date_birth, age, gender, zip_code, date_onset) %>% 
+  select(date_birth, date_report, age, gender, zip_code) %>% 
   
   # parse dates, clean gender, clean erroneous ages
-  mutate(date_birth = ymd(dob),
-         date_onset = ymd(date_onset),
+  mutate(date_birth = ymd(date_birth),
+         date_report = ymd(date_report),
          gender = str_to_title(gender),
          age = ifelse(age < 0, NA_integer_, age)) %>% 
   
   # remove recent data to account for lag
-  filter(date_onset < Sys.Date() - weeks(2))
+  filter(date_report < Sys.Date() - weeks(2))
 
 ```
 
@@ -547,13 +550,15 @@ and the [EpiRHandbook section on dates](https://epirhandbook.com/working-with-da
 
 linelist <- raw_linelist %>% 
   # choose variables
-  select(date_birth, age, gender, zip_code, date_onset) %>% 
+  select(date_birth, date_report,  age, gender, zip_code) %>% 
   # parse dates, clean gender, clean erroneous ages
-  mutate(across(
-    # apply to columns containing the string 'date'
-    .cols = contains("date")),  #<<
-    # apply as.Date() function to all selected columns
-    .fns = ~as.Date(.x)  #<<
+  mutate(
+    across(
+      # apply to columns containing the string 'date'
+      .cols = across(.cols = contains("date")),  #<<
+      # apply as.Date() function to all selected columns
+      .fns = ~as.Date(.x)  #<<
+    )
   ) 
 
 ```
