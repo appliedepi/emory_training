@@ -563,9 +563,9 @@ Piping is useful to make one-time changes to a dataset prior to plotting.
 ```{r, eval=F, echo=T}
 ggplot(
   data = linelist,
-  mapping = aes(
-    x = age,
-    y = days_hosp)
+  mapping = aes(    #<<
+    x = age,        #<<
+    y = days_hosp)  #<< 
 )
 ```
 
