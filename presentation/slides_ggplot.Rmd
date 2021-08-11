@@ -144,6 +144,7 @@ style_mono_accent(
 * Mathilde Mousset  
  - With Epicentre (MSF). Former specialization in ecology.  
 * Henry Laurenson-Schafer  
+ - R programmer / Data manager at Epicentre (@MSF). PhD in evolutionary ecology. 
  - Epi/data scientist with WHO Geneva on COVID response. PhD in molecular biology/bioinformatics.  
  
 
