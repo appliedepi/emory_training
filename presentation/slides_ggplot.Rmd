@@ -1263,9 +1263,7 @@ As there is only one geom, all aesthetics can be writtein `ggplot()`, or in `geo
 ---
 # A common error  
 
-.pull-left[
-
-Aesthetic mappings like `fill=` and `color=` create "groups" in the plot. Problems arise if your data are "grouped", but your plot does not account for this. In other words: you have multiple "y" values per x-value.  
+You summarised the data "by group", but plot everything indiscriminately, despite having multiple "y" values per x-value.  
 
 Below, `outcome_time_data` has one row per week-outcome, but the plotting command does not account for this.  
 
@@ -1285,37 +1283,19 @@ outcome_time_data %>%
   knitr::kable()
 ```
 
+---
+# A common error  
 
-```{r, echo=T, eval=F}
+```{r, echo=T, eval=T}
 # Forgot to include an aesthetic mapping to create groups!
 ggplot(
   data = outcome_time_data,
   mapping = aes(
     x = week_onset,       
-    y = n_cases))+
-  geom_line()+
+    y = n_cases)) +
+  geom_line() +
   labs(title = "Weekly cases, by outcome (?)")
 ```
-
-
-
-
-]
-
-.pull-right[
-
-```{r, eval=T, echo=F}
-ggplot(
-  data = outcome_time_data,
-  mapping = aes(
-    x = week_onset,       
-    y = n_cases))+
-  geom_line()+
-  labs(title = "Weekly cases, by outcome (?)")
-
-```
-]
-
 
 
 ---
@@ -1323,7 +1303,9 @@ ggplot(
 
 .pull-left[
 
-This version includes `color=` mapped to the `died` column. So the lines separate nicely.  
+Use aesthetic mappings like `fill` or `color` to visualise "groups" in the plot.  
+
+This version includes `color` mapped to the `died` column.
 
 ```{r, echo=T, eval=F}
 ggplot(
@@ -1331,8 +1313,8 @@ ggplot(
   mapping = aes(
     x = week_onset,       
     y = n_cases,
-*   color = died))+
-  geom_line()+
+*   color = died)) +
+  geom_line() +
   labs(title = "Weekly cases, by outcome")
 ```
 
@@ -1346,11 +1328,9 @@ ggplot(
   mapping = aes(
     x = week_onset,       
     y = n_cases,
-    color = died))+
-  geom_line()+
+    color = died)) +
+  geom_line() +
   labs(title = "Weekly cases, by outcome")
-
-
 ```
 ]
 
