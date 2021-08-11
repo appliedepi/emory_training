@@ -1221,18 +1221,20 @@ geom_point()
 
 .pull-left[
 
+We can mix static and dynamic aesthetics:  
 
 ```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
 ggplot(
   data = linelist,
   mapping = aes(
-    x = age,
-    y = days_hosp,
-*   color = died))+   # color by outcome
-*geom_point(size = 7) # all points 7x size 
+    x     = age,
+    y     = days_hosp,
+*   color = died)) +       # color by outcome
+*geom_point(size  = 7,     # all points 7x size 
+*           alpha = 0.7)   # increase transparency 
 ```
 
-Above, `size = 7` is a static aesthetic - it is not within any `aes()` function and therefore is not mapped to any column.  
+Above, `size = 7` and `alpha = 0.7`are static aesthetics defined outside any `aes()` and therefore not mapped to any column.  
 
 ]
 
@@ -1244,8 +1246,9 @@ ggplot(
   mapping = aes(
     x = age,
     y = days_hosp,
-    color = died))+ # color varies by outcome
-geom_point(size = 7) # all points 7x size      
+    color = died)) + # color varies by outcome
+geom_point(size = 7,
+           alpha = 0.7) # all points 7x size      
 ```
 ]
 
