@@ -906,17 +906,19 @@ ggplot(data = linelist,
 
 .pull-left[
 
+We can add additional geoms to the current plot.
+
+Geoms are added to the graph **in the order they are written in**: the smoothed line appears on top of the points.
 
 ```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
 ggplot(data = linelist,
        mapping = aes(
          x = age,
-         y = days_hosp))+
-  geom_point()+
+         y = days_hosp)) +
+  geom_point() +
 * geom_smooth()
 ```
 
-Additional geoms can be added on top.  
 
 `geom_smooth()` gives smoothed conditional means, helping to show trends in presence of "over-plotting" (see [documentation](https://ggplot2.tidyverse.org/reference/geom_smooth.html)).  
 
@@ -929,8 +931,8 @@ ggplot(
   data = linelist,
   mapping = aes(
     x = age,
-    y = days_hosp))+
-  geom_point()+
+    y = days_hosp)) +
+  geom_point() +
   geom_smooth()
 ```
 ] 
