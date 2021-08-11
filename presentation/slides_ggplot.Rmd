@@ -136,22 +136,27 @@ style_mono_accent(
 ---
 # Introducing ourselves  
 
-* Neale Batra  
+* **Neale Batra**  
  - Founder of the Epi R Handbook.  
  - Previously @Philly, @SantaClaraCounty, and @USAID/PEPFAR. Internationally with @MSF and @WHO.  
-* Alex Spina  
+* **Alex Spina**  
  - Alum of EPIET (European EIS). Med student and epi consultant for @MSF and @WHO.  
-* Mathilde Mousset  
- - With Epicentre (MSF). Former specialization in ecology.  
-* Henry Laurenson-Schafer  
+* **Mathilde Mousset**  
+ - R programmer / Data manager at Epicentre (@MSF). PhD in evolutionary ecology.  
+* **Henry Laurenson-Schafer**  
  - Epi/data scientist with WHO Geneva on COVID response. PhD in molecular biology/bioinformatics.  
- 
+* **Wen Lin** 
+ - Epi @SantaClaraCounty, **Resident SAS expert**. 
+
+???
+We have Wen available for answering any questions on translating SAS to R 
+
 
 
 ---
 # Today's session   
 
-Today is primarily *explanation* and *demonstration*, following from the previous [demonstration on data management and workflow](https://appliedepi.github.io/emory_training/presentation/slides.html).  
+Today is primarily *explanation* and *demonstration*, following from the previous [demonstration on data management and workflow](https://appliedepi.github.io/emory_training/presentation/slides_workflow.html).  
 
 We assume you have reviewed the Handbook pages on [R Basics](https://epirhandbook.com/r-basics.html) and [ggplot basics](https://epirhandbook.com/ggplot-basics.html).  
 
@@ -161,7 +166,7 @@ We assume you have reviewed the Handbook pages on [R Basics](https://epirhandboo
 
 
 ???
-- The learning process can be summarised into this acronym "EDGE". Today's session is primarily a *demonstration* with question & answer session. We assume that you have read at least some of the relevant pages in the Epi R Handbook prior to this session. We also offer trainings in which we guide you through case studies with hands-on coaching. 
+- The learning process can be summarised into this acronym "EDGE". Today's session is primarily a *demonstration* with question & answer session. We assume that you have read at least some of the relevant pages in the Epi R Handbook prior to this session. We also offer training in which we guide you through case studies with hands-on coaching. 
 
 
 ---
