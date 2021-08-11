@@ -799,8 +799,11 @@ geom_point()              # display data as points
 ???
 - Explain why you might use one or the other 
 long style can enable informative comments/annotations  
-
-
+- short style very dense (harder to read for some). Shorter scripts, but so what? The number of lines of your code is not an informative metrics.
+- very long lines => needs to scroll horizontally for people with smaller monitors (not nice)
+- long-ish style makes it easier to see which argument belongs to each function
+- spaces around "=" or "+" => make it easier to parse to many people
+- other?
 
 
 
