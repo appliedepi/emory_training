@@ -335,7 +335,7 @@ class: inverse, center, middle
 
 ---
 # Setting the scene  
-### Start with a new R project
+### Start with a new R project  
 
 
 .pull-left[
@@ -364,7 +364,7 @@ class: inverse, center, middle
 
 ---
 # Setting the scene  
-#### Download our [example R project](https://minhaskamal.github.io/DownGit/#/home?url=https://github.com/appliedepi/emory_training/tree/master/case_study)!
+#### Download our [example R project](https://minhaskamal.github.io/DownGit/#/home?url=https://github.com/appliedepi/emory_training/tree/master/case_study)! (be sure to un-zip)
 
 
 We created a dedicated R project, a directory containing:  
@@ -572,10 +572,10 @@ linelist <- raw_linelist %>%
 
 --
 
-- Make sure values in common columns are aligned
+- Make sure values in common columns are aligned exactly  
   + Follow the principles of categorical variable cleaning
-  + Use `dplyr::unique()`
-
+  + Use `dplyr::unique()` to verify  
+  
 --
 
 - Use the correct join type from `{tidyr}` package
@@ -656,7 +656,7 @@ zipcodes <- sf::read_sf(
 
 
 .pull-left[
-**Table 1**
+**Table 1:** `cases_by_zip`  
 
 ```{r, echo = FALSE}
 cases_by_zip %>% 
@@ -669,7 +669,7 @@ cases_by_zip %>%
 ]
 
 .pull-right[
-**Table 2**
+**Table 2:** `zipcodes`  
 
 ```{r, echo = FALSE}
 zipcodes %>% 
@@ -715,7 +715,7 @@ cases_by_zip %>%
 
 --
 
-- Group over key variable(s) to:
+- Group rows in key variable(s) to:
  + Calculate totals
  + Calculate percents
 
