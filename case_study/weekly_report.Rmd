@@ -14,7 +14,7 @@ params:
 # Introduction to this case study script
 
 This is a an example R-markdown script which demonstrates how to create an 
-automated outbreak situation report for COVID-19 in Fulton county, USA.  
+automated outbreak situation report for COVID-19 in Fulton county, USA. The data used are anonymised and fake (scrambled), for example purposes only.  
 
 - We demonstrate how to import, clean and analyse your data.  
 - Analysis is organised by time, place and person.  
