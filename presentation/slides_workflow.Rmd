@@ -549,9 +549,9 @@ linelist <- raw_linelist %>%
   # choose variables
   select(date_birth, age, gender, zip_code, date_onset) %>% 
   # parse dates, clean gender, clean erroneous ages
-  mutate(
+  mutate(across(
     # apply to columns containing the string 'date'
-    .cols = across(.cols = contains("date")),  #<<
+    .cols = contains("date")),  #<<
     # apply as.Date() function to all selected columns
     .fns = ~as.Date(.x)  #<<
   ) 
@@ -567,10 +567,10 @@ linelist <- raw_linelist %>%
 
 --
 
-- Make sure values in common columns are aligned
+- Make sure values in common columns are aligned exactly  
   + Follow the principles of categorical variable cleaning
-  + Use `dplyr::unique()`
-
+  + Use `dplyr::unique()` to verify  
+  
 --
 
 - Use the correct join type from `{tidyr}` package
@@ -651,7 +651,7 @@ zipcodes <- sf::read_sf(
 
 
 .pull-left[
-**Table 1**
+**Table 1:** `cases_by_zip`  
 
 ```{r, echo = FALSE}
 cases_by_zip %>% 
@@ -664,7 +664,7 @@ cases_by_zip %>%
 ]
 
 .pull-right[
-**Table 2**
+**Table 2:** `zipcodes`  
 
 ```{r, echo = FALSE}
 zipcodes %>% 
@@ -710,7 +710,7 @@ cases_by_zip %>%
 
 --
 
-- Group over key variable(s) to:
+- Group rows in key variable(s) to:
  + Calculate totals
  + Calculate percents
 
