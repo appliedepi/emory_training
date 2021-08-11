@@ -276,7 +276,7 @@ One tip is to load tidyverse last to avoid masking of package names
 
 ---
 
-# Import data
+# Import and clean data
 
 Today we begin with a clean dataset in order to focus on visualization techniques.  
 
@@ -297,22 +297,7 @@ linelist_raw <- import(here::here("data", "covid_example_data.xlsx"))
 ]
 
 
-
-
-
----
-
-class: remark-code
-
-# Clean data  
-
-See the R markdown script from the previous session for all the cleaning code.  
-
-We will not linger on data cleaning today, in the interest of time.  
-
-We will touch upon data structure and pivoting later in the presentation.  
-
-
+See the R markdown script from the previous session for the cleaning code. 
 
 ```{r, echo=F}
 linelist <- linelist_raw %>% 
@@ -416,7 +401,9 @@ linelist <- linelist_raw %>%
 
 
 
-
+???
+We will not linger on data cleaning today, in the interest of time.  
+We will touch upon data structure and pivoting later in the presentation.  
 
 
 
