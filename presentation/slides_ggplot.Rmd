@@ -182,7 +182,7 @@ Today's demonstration will include:
 * Advanced tips such as **scales** and **gganimate**  
 
 
-The Epi R Handbook contains more examples and more complex plots, for your personal reading  
+The [Epi R Handbook](https://epirhandbook.com/index.html) contains more examples and more complex plots, for your personal reading  
 
 
 
