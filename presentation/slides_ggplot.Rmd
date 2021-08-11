@@ -193,15 +193,19 @@ The [Epi R Handbook](https://epirhandbook.com/index.html) contains more examples
 ---
 # Visualization options in R  
 
-Today we focus on **ggplot2** because:  
+Today we focus on **ggplot2** because it:  
 
-* It is good for fast data exploration of multi-dimensional data  
-* It produces very high quality final outputs  
-* Is accompanied by many packages that expand functionality  
-* Has well-structured grammar = consistency  
+* is good for fast data exploration, especially of multi-dimensional data
+* has well-structured grammar => **high consistency**   
+* produces very **high quality** final outputs  
+* is accompanied by many packages that expand functionality  
+ 
 
-Other plotting options include [**base** R](https://towardsdatascience.com/base-plotting-in-r-eb365da06b22), [**lattice**](https://www.statmethods.net/advgraphs/trellis.html), and [**plotly**](https://plotly.com/r/).  
+Other plotting options include [**base R**](https://towardsdatascience.com/base-plotting-in-r-eb365da06b22), [**lattice**](https://www.statmethods.net/advgraphs/trellis.html), and [**plotly**](https://plotly.com/r/).  
 
+
+??? 
+Should we explicit why consistency is good (the other points being self-explanatory in my opinion)? For me it leads to faster rates of learning: despite ggplot syntax being somewhat obscure for someone who never read a tutorial on it. It means that one you have grasped the basics of the basics, you can learn new geoms extremely fast. Also mix and match geoms in graphs. Also, better retention => less time spend searching the help page/internet because it always work in the same way.
 
 
 
