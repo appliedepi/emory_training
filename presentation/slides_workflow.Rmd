@@ -332,7 +332,7 @@ class: inverse, center, middle
 
 ---
 # Setting the scene  
-### Start with a new R project
+### Start with a new R project  
 
 
 .pull-left[
@@ -361,7 +361,7 @@ class: inverse, center, middle
 
 ---
 # Setting the scene  
-#### Download our [example R project](https://minhaskamal.github.io/DownGit/#/home?url=https://github.com/appliedepi/emory_training/tree/master/case_study)!
+#### Download our [example R project](https://minhaskamal.github.io/DownGit/#/home?url=https://github.com/appliedepi/emory_training/tree/master/case_study)! (be sure to un-zip)
 
 
 We created a dedicated R project, a directory containing:  
