@@ -522,7 +522,7 @@ Remember that although the commands may be long, it is infinitely easier to edit
 
 
 ---
-# Syntax - open the plot  
+# Open the plot  
 
 .pull-left[
 
