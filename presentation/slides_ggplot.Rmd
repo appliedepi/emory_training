@@ -470,7 +470,7 @@ head(linelist, 25) %>%
 **ggplot2** benefits from a wide variety of supplementary R packages that extends its functionalities, such as **gganimate**, **ggthemr**, **ggdendro**, **gghighlight**, **ggforce**...  
 
 .footnote[
-Bonus question: What does the "gg” in these names represent?
+*Bonus question*: What does the "gg” in these names represent?
 ]
 
 ???
