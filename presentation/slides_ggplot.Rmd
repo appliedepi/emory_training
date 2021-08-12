@@ -2680,12 +2680,13 @@ plot(weekly, fill = eth_race)+
 
 You can also use **incidence2** on data that are aggregated counts...  
 
-```{r, eval=T, echo=F}
+```{r, eval=T, echo=T}
 # For demo: aggregate linelist
 # create daily counts
 linelist_day_counts <-linelist %>% 
-  count(day = floor_date(date_report, "day"),
-        died) %>% 
+  count(
+    day = floor_date(date_report, "day"),
+    died) %>% 
   drop_na(day)
 ```
 
@@ -2697,7 +2698,7 @@ A few rows:
 ```{r, eval=T, echo=F}
 linelist_day_counts %>% 
   tail(10) %>% 
-  knitr::kable()
+  knitr::kable(row.names = F)
 ```
 
 ]
@@ -2710,11 +2711,11 @@ linelist_day_counts %>%
 
 .pull-left[
 
-```{r, eval=F, echo=F}
+```{r, eval=F, echo=T}
 died_curve <- incidence(  
   linelist_day_counts,  # dataset with counts aggregated by day
   date_index = day,     # column with dates
-  count = n,            # column with counts
+* count = n,            # column with counts
   interval = "week",    # aggregate daily counts up to weeks
   groups = died         # group by outcome
   )
@@ -2758,7 +2759,6 @@ We suggest two ways to make age pyramids:
 
 2) Use **ggplot2** - more customizeable, but opportunity for error  
 
---
 
 Today we will demonstrate **apyramid**.  
 
@@ -2892,44 +2892,53 @@ labs(
 ]
 
 
-
 ---
 # Dynamic labels example
 
-Let's use these dynamic labels for the demographic pyramid, so that they will update with the data.  
+Let's use dynamic labels that will update with the data.  
 
-For complicated `str_glue()` cases, define the dynamic components outside the quotation marks.  
 
-**Caption**  
-```{r, eval=F, echo=T}
-labs(caption = str_glue(
-  "{missing} cases missing either age or gender are not shown.",
-  missing = linelist %>%
-            filter(is.na(gender) | is.na(age_group)) %>% 
-            nrow()
-  ))
+```{r, eval=T, echo=F}
+library(epikit)
 ```
 
-.footnote[Note you can make data missing age appear at pyramid top with `na.rm = FALSE`]
+**Simple caption**
+```{r, eval=T, echo=T}
+str_glue("n = {nrow(linelist)}")
+```
+
+**Complex caption**  
+
+
+For complicated `str_glue()` scenarios, define the dynamic components outside the quotation marks.  
+
+`fmt_count()` from **epikit** is useful to count and display rows.  
+
+```{r, eval=T, echo=T}
+str_glue("{missing} of cases missing either age or gender are not shown.",
+        missing = epikit::fmt_count(linelist, is.na(gender) | is.na(age_group))
+        )
+```
+
 
 
 ---
 # Dynamic labels example
 
-Let's use these dynamic labels for the demographic pyramid, so that they will update with the data:  
 
 **Subtitle**  
-```{r, eval=F, echo=T}
-labs(
-  subtitle = str_glue(
-    "Fulton County, GA, reported {min_date} - {max_date}",
-  
+
+Max/Min dates can be wrapped in `format()` from **base** to adjust the display. See the epiRhandbook section on [strptime syntax](https://epirhandbook.com/working-with-dates.html?q=strptime#format).  
+
+```{r, eval=T, echo=T}
+str_glue("Fulton County, GA, reported {min_date} - {max_date}",
     min_date = format(min(linelist$date_report, na.rm=T), "%B %d %Y"),
-  
     max_date = format(max(linelist$date_report, na.rm=T), "%B %d %Y")
-  )
-) 
+    )
 ```
+
+
+
 
 
 
@@ -2970,9 +2979,7 @@ labs(
   fill = "Gender",
   caption = str_glue(
     "{missing} cases missing either age or gender are not shown.",
-    missing = linelist %>%
-              filter(is.na(gender) | is.na(age_group)) %>% 
-              nrow())
+    missing = fmt_count(linelist, is.na(gender) | is.na(age_group)))
   )
 ```
 
