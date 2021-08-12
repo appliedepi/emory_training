@@ -335,7 +335,7 @@ class: inverse, center, middle
 
 ---
 # Setting the scene  
-### Start with a new R project
+### Start with a new R project  
 
 
 .pull-left[
@@ -364,7 +364,7 @@ class: inverse, center, middle
 
 ---
 # Setting the scene  
-#### Download our [example R project](https://minhaskamal.github.io/DownGit/#/home?url=https://github.com/appliedepi/emory_training/tree/master/case_study)!
+#### Download our [example R project](https://minhaskamal.github.io/DownGit/#/home?url=https://github.com/appliedepi/emory_training/tree/master/case_study)! (be sure to un-zip)
 
 
 We created a dedicated R project, a directory containing:  
@@ -552,15 +552,12 @@ linelist <- raw_linelist %>%
   # choose variables
   select(date_birth, date_report,  age, gender, zip_code) %>% 
   # parse dates, clean gender, clean erroneous ages
-  mutate(
-    across(
+  mutate(across(
       # apply to columns containing the string 'date'
-      .cols = across(.cols = contains("date")),  #<<
+      .cols = contains("date"),  #<<
       # apply as.Date() function to all selected columns
       .fns = ~as.Date(.x)  #<<
-    )
-  ) 
-
+    )) 
 ```
 
 
@@ -572,10 +569,10 @@ linelist <- raw_linelist %>%
 
 --
 
-- Make sure values in common columns are aligned
+- Make sure values in common columns are aligned exactly  
   + Follow the principles of categorical variable cleaning
-  + Use `dplyr::unique()`
-
+  + Use `dplyr::unique()` to verify  
+  
 --
 
 - Use the correct join type from `{tidyr}` package
@@ -636,32 +633,38 @@ background-position: 50% 65%
 
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
 
-cases_by_zip <- tibble(
+cases_by_county <- tibble(
      date_report = ymd("2020-12-20", "2020-12-21", "2020-12-20", "2020-12-20"),
-     zip_code = c("30326", "30326", "30311", "zip: 30312"),
-     new_cases = c(20, 16, 10, 43)
+     county = c("Fulton", "Fulton cty", "DeKalb", "Forsyth"),
+     # zip_code = c("30326", "30326", "30311", "zip: 30312"),
+     new_cases = c(2032, 1624, 1091, 438)
+)
+
+counties <- tibble(
+  County = c("Fulton", "DeKalb", "Forsyth", "Gwinnett", "Bibb"),
+  Population = c(950000, 710000, 180000, 820000, 160000)
 )
 
 
-zipcodes <- sf::read_sf(
-     here::here("case_study", "data", "covid_example_data", "covid_shapefile", "FultonCountyZipCodes.shp")
-) %>% 
-     as_tibble() %>% 
-     select(ZipCode, Population) %>% 
-     mutate(ZipCode = as.double(ZipCode)) %>% 
-     filter(ZipCode %in% c(30311, 30326, 30312, 30213, 30304))
+# zipcodes <- sf::read_sf(
+#      here::here("case_study", "data", "covid_example_data", "covid_shapefile", "FultonCountyZipCodes.shp")
+# ) %>% 
+#      as_tibble() %>% 
+#      select(ZipCode, Population) %>% 
+#      mutate(ZipCode = as.double(ZipCode)) %>% 
+#      filter(ZipCode %in% c(30311, 30326, 30312, 30213, 30304)) 
 
 ```
 
 
 
 .pull-left[
-**Table 1**
+**Table 1:** `cases_by_county`  
 
 ```{r, echo = FALSE}
-cases_by_zip %>% 
-     mutate(zip_code = kableExtra::cell_spec(zip_code, 
-                                             background = ifelse(str_detect(zip_code, "zip"), "#d73027", "#31a354"),
+cases_by_county %>% 
+     mutate(county = kableExtra::cell_spec(county, 
+                                             background = ifelse(str_detect(county, "cty"), "#d73027", "#31a354"),
                                              color = "white")) %>% 
      knitr::kable(format = 'html', escape = FALSE)
 ```
@@ -669,11 +672,11 @@ cases_by_zip %>%
 ]
 
 .pull-right[
-**Table 2**
+**Table 2:** `counties`  
 
 ```{r, echo = FALSE}
-zipcodes %>% 
-     mutate(ZipCode = kableExtra::cell_spec(ZipCode, 
+counties %>% 
+     mutate(County = kableExtra::cell_spec(County, 
                                             background = "#31a354",
                                             color = "white"))  %>% 
      knitr::kable(format = 'html', escape = FALSE)
@@ -685,9 +688,9 @@ zipcodes %>%
 <br> </br>
 
 ```{r, eval = TRUE, echo = TRUE}
-cases_by_zip <- cases_by_zip %>% 
+cases_by_county <- cases_by_county %>% 
   # clean the column we are merging by
-  mutate(zip_code = as.numeric(str_remove(zip_code, "zip: ")))
+  mutate(county = str_remove(county, " cty"))
 ```
 
 
@@ -696,15 +699,15 @@ cases_by_zip <- cases_by_zip %>%
 # Merging data
 
 ```{r, echo = TRUE, message = FALSE, message = TRUE}
-cases_by_zip <- cases_by_zip %>% 
+cases_by_county <- cases_by_county %>% 
   # merge zipcodes with aggregated case data
-  left_join(zipcodes, by = c("zip_code" = "ZipCode")) %>% 
+  left_join(counties, by = c("county" = "County")) %>% 
   # calculate case incidence
   mutate(cases_per_10k = new_cases / Population * 10000)
 ```
 
 ```{r, echo = FALSE}
-cases_by_zip %>% 
+cases_by_county %>% 
   knitr::kable(format = 'html')
 ```
 
@@ -715,7 +718,7 @@ cases_by_zip %>%
 
 --
 
-- Group over key variable(s) to:
+- Group rows in key variable(s) to:
  + Calculate totals
  + Calculate percents
 
@@ -921,6 +924,20 @@ linelist_raw %>%
   )
 
 ```
+
+
+
+---
+
+# Thank you for your service  
+
+We know personally how exhausting it is to work on COVID-19 response.  
+
+**Thank you** for your dedication to public service and epidemiology in these trying and historic times.  
+
+???
+We are seeking to make small improvements to the lives of epidemiologists 
+
 
 
 ---
