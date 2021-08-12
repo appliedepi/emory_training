@@ -27,11 +27,11 @@ knitr::opts_chunk$set(
 # Applied Epi  
 
 
-<img src = "https://github.com/appliedepi/epiRhandbook_eng/raw/master/images/epiRhandbook_HexSticker_500x500.png" height = "200" align = "right">
+<img src = "https://github.com/appliedepi/emory_training/raw/master/presentation/images/AppliedEpi_Hex_sub.png" height = "200" align = "right">
 
-**Applied Epi** is the non-profit that wrote the [Epidemiologist R Handbook](www.epirhandbook.com), a free R reference manual for applied epidemiology and public health which has been used by 50,000 people around the world.  
+**Applied Epi** is the non-profit organization that wrote the [Epidemiologist R Handbook](www.epirhandbook.com), a free R reference manual for applied epidemiology and public health which has been used by 50,000 people around the world.  
 
-Contact **epiRhandbook@gmail.com** to schedule R demonstrations, interactive trainings, Intro-to-R workshops, or "help desk" services from R experts who know applied epi!  
+Contact **epiRhandbook@gmail.com** to schedule R demonstrations, interactive training sessions, Intro-to-R workshops, or to subscribe to "help desk" support services from R experts who know applied epi!  
 
 
 
