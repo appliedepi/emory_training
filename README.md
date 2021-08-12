@@ -59,8 +59,8 @@ in an R markdown report
 
 -   [Analytical workflow presentation
     slides](https://appliedepi.github.io/emory_training/presentation/slides_workflow.html)
--   [Case study R markdnwon script (download
-    zip)](https://minhaskamal.github.io/DownGit/#/home?url=https://github.com/appliedepi/emory_training/tree/master/case_study)
+-   [Case study R project (zip download of example data and R markdown
+    script)](https://minhaskamal.github.io/DownGit/#/home?url=https://github.com/appliedepi/emory_training/tree/master/case_study)
 
 Session 2: Data visualization with **ggplot2**
 
