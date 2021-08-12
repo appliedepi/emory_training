@@ -61,7 +61,7 @@ style_mono_accent(
   title_slide_background_position = "100% 100%", 
   title_slide_background_size = "25%", 
   ## add logo to all following slides
-  background_image = "https://github.com/appliedepi/epiRhandbook_eng/raw/master/images/epiRhandbook_HexSticker_500x500.png", 
+  background_image = "https://github.com/appliedepi/emory_training/raw/master/presentation/images/AppliedEpi_Hex.png", 
   background_size = "10%",
   background_position = "100% 0%"
 )
@@ -107,7 +107,7 @@ style_mono_accent(
 
 * **Neale Batra**  
  - Founder of the Epi R Handbook.  
- - Previously @Philly, @SantaClaraCounty, and @USAID/PEPFAR. Internationally with @MSF and @WHO.  
+ - Previously @Philly, @SantaClaraCounty, @WHO, @CDC, @USAID/PEPFAR, @MSF.  
 * **Alex Spina**  
  - Alum of EPIET (European EIS). Med student and epi consultant for @MSF and @WHO.  
 * **Mathilde Mousset**  
@@ -115,7 +115,7 @@ style_mono_accent(
 * **Henry Laurenson-Schafer**  
  - Epi/data scientist with WHO Geneva on COVID response. PhD in molecular biology/bioinformatics.  
 * **Wen Lin** 
- - Epi @SantaClaraCounty, **Resident SAS expert**. 
+ - Senior epi @SantaClaraCounty, **Resident SAS expert**. 
 
 ???
 We have Wen available for answering any questions on translating SAS to R 
