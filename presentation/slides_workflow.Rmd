@@ -320,17 +320,22 @@ class: inverse, center, middle
 ### COVID-19 epidemiological report for Fulton County
 
 ---
-# Setting the scene 
+# Setting the scene
+
+.pull-left[
 
 - You are the local epi tasked with automating the weekly situation report  
-
   - We are going to reproduce [Fulton County epidemiology reports](https://www.fultoncountyga.gov/covid-19/epidemiology-reports)  
-  
   - We have pre-packaged an example **R-project** folder 
-  
   - Walk-through from start to finish 
 
-![](https://github.com/appliedepi/emory_training/blob/master/presentation/images/fulton_report.png?raw=true)
+]
+
+.pull-right[
+
+![](https://github.com/appliedepi/emory_training/blob/master/presentation/images/fulton_report.PNG?raw=true)
+
+]
 
 
 ---
@@ -629,7 +634,7 @@ linelist_raw %>%
 
 - Make sure values in common columns are aligned exactly  
   + Follow the principles of categorical variable cleaning
-  + Use `dplyr::unique()` to verify  
+  + Use `unique()` to verify  
   
 --
 
@@ -855,7 +860,7 @@ linelist_reg <- linelist %>%
   # set reference values
   mutate(
     outcome = fct_relevel(outcome, c("Recovered", "Died")), #<<
-    gender  = fct_relevel(gender, c("Female", "Male", "Unknown")), #<<
+    gender  = fct_relevel(gender, c("Female", "Male")), #<<
     fever   = fct_relevel(fever, c("No", "Yes")) #<<
   )
   
