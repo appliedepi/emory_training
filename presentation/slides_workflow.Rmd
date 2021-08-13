@@ -560,7 +560,65 @@ linelist <- raw_linelist %>%
     )) 
 ```
 
+---
+# Descriptive analysis
 
+- We want to produce descriptive *tables* and plots
+
+--
+
+- Group rows in key variable(s) to:
+ + Calculate totals
+ + Calculate percents
+
+--
+
+- Key packages:
+ + `{janitor}`
+ + `{dplyr}`
+ + `{gtsummary}`
+ 
+
+.footnote[
+
+See the [EpiRHandbook section on descriptive tables](https://epirhandbook.com/descriptive-tables.html)
+
+]
+
+---
+# Descriptive analysis
+
+```{r, eval = FALSE, echo = TRUE, message = FALSE, warning = FALSE}
+
+linelist %>% 
+  # get counts and percentages 
+  janitor::tabyl(gender) %>% 
+  
+  # add the overall counts as a row
+  janitor::adorn_totals() %>%  
+  
+  # change from proportions to percentages (do not add a % sign)
+  janitor::adorn_pct_formatting(affix_sign = FALSE)
+
+```
+
+
+```{r, eval = TRUE, echo = FALSE, message = FALSE, warning = FALSE}
+
+linelist_raw %>% 
+  mutate(gender = replace_na(case_gender, "Unknown")) %>% 
+  
+  # get counts and percentages 
+  tabyl(gender) %>% 
+  
+  # add the overall counts as a row
+  adorn_totals() %>%  
+  
+  # change from proportions to percentages (do not add a % sign)
+  adorn_pct_formatting(affix_sign = FALSE) %>% 
+  knitr::kable()
+
+```
 
 ---
 # Merging data  
@@ -711,65 +769,6 @@ cases_by_county %>%
   knitr::kable(format = 'html')
 ```
 
----
-# Descriptive analysis
-
-- We want to produce descriptive *tables* and plots
-
---
-
-- Group rows in key variable(s) to:
- + Calculate totals
- + Calculate percents
-
---
-
-- Key packages:
- + `{janitor}`
- + `{dplyr}`
- + `{gtsummary}`
- 
-
-.footnote[
-
-See the [EpiRHandbook section on descriptive tables](https://epirhandbook.com/descriptive-tables.html)
-
-]
----
-
-# Descriptive analysis
-
-```{r, eval = FALSE, echo = TRUE, message = FALSE, warning = FALSE}
-
-linelist %>% 
-  # get counts and percentages 
-  janitor::tabyl(gender) %>% 
-  
-  # add the overall counts as a row
-  janitor::adorn_totals() %>%  
-  
-  # change from proportions to percentages (do not add a % sign)
-  janitor::adorn_pct_formatting(affix_sign = FALSE)
-
-```
-
-
-```{r, eval = TRUE, echo = FALSE, message = FALSE, warning = FALSE}
-
-linelist_raw %>% 
-  mutate(gender = replace_na(case_gender, "Unknown")) %>% 
-  
-  # get counts and percentages 
-  tabyl(gender) %>% 
-  
-  # add the overall counts as a row
-  adorn_totals() %>%  
-  
-  # change from proportions to percentages (do not add a % sign)
-  adorn_pct_formatting(affix_sign = FALSE) %>% 
-  knitr::kable()
-
-```
 
 ---
 # Simple statistics
