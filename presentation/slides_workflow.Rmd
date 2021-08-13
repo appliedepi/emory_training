@@ -152,6 +152,11 @@ We also assume you have reviewed the Handbook pages on [R Basics](https://epirha
     
 Prioritised report generation -> simpler code in the Handbook 
 
+.center[
+
+**Questions, Questions, Questions!**
+
+]
 
 ---
 class: inverse, center, middle
