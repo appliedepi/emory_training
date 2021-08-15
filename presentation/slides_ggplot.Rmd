@@ -17,6 +17,7 @@ output:
 
 ```{r, echo=F}
 # You need to run this line once, for the slides to render 
+# remotes::install_github("mitchelloharawild/icons")
 # icons::download_fontawesome()
 
 # Use this command to run preview-mode in RStudio. Save Rmd to update slide preview
@@ -1371,13 +1372,13 @@ ggplot(
 
 .pull-left[
 
-Another way of displaying groups is via faceting.  
+Another way of *displaying groups* is via faceting.  
 
 ```{r , echo = TRUE, eval = FALSE, tidy = FALSE}
 ggplot(
   data = linelist,
   mapping = aes(x = date_onset)) +
-geom_histogram() +
+  geom_histogram() +
 *facet_wrap(~eth_race)
 ```
 
@@ -1402,7 +1403,7 @@ ggplot(data = linelist,
 
 .pull-left[
 
-"Free" axes by setting `scales=` to "free_y", "free_x", or "free".  
+Free-ranging axes:  
 
 ```{r , echo = TRUE, eval = FALSE, tidy = FALSE}
 ggplot(
@@ -1412,10 +1413,17 @@ geom_histogram() +
 *facet_wrap(~ eth_race, scales = "free_y") #<<
 ```
 
+`scales=` settings:  
+- "free_y"  
+- "free_x"   
+- "free" (both x and y)  
+
 ] 
 
 .footnote[
-Alert your audience if you free an axis! Also, try `ncol=` and `nrow=`. 
+Alert your audience if you free an axis! 
+
+Also, try `ncol=` and `nrow=`. 
 ]
 
 
@@ -1424,7 +1432,8 @@ Alert your audience if you free an axis! Also, try `ncol=` and `nrow=`.
 ggplot(data = linelist,
        mapping = aes(x = date_onset)) +
   geom_histogram() +
-  facet_wrap(~ eth_race, scales = "free_y")
+  facet_wrap(~ eth_race, scales = "free_y") +
+  labs(caption = "Note the free y-axis")
 ```
 
 ]
@@ -1437,6 +1446,8 @@ ggplot(data = linelist,
 
 
 .pull-left[
+
+**Facetting by two variables:**   
 
 To generate one graph per race/ethnicity AND gender:  
 
@@ -1444,15 +1455,16 @@ To generate one graph per race/ethnicity AND gender:
 ggplot(
   data = linelist,
   mapping = aes(x = date_onset)) +
-geom_histogram() +
-*facet_wrap(gender ~ eth_race) 
+  geom_histogram() +
+  *facet_wrap(gender ~ eth_race) 
 ```
 
 The "~" signifies "by"  
 
-] 
 
-By using `facet_wrap()` the plots appear sequentially by alphabet/factor level. Facet titles are combined.  
+Plots appear sequentially by alphabet/factor level. Facet titles are combined.  
+
+] 
 
 
 .pull-right[
@@ -1460,8 +1472,8 @@ By using `facet_wrap()` the plots appear sequentially by alphabet/factor level. 
 ggplot(
   data = linelist,
   mapping = aes(x = date_onset)) +
-geom_histogram() +
-facet_wrap(gender ~ eth_race)
+  geom_histogram() +
+  facet_wrap(gender ~ eth_race)
 ```
 
 ]
@@ -1475,15 +1487,18 @@ facet_wrap(gender ~ eth_race)
 
 .pull-left[
 
-Try `facet_grid()` to show two variables in a grid. Note the labels along the sides.  
+**Show two variables in a grid: `facet_grid()`.   
+
 
 ```{r , echo = TRUE, eval = FALSE, tidy = FALSE}
 ggplot(
   data = linelist,
   mapping = aes(x = date_onset)) +
-geom_histogram() +
-*facet_grid(gender ~ eth_race) 
+  geom_histogram() +
+  *facet_grid(gender ~ eth_race) 
 ```
+
+*Note the labels along the sides.*
 
 ] 
 
@@ -1493,8 +1508,8 @@ geom_histogram() +
 ggplot(
   data = linelist,
   mapping = aes(x = date_onset)) +
-geom_histogram() +
-facet_grid(gender ~ eth_race)
+  geom_histogram() +
+  facet_grid(gender ~ eth_race)
 ```
 
 ]
@@ -1506,12 +1521,15 @@ facet_grid(gender ~ eth_race)
 
 .pull-left[
 
-You can `filter()` or `drop_na()` in advance, to remove undesired levels  
+**Dropping levels you don't want**
+
+
+* You can `filter()` or `drop_na()` in advance, to remove undesired levels  
 
 ```{r , echo = TRUE, eval = FALSE, tidy = FALSE}
 linelist %>% 
-  drop_na(gender, eth_race) %>% 
-  filter(gender != "Unknown") %>% 
+  *drop_na(gender, eth_race) %>% 
+  *filter(gender != "Unknown") %>% 
   
   # begin plot
   ggplot(
@@ -1538,6 +1556,23 @@ linelist %>%
 
 ]
 
+# Facets/small-multiples
+
+
+.pull-left[
+
+**Dropping empty levels or not?**
+
+By default, `facet_grid` and `facet_wrap` drop unused levels/categories. 
+
+Change `drop=` to `FALSE` to keep the empty facet
+]
+
+
+.pull-right[
+
+
+]
 
 
 ---
@@ -1552,17 +1587,13 @@ ggplot(
   data = linelist,
   mapping = aes(
     x = date_onset,
-*   fill = eth_race)) +
-geom_histogram() +
-facet_wrap(~ eth_race)+
-*gghighlight::gghighlight()
+    *fill = eth_race)) +
+  geom_histogram() +
+  facet_wrap(~ eth_race) +
+  *gghighlight::gghighlight()
 ```
 
 ] 
-
-.footnote[
-Try `gghighlight()` with other plots! 
-]
 
 
 .pull-right[
@@ -1572,14 +1603,16 @@ ggplot(
   mapping = aes(
     x = date_onset,
     fill = eth_race)) +
-geom_histogram() +
-facet_wrap(~ eth_race)+
-gghighlight::gghighlight()
+  geom_histogram() +
+  facet_wrap(~ eth_race) +
+  gghighlight::gghighlight()
 ```
 
 ]
 
-
+.footnote[
+Try `gghighlight()` with other plots! 
+]
 
 
 
@@ -1603,7 +1636,8 @@ linelist %>%
       y = n,
       color = age_group))+
   geom_line()+
-* gghighlight::gghighlight(age_group %in% c("40-49", "60-69)"))+
+* gghighlight::gghighlight(age_group %in% 
+                             c("40-49", "60-69)"))+
   theme(legend.position = "none")
   
 ```
