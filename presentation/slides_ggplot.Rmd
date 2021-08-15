@@ -1487,15 +1487,18 @@ ggplot(
 
 .pull-left[
 
-Try `facet_grid()` to show two variables in a grid. Note the labels along the sides.  
+**Show two variables in a grid: `facet_grid()`.   
+
 
 ```{r , echo = TRUE, eval = FALSE, tidy = FALSE}
 ggplot(
   data = linelist,
   mapping = aes(x = date_onset)) +
-geom_histogram() +
-*facet_grid(gender ~ eth_race) 
+  geom_histogram() +
+  *facet_grid(gender ~ eth_race) 
 ```
+
+*Note the labels along the sides.*
 
 ] 
 
@@ -1505,8 +1508,8 @@ geom_histogram() +
 ggplot(
   data = linelist,
   mapping = aes(x = date_onset)) +
-geom_histogram() +
-facet_grid(gender ~ eth_race)
+  geom_histogram() +
+  facet_grid(gender ~ eth_race)
 ```
 
 ]
