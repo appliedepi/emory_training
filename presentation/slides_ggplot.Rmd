@@ -1447,21 +1447,24 @@ ggplot(data = linelist,
 
 .pull-left[
 
+**Facetting by two variables:**   
+
 To generate one graph per race/ethnicity AND gender:  
 
 ```{r , echo = TRUE, eval = FALSE, tidy = FALSE}
 ggplot(
   data = linelist,
   mapping = aes(x = date_onset)) +
-geom_histogram() +
-*facet_wrap(gender ~ eth_race) 
+  geom_histogram() +
+  *facet_wrap(gender ~ eth_race) 
 ```
 
 The "~" signifies "by"  
 
-] 
 
-By using `facet_wrap()` the plots appear sequentially by alphabet/factor level. Facet titles are combined.  
+Plots appear sequentially by alphabet/factor level. Facet titles are combined.  
+
+] 
 
 
 .pull-right[
@@ -1469,8 +1472,8 @@ By using `facet_wrap()` the plots appear sequentially by alphabet/factor level. 
 ggplot(
   data = linelist,
   mapping = aes(x = date_onset)) +
-geom_histogram() +
-facet_wrap(gender ~ eth_race)
+  geom_histogram() +
+  facet_wrap(gender ~ eth_race)
 ```
 
 ]
