@@ -1595,10 +1595,6 @@ ggplot(
 
 ] 
 
-.footnote[
-Try `gghighlight()` with other plots! 
-]
-
 
 .pull-right[
 ```{r }
@@ -1614,7 +1610,9 @@ ggplot(
 
 ]
 
-
+.footnote[
+Try `gghighlight()` with other plots! 
+]
 
 
 
@@ -1638,7 +1636,8 @@ linelist %>%
       y = n,
       color = age_group))+
   geom_line()+
-* gghighlight::gghighlight(age_group %in% c("40-49", "60-69)"))+
+* gghighlight::gghighlight(age_group %in% 
+                             c("40-49", "60-69)"))+
   theme(legend.position = "none")
   
 ```
