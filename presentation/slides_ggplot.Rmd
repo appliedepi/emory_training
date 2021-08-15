@@ -1587,10 +1587,10 @@ ggplot(
   data = linelist,
   mapping = aes(
     x = date_onset,
-*   fill = eth_race)) +
-geom_histogram() +
-facet_wrap(~ eth_race)+
-*gghighlight::gghighlight()
+    *fill = eth_race)) +
+  geom_histogram() +
+  facet_wrap(~ eth_race) +
+  *gghighlight::gghighlight()
 ```
 
 ] 
@@ -1607,9 +1607,9 @@ ggplot(
   mapping = aes(
     x = date_onset,
     fill = eth_race)) +
-geom_histogram() +
-facet_wrap(~ eth_race)+
-gghighlight::gghighlight()
+  geom_histogram() +
+  facet_wrap(~ eth_race) +
+  gghighlight::gghighlight()
 ```
 
 ]
