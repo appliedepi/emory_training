@@ -1556,6 +1556,23 @@ linelist %>%
 
 ]
 
+# Facets/small-multiples
+
+
+.pull-left[
+
+**Dropping empty levels or not?**
+
+By default, `facet_grid` and `facet_wrap` drop unused levels/categories. 
+
+Change `drop=` to `FALSE` to keep the empty facet
+]
+
+
+.pull-right[
+
+
+]
 
 
 ---
