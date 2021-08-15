@@ -1403,7 +1403,7 @@ ggplot(data = linelist,
 
 .pull-left[
 
-"Free" axes by setting `scales=` to "free_y", "free_x", or "free".  
+Free-ranging axes:  
 
 ```{r , echo = TRUE, eval = FALSE, tidy = FALSE}
 ggplot(
@@ -1413,10 +1413,17 @@ geom_histogram() +
 *facet_wrap(~ eth_race, scales = "free_y") #<<
 ```
 
+`scales=` settings:  
+- "free_y"  
+- "free_x"   
+- "free" (both x and y)  
+
 ] 
 
 .footnote[
-Alert your audience if you free an axis! Also, try `ncol=` and `nrow=`. 
+Alert your audience if you free an axis! 
+
+Also, try `ncol=` and `nrow=`. 
 ]
 
 
