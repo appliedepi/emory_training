@@ -17,6 +17,7 @@ output:
 
 ```{r, echo=F}
 # You need to run this line once, for the slides to render 
+# remotes::install_github("mitchelloharawild/icons")
 # icons::download_fontawesome()
 
 # Use this command to run preview-mode in RStudio. Save Rmd to update slide preview
