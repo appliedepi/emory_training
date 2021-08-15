@@ -1521,12 +1521,15 @@ ggplot(
 
 .pull-left[
 
-You can `filter()` or `drop_na()` in advance, to remove undesired levels  
+**Dropping levels you don't want**
+
+
+* You can `filter()` or `drop_na()` in advance, to remove undesired levels  
 
 ```{r , echo = TRUE, eval = FALSE, tidy = FALSE}
 linelist %>% 
-  drop_na(gender, eth_race) %>% 
-  filter(gender != "Unknown") %>% 
+  *drop_na(gender, eth_race) %>% 
+  *filter(gender != "Unknown") %>% 
   
   # begin plot
   ggplot(
