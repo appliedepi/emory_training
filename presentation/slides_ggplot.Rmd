@@ -1372,13 +1372,13 @@ ggplot(
 
 .pull-left[
 
-Another way of displaying groups is via faceting.  
+Another way of *displaying groups* is via faceting.  
 
 ```{r , echo = TRUE, eval = FALSE, tidy = FALSE}
 ggplot(
   data = linelist,
   mapping = aes(x = date_onset)) +
-geom_histogram() +
+  geom_histogram() +
 *facet_wrap(~eth_race)
 ```
 
