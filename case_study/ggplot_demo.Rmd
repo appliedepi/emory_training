@@ -1,0 +1,332 @@
+---
+title: "ggplot2 demo"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      warning = FALSE,
+                      message = FALSE)
+```
+
+This script includes the R code to produce the **ggplot2** figures in these [presentation slides](https://appliedepi.github.io/emory_training/presentation/slides_ggplot.html) 
+
+# Load packages
+
+```{r, warning=F, message=F}
+pacman::p_load(
+  rio,            # import/export
+  here,           # file locator
+  DT,             # interactive tables for this report
+  lubridate,      # working with dates
+  incidence2,     # epidemic curves
+  apyramid,       # demographic pyramids
+  gghighlight,    # specialized highlight plots
+  ggrepel,        # smart labels
+  scales,         # formatting of scales
+  cowplot,        # combining plots
+  ggplotly,       # interactive plots
+  tidyverse       # mega-package for data management and visualization
+  )
+```
+
+
+# Import cleaned linelist data
+
+```{r}
+linelist <- import(here::here("data", "covid_example_data", "linelist_cleaned.rds"))
+```
+
+
+# Review first rows of data
+
+```{r}
+head(linelist, 25) %>% 
+  DT::datatable(
+    options = list(
+      scrollY = 300,
+      scrollX = 600,
+      pageLength = 25,
+      fontSize = '25%',
+      dom = "ti",
+      ordering = FALSE,
+      rownames = FALSE,
+      options = list(pageLength = 5, scrollX=T),
+      class = 'white-space: nowrap' 
+    )
+  )
+```
+
+
+
+# Empty ggplot  
+
+```{r}
+ggplot(data = linelist)
+```
+
+# Add axis mappings  
+
+```{r}
+ggplot(data = linelist,
+       mapping = aes(
+         x = age,
+         y = days_hosp))
+  
+```
+
+
+# Add geometry  
+
+```{r}
+ggplot(
+  data = linelist,
+  mapping = aes(
+    x = age,
+    y = days_hosp))+
+geom_point()
+```
+
+# Add further geometry
+
+```{r}
+ggplot(
+  data = linelist,
+  mapping = aes(
+    x = age,
+    y = days_hosp)) +
+geom_point() +
+geom_smooth()
+```
+
+
+# Static aesthetic
+
+```{r}
+ggplot(
+  data = linelist,
+  mapping = aes(
+     x = age,
+     y = days_hosp)) +
+geom_point(color = "seagreen")
+```
+
+# Dynamic aesthetics  
+
+```{r}
+ggplot(
+  data = linelist,
+  mapping = aes(
+    x = age,
+    y = days_hosp,
+    color = died)) +   
+geom_point()
+```
+
+
+# Static and dynamic aesthetics
+
+```{r}
+ggplot(
+  data = linelist,
+  mapping = aes(
+    x = age,
+    y = days_hosp,
+    color = died))+ # color varies by outcome
+geom_point(size = 7,    # all points 7x size
+           alpha = 0.7) # transparency    
+```
+
+
+# A common error:  
+
+```{r}
+# create data
+outcome_time_data <- linelist %>% 
+  group_by(died,
+           week_onset = lubridate::floor_date(date_onset, "week")) %>% 
+  summarise(n_cases = n()) %>%
+
+  select(week_onset, everything()) %>% 
+  arrange(week_onset) %>% 
+  drop_na(week_onset)
+
+# Show top
+outcome_time_data %>%
+  head() %>% 
+  knitr::kable()
+
+# plot with error
+ggplot(
+  data = outcome_time_data,
+  mapping = aes(
+    x = week_onset,       
+    y = n_cases)) +
+  geom_line() +
+  labs(title = "Weekly cases, by outcome (?)")
+
+# plot resolved
+ggplot(
+  data = outcome_time_data,
+  mapping = aes(
+    x = week_onset,       
+    y = n_cases,
+    color = died)) +
+  geom_line() +
+  labs(title = "Weekly cases, by outcome")
+
+```
+
+
+
+# Facets/small multiples
+
+```{r}
+
+# facet wrap by ethnicity/race value
+ggplot(data = linelist,
+       mapping = aes(x = date_onset)) +
+  geom_histogram() +
+  facet_wrap(~ eth_race)
+
+# facet wrap with free y-axes
+ggplot(data = linelist,
+       mapping = aes(x = date_onset)) +
+  geom_histogram() +
+  facet_wrap(~ eth_race, scales = "free_y") +
+  labs(caption = "Note the free y-axis")
+
+# facet wrap with two variables
+ggplot(
+  data = linelist,
+  mapping = aes(x = date_onset)) +
+  geom_histogram() +
+  facet_wrap(gender ~ eth_race)
+
+# facet grid with two variables
+ggplot(
+  data = linelist,
+  mapping = aes(x = date_onset)) +
+  geom_histogram() +
+  facet_grid(gender ~ eth_race)
+
+
+# drop levels you do not want
+linelist %>% 
+  drop_na(gender, eth_race) %>% 
+  filter(gender != "Unknown") %>% 
+  
+  ggplot(
+    mapping = aes(x = date_onset)) +
+  geom_histogram() +
+  facet_grid(gender ~ eth_race)
+
+
+
+
+```
+
+
+
+# gghighlight
+
+```{r}
+
+# facets with gghighlight and fill
+ggplot(
+  data = linelist,
+  mapping = aes(
+    x = date_onset,
+    fill = eth_race)) +
+  geom_histogram() +
+  facet_wrap(~ eth_race) +
+  gghighlight::gghighlight()
+
+
+# geom_line with gghighlight
+linelist %>% 
+  # get daily counts by zip code
+  group_by(age_group, date_report) %>%
+  count() %>% 
+  
+  # plot
+  ggplot(
+    mapping = aes(
+      x = date_report,
+      y = n,
+      color = age_group)) +
+  geom_line()+
+  gghighlight::gghighlight(age_group %in% c("40-49", "60-69")) +
+  theme(legend.position = "none")
+```
+
+
+# Scales - default
+
+```{r}
+ggplot(linelist) +
+  geom_bar(aes(x = eth_race, fill = died)) +
+  theme_gray(base_size = 18)
+```
+
+
+# Scales - adjusted fill  
+
+```{r}
+ggplot(linelist) +
+geom_bar(aes(x = eth_race, fill = died)) +
+scale_fill_manual(        
+  values = c("Yes" = "violetred", 
+             "No" = "aquamarine",
+            "Unknown" = "grey")) +
+theme_gray(base_size = 18)
+```
+
+# Scales - adjusted y-axis  
+
+```{r}
+ggplot(linelist) +
+geom_bar(aes(x = eth_race, fill = died)) +
+scale_fill_manual(        
+  values = c("Yes" = "violetred", 
+             "No" = "aquamarine",
+            "Unknown" = "grey")) +
+scale_y_continuous(
+  breaks = seq(from = 0,
+               to = 35000,
+               by = 5000)) +
+theme_gray(base_size = 18)
+```
+
+# Scales - adjusted expansion
+
+```{r}
+ggplot(linelist) +
+geom_bar(aes(x = eth_race, fill = died))+
+scale_fill_manual(        
+  values = c("Yes" = "violetred", 
+             "No" = "aquamarine",
+            "Unknown" = "grey")) +
+scale_y_continuous(
+  breaks = seq(from = 0,
+               to = 35000,
+               by = 5000),
+  expand = c(0,0)) +
+scale_x_discrete(
+  expand = c(0,0)) +
+theme_grey(base_size = 18)
+```
+
+# Scales - date axis
+
+```{r}
+ggplot(linelist) +
+geom_histogram(aes(x = date_onset)) +
+scale_x_date(
+  date_breaks = "3 months",
+  date_labels = "%d %b\n%Y"
+) +
+theme_grey(base_size = 18)
+
+```
+

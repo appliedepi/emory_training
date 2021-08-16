@@ -138,11 +138,10 @@ Today's demonstration will include:
 * Smart text labels for data  
 * Epidemic curves with **incidence2**    
 * Demographic pyramids with **apyramid**  
-* Highlighting with **gghighlight**  
-* Advanced tips such as **scales** and **gganimate**  
+* Advanced tips such as using **gghighlight**, **scales** and **ggplotly**  
 
 
-The Epi R Handbook contains more examples and more complex plots, for your personal reading  
+The [Epi R Handbook](https://epirhandbook.com/index.html) contains more examples and more complex plots, for your personal reading  
 
 
 
@@ -153,12 +152,13 @@ The Epi R Handbook contains more examples and more complex plots, for your perso
 ---
 # Visualization options in R  
 
-Today we focus on **ggplot2** because:  
+Today we focus on **ggplot2** because it:  
 
-* It is good for fast data exploration of multi-dimensional data  
-* It produces very high quality final outputs  
-* Is accompanied by many packages that expand functionality  
-* Has well-structured grammar = consistency  
+* is good for fast data exploration of multi-dimensional data  
+* produces very **high quality** final outputs  
+* has well-structured grammar =&gt; **high consistency**  
+* is accompanied by many packages that expand functionality  
+
 
 Other plotting options include [**base** R](https://towardsdatascience.com/base-plotting-in-r-eb365da06b22), [**lattice**](https://www.statmethods.net/advgraphs/trellis.html), and [**plotly**](https://plotly.com/r/).  
 
@@ -176,11 +176,12 @@ Other plotting options include [**base** R](https://towardsdatascience.com/base-
 ---
 # Directory structure  
 
-Today's R work is conducted within a dedicated R project, which is a directory that contains:  
+Today's work is conducted within a dedicated R project, which can be [downloaded as a zipped file](https://minhaskamal.github.io/DownGit/#/home?url=https://github.com/appliedepi/emory_training/tree/master/case_study):  
 
 R project file (`case_study.Rproj`)  
   * `data/` folder  
     * `covid_example_data.xlsx`  
+    * `linelist_cleaned.rds`  
     * `covid_shapefile/` folder  
       - `FultonCountryZipCode.shp`...
   * `ggplot_demo.Rmd` (R markdown script)  
@@ -231,9 +232,11 @@ One tip is to load tidyverse last to avoid masking of package names
 
 ---
 
-# Import data
+# Import and clean data
 
-Today we begin with a clean dataset in order to focus on visualization techniques. See the R markdown script from the previous session for all the cleaning code.  
+
+
+Today we begin with the cleaned linelist in order to focus on visualization techniques. See the R markdown script from the previous session for all the cleaning code.  
 
 * Use `import()` from **rio** to import a file  
 * Use `here()` from **here** to locate the file relative to the R project root
@@ -242,19 +245,11 @@ Today we begin with a clean dataset in order to focus on visualization technique
 
 
 ```r
-linelist_raw &lt;- import(here::here("data", "covid_example_data.xlsx"))
+linelist &lt;- import(here::here("data", "covid_example_data", "linelist_cleaned.rds"))
 ```
 
 
-.footnote[The `import()` function can import almost any kind of file. If using the example data, adjust this file path according to your directory structure
-]
-
-
-
-
-
-
-
+.footnote[The `import()` function can import almost any kind of file. An `.rds` file retains column classes from an R data frame.]
 
 
 
@@ -269,8 +264,8 @@ class: medium-large-table
 
 Below are the first 25 rows of the `linelist` data frame:  
 
-<div id="htmlwidget-74ca870bcdeb9eb74e6d" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-74ca870bcdeb9eb74e6d">{"x":{"filter":"none","data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25"],["2020-03-22","2020-02-01","2020-02-10","2020-03-20","2020-02-26","2020-02-11","2020-03-01","2020-03-01","2020-03-18","2020-03-12","2020-02-26","2020-04-10","2020-04-06","2020-03-20","2020-03-05","2020-03-05","2020-02-24","2020-04-04","2020-03-28","2020-04-07","2020-04-06","2020-02-26","2020-04-12","2020-04-01","2020-02-28"],["2004-11-08","1964-06-07","1944-04-06","1964-06-25","1964-12-21","1956-06-21","1974-05-25","1960-02-17","1985-06-09","1978-11-26","1946-12-21","1993-10-27","1941-06-04","1954-03-19","1958-10-22","1929-10-22","1952-01-11","1994-01-01","1995-12-25","1987-09-14","1981-12-12","1975-07-11","1948-01-11","1974-05-30","1977-01-04"],[16,57,77,57,56,65,47,61,36,42,74,27,80,67,62,91,69,27,25,33,39,46,73,47,44],["Male","Male","Female","Female","Male","Male","Male","Female","Male","Female","Male","Female","Female","Male","Female","Male","Male","Male","Male","Female","Female","Female","Male","Male","Female"],["30308","30308","30315","30213","30004","30314","30313","30350","30324","30305","30315","30308","30312","30213","30311","30311","30327","30349","30009","30337","30344","30315","30349","30327","30318"],["NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NOT SPECIFIED","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO"],["WHITE","WHITE","BLACK","BLACK","WHITE","BLACK","BLACK","BLACK","ASIAN","BLACK","BLACK","BLACK","BLACK","BLACK","BLACK","BLACK","WHITE","BLACK","WHITE","BLACK","BLACK","BLACK","BLACK","WHITE","BLACK"],["Yes-Symptomatic","Yes-Symptomatic","Yes-Symptomatic","Yes-Symptomatic","Yes-Symptomatic","Yes-Symptomatic","Yes-Symptomatic","Yes-Symptomatic","Yes-Symptomatic","Yes-Symptomatic","Yes-Symptomatic","Yes-Symptomatic","Yes-Symptomatic","Yes-Symptomatic","Yes-Symptomatic","Yes-Symptomatic","Yes-Symptomatic","Yes-Symptomatic","Yes-Symptomatic","Yes-Symptomatic","Yes-Symptomatic","Yes-Symptomatic","Yes-Symptomatic","Yes-Symptomatic","Yes-Symptomatic"],["2020-03-20","2020-01-28","2020-02-10","2021-05-19","2020-02-20","2020-01-17","2020-02-21","2020-02-25","2020-03-17","2020-11-21","2020-02-15","2020-04-02","2020-03-22","2020-03-10","2020-03-02","2020-02-29","2020-02-19",null,"2020-03-25","2020-03-30","2020-03-29","2020-02-17","2020-03-30","2020-03-28","2020-02-26"],["Yes","No","Yes","No","Yes","Yes","No","Yes","No","Yes",null,"Unk","No","Yes","Yes","Yes","Yes","Yes","No","No","No","Yes","Yes","No","No"],["Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Unk","Yes","Yes","Yes","No","Yes","Yes","Yes","Yes",null,"Yes"],["Yes","No",null,"Yes","No","Unk","Yes","No","Yes","No",null,"No","No","Yes","Unk","No",null,"No","No","No","No","No","No",null,null],[null,null,null,null,null,null,null,null,null,"Yes",null,null,null,null,null,null,null,null,"No",null,null,null,null,null,null],["Yes","No","Yes","Yes","No","Unk","Yes","Yes","Yes","Yes",null,"No","No","No","Unk","No",null,"No","Yes","No","No","Yes","No",null,null],["No","Yes","Yes","Yes","Yes","No","Unk","No","No","Yes",null,"No","No","Yes","Unk","No",null,"Yes","No","Yes","No","No","Yes","Yes",null],["Yes","No",null,"No","No","No","No","No","No","Yes","No","No","Yes","No","Unk","No",null,"No","No","No","No","No","No","No","No"],["No","No","Yes",null,"Yes","Yes","Yes","No","No","Yes",null,"No","Yes","Yes","Yes","Yes","No","Yes","No","Yes","No","Yes","Yes","No","Yes"],[null,null,"2020-02-08",null,"2020-02-26","2020-01-27","2020-03-01",null,null,"2020-11-28",null,null,"2020-04-06","2020-03-19","2020-03-03","2020-03-03",null,"2020-04-03",null,"2020-04-06",null,"2020-02-22","2020-04-15",null,"2020-02-27"],[null,null,null,null,null,"2020-02-21",null,null,null,"2020-12-02",null,null,"2020-04-16",null,null,null,null,null,null,"2020-04-10",null,"2020-03-10","2020-04-18",null,"2020-02-27"],["No","No","No","No","Unknown","Yes","No","Unknown","No","No","Unknown","No","Yes","No","No","No","Unknown","No","No","No","No","No","No","No","No"],["No","No","No","No",null,"Yes","No",null,"No","No",null,"No","Yes","No","No","No",null,"No","No","No","No","No","No","No","No"],[null,null,null,null,null,"2020-02-21",null,null,null,null,null,null,"2020-04-16",null,null,null,null,null,null,null,null,null,null,null,null],[33.77664546,33.78051014,33.73023331,33.55506787,34.10608705,33.75937142,33.76269487,33.99152006,33.81818887,0.000509015,33.7247196,33.76662936,33.73726168,33.58325606,33.73072166,33.74443579,33.84942894,33.61755356,34.09972633,33.65329287,33.69052246,33.71013231,33.64674578,33.84126361,33.80477485],[-84.38568523,-84.38947474,-84.38425189,-84.62885167,-84.27453508,-84.42582354,-84.40045162,-84.35447278,-84.37365369,-0.000975479,-84.38623582,-84.38936047,-84.38274508,-84.63672804,-84.44208134,-84.47630174,-84.41986975,-84.46304234,-84.31308119,-84.45800906,-84.46524239,-84.38555839,-84.57468022,-84.42349808,-84.45733019],[null,null,null,null,6,10,9,null,null,7,null,null,15,9,1,3,null,null,null,7,null,5,16,null,1],[null,null,null,null,null,"2020-02-21",null,null,null,"2020-12-02",null,null,"2020-04-16",null,null,null,null,null,null,"2020-04-10",null,"2020-03-10","2020-04-18",null,"2020-02-27"],[null,null,null,null,null,25,null,null,null,4,null,null,10,null,null,null,null,null,null,4,null,17,3,null,0],["White, NH","White, NH","Black, NH","Black, NH","White, NH","Black, NH","Black, NH","Black, NH","Asian, NH","Black, NH","Black, NH","Black, NH","Black, NH","Black, NH","Black, NH","Black, NH","White, NH","Black, NH","White, NH","Black, NH","Black, NH","Black, NH","Black, NH","White, NH","Black, NH"],["10-19","50-59","70+","50-59","50-59","60-69","40-49","60-69","30-39","40-49","70+","20-29","70+","60-69","60-69","70+","60-69","20-29","20-29","30-39","30-39","40-49","70+","40-49","40-49"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>date_report<\/th>\n      <th>date_dob<\/th>\n      <th>age<\/th>\n      <th>gender<\/th>\n      <th>zip<\/th>\n      <th>eth<\/th>\n      <th>race<\/th>\n      <th>Contact_id<\/th>\n      <th>date_onset<\/th>\n      <th>sym_fever<\/th>\n      <th>sym_cough<\/th>\n      <th>sym_headache<\/th>\n      <th>sym_losstastesmell<\/th>\n      <th>sym_sorethroat<\/th>\n      <th>sym_myalgia<\/th>\n      <th>contact_hh<\/th>\n      <th>hospitalized<\/th>\n      <th>date_hospitalized<\/th>\n      <th>date_discharge<\/th>\n      <th>died<\/th>\n      <th>died_covid<\/th>\n      <th>date_died<\/th>\n      <th>lat<\/th>\n      <th>lon<\/th>\n      <th>days_onset_hosp<\/th>\n      <th>date_outcome<\/th>\n      <th>days_hosp<\/th>\n      <th>eth_race<\/th>\n      <th>age_group<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"scrollY":300,"scrollX":600,"pageLength":25,"fontSize":"25%","dom":"ti","ordering":false,"rownames":false,"options":{"pageLength":5,"scrollX":true},"class":"white-space: nowrap","columnDefs":[{"className":"dt-right","targets":[3,23,24,25,27]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-d6d3ce718860c147d485" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-d6d3ce718860c147d485">{"x":{"filter":"none","data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25"],["3a85e6992a5ac52f","c6b5281d5fc50b96","53495ad0dca4e22c","2948a265da0d081b","a5524aadd1ca0458","db14eeabe531fab7","8bd07af27a9095e2","b0fb67854aaeb475","bf9099af39be433a","c01011bc9755eb3a","27b97d577fb9a30d","932f146c3860e756","44655181e230b95c","a951cb110aacd31f","7288a58b47539174","dfbc141429716762","033e8eb949e30135","a254eb953370eb3d","2ebf4b64459ff07c","8285906d7277879a","75ed6eb8e8a5373a","bee0aecf4384dbc8","147251528ba0e86c","3517a48c39570377","ddfe45263e67714b"],["2020-03-22","2020-02-01","2020-02-10","2020-03-20","2020-02-26","2020-02-11","2020-03-01","2020-03-01","2020-03-18","2020-03-12","2020-02-26","2020-04-10","2020-04-06","2020-03-20","2020-03-05","2020-03-05","2020-02-24","2020-04-04","2020-03-28","2020-04-07","2020-04-06","2020-02-26","2020-04-12","2020-04-01","2020-02-28"],["2004-11-08","1964-06-07","1944-04-06","1964-06-25","1964-12-21","1956-06-21","1974-05-25","1960-02-17","1985-06-09","1978-11-26","1946-12-21","1993-10-27","1941-06-04","1954-03-19","1958-10-22","1929-10-22","1952-01-11","1994-01-01","1995-12-25","1987-09-14","1981-12-12","1975-07-11","1948-01-11","1974-05-30","1977-01-04"],[16,57,77,57,56,65,47,61,36,42,74,27,80,67,62,91,69,27,25,33,39,46,73,47,44],["Male","Male","Female","Female","Male","Male","Male","Female","Male","Female","Male","Female","Female","Male","Female","Male","Male","Male","Male","Female","Female","Female","Male","Male","Female"],["WHITE","WHITE","BLACK","BLACK","WHITE","BLACK","BLACK","BLACK","ASIAN","BLACK","BLACK","BLACK","BLACK","BLACK","BLACK","BLACK","WHITE","BLACK","WHITE","BLACK","BLACK","BLACK","BLACK","WHITE","BLACK"],["NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NOT SPECIFIED","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO"],["30308","30308","30315","30213","30004","30314","30313","30350","30324","30305","30315","30308","30312","30213","30311","30311","30327","30349","30009","30337","30344","30315","30349","30327","30318"],["Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields"],["PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)"],["Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia"],["Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes"],["2020-03-20","2020-01-28","2020-02-10","2021-05-19","2020-02-20","2020-01-17","2020-02-21","2020-02-25","2020-03-17","2020-11-21","2020-02-15","2020-04-02","2020-03-22","2020-03-10","2020-03-02","2020-02-29","2020-02-19",null,"2020-03-25","2020-03-30","2020-03-29","2020-02-17","2020-03-30","2020-03-28","2020-02-26"],["Yes","No","Yes","No","Yes","Yes","No","Yes","No","Yes","Unknown","Unk","No","Yes","Yes","Yes","Yes","Yes","No","No","No","Yes","Yes","No","No"],["Yes","No","Unknown","Yes","Yes","Yes","No","Yes","Yes","No","Unknown","Yes","No","Yes","Unk","Yes","Yes","No","No","Yes","No","Yes","No","Yes","Unknown"],["No","Yes","Yes","Yes","Yes","No","Unk","No","No","Yes","Unknown","No","No","Yes","Unk","No","Unknown","Yes","No","Yes","No","No","Yes","Yes","Unknown"],["Unknown","Unknown","Unknown","Unknown","Unknown","Unknown","Unknown","Unknown","Unknown","Yes","Unknown","Unknown","Unknown","Unknown","Unknown","Unknown","Unknown","Unknown","No","Unknown","Unknown","Unknown","Unknown","Unknown","Unknown"],["Yes","No","Yes","Yes","No","Unk","Yes","Yes","Yes","Yes","Unknown","No","No","No","Unk","No","Unknown","No","Yes","No","No","Yes","No","Unknown","Unknown"],["Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Unk","Yes","Yes","Yes","No","Yes","Yes","Yes","Yes","Unknown","Yes"],["Yes","No","Unknown","Yes","No","Unk","Yes","No","Yes","No","Unknown","No","No","Yes","Unk","No","Unknown","No","No","No","No","No","No","Unknown","Unknown"],["No","No","No","No","No","Yes","No","No","No","No","No","No","Yes","Yes","No","No","Unknown","No","No","Yes","No","No","No","No","No"],[null,null,null,null,null,"2020-02-21",null,null,null,null,null,null,"2020-04-16",null,null,null,null,null,null,"2020-04-10",null,null,null,null,null],["Yes","No","Unknown","No","No","No","No","No","No","Yes","No","No","Yes","No","Unk","No","Unknown","No","No","No","No","No","No","No","No"],["No","No","Yes","Unknown","Yes","Yes","Yes","No","No","Yes","Unknown","No","Yes","Yes","Yes","Yes","No","Yes","No","Yes","No","Yes","Yes","No","Yes"],[null,null,"2020-02-08",null,"2020-02-26","2020-01-27","2020-03-01",null,null,"2020-11-28",null,null,"2020-04-06","2020-03-19","2020-03-03","2020-03-03",null,"2020-04-03",null,"2020-04-06",null,"2020-02-22","2020-04-15",null,"2020-02-27"],[null,null,null,null,null,"2020-02-21",null,null,null,"2020-12-02",null,null,"2020-04-16",null,null,null,null,null,null,"2020-04-10",null,"2020-03-10","2020-04-18",null,"2020-02-27"],["No","No","No","No","Unknown","Yes","No","Unknown","No","No","Unknown","No","Yes","No","No","No","Unknown","No","No","No","No","No","No","No","No"],["No","No","No","No","Unknown","Yes","No","Unknown","No","No","Unknown","No","Yes","No","No","No","Unknown","No","No","No","No","No","No","No","No"],[null,null,null,null,null,"2020-02-21",null,null,null,null,null,null,"2020-04-16",null,null,null,null,null,null,null,null,null,null,null,null],["Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes"],["Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed"],["2020-03-22","2020-02-01","2020-02-10","2021-01-17","2020-02-25","2020-02-20","2020-03-02","2020-02-29","2020-03-17","2020-11-21","2020-03-02","2020-04-10","2020-04-15","2020-03-20","2020-03-07","2020-03-05","2020-02-21","2020-12-16","2021-01-28","2020-04-08","2020-04-02","2020-02-22","2020-04-11","2020-03-29","2020-02-27"],[33.77664546,33.78051014,33.73023331,33.55506787,34.10608705,33.75937142,33.76269487,33.99152006,33.81818887,0.000509015,33.7247196,33.76662936,33.73726168,33.58325606,33.73072166,33.74443579,33.84942894,33.61755356,34.09972633,33.65329287,33.69052246,33.71013231,33.64674578,33.84126361,33.80477485],[-84.38568523,-84.38947474,-84.38425189,-84.62885167,-84.27453508,-84.42582354,-84.40045162,-84.35447278,-84.37365369,-0.000975479,-84.38623582,-84.38936047,-84.38274508,-84.63672804,-84.44208134,-84.47630174,-84.41986975,-84.46304234,-84.31308119,-84.45800906,-84.46524239,-84.38555839,-84.57468022,-84.42349808,-84.45733019],["2020-03-18","2020-01-29","2020-02-05","2020-03-18","2020-02-26","2020-02-05","2020-02-26","2020-02-26","2020-03-18","2020-03-11","2020-02-26","2020-04-08","2020-04-01","2020-03-18","2020-03-04","2020-03-04","2020-02-19","2020-04-01","2020-03-25","2020-04-01","2020-04-01","2020-02-26","2020-04-08","2020-04-01","2020-02-26"],[null,null,null,null,6,10,9,null,null,7,null,null,15,9,1,3,null,null,null,7,null,5,16,null,1],[null,null,null,null,null,"2020-02-21",null,null,null,"2020-12-02",null,null,"2020-04-16",null,null,null,null,null,null,"2020-04-10",null,"2020-03-10","2020-04-18",null,"2020-02-27"],[null,null,null,null,null,25,null,null,null,4,null,null,10,null,null,null,null,null,null,4,null,17,3,null,0],["10-19","50-59","70+","50-59","50-59","60-69","40-49","60-69","30-39","40-49","70+","20-29","70+","60-69","60-69","70+","60-69","20-29","20-29","30-39","30-39","40-49","70+","40-49","40-49"],["White, NH","White, NH","Black, NH","Black, NH","White, NH","Black, NH","Black, NH","Black, NH","Asian, NH","Black, NH","Black, NH","Black, NH","Black, NH","Black, NH","Black, NH","Black, NH","White, NH","Black, NH","White, NH","Black, NH","Black, NH","Black, NH","Black, NH","White, NH","Black, NH"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>pid<\/th>\n      <th>date_report<\/th>\n      <th>date_dob<\/th>\n      <th>age<\/th>\n      <th>gender<\/th>\n      <th>race<\/th>\n      <th>eth<\/th>\n      <th>zip<\/th>\n      <th>county<\/th>\n      <th>district<\/th>\n      <th>state<\/th>\n      <th>contact_id<\/th>\n      <th>date_onset<\/th>\n      <th>sym_fever<\/th>\n      <th>sym_subjfever<\/th>\n      <th>sym_myalgia<\/th>\n      <th>sym_losstastesmell<\/th>\n      <th>sym_sorethroat<\/th>\n      <th>sym_cough<\/th>\n      <th>sym_headache<\/th>\n      <th>sym_resolved<\/th>\n      <th>date_recovery<\/th>\n      <th>contact_hh<\/th>\n      <th>hospitalized<\/th>\n      <th>date_hospitalized<\/th>\n      <th>date_discharge<\/th>\n      <th>died<\/th>\n      <th>died_covid<\/th>\n      <th>date_died<\/th>\n      <th>confirmed_case<\/th>\n      <th>covid_dx<\/th>\n      <th>date_positive<\/th>\n      <th>lat<\/th>\n      <th>lon<\/th>\n      <th>epiweek<\/th>\n      <th>days_onset_hosp<\/th>\n      <th>date_outcome<\/th>\n      <th>days_hosp<\/th>\n      <th>age_group<\/th>\n      <th>eth_race<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"scrollY":300,"scrollX":600,"pageLength":25,"fontSize":"25%","dom":"ti","ordering":false,"rownames":false,"options":{"pageLength":5,"scrollX":true},"class":"white-space: nowrap","columnDefs":[{"className":"dt-right","targets":[4,33,34,36,38]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 
 .footnote[Tip: Use `skim()` from **skimr** package to review all columns with summary statistics]  
 
@@ -317,7 +312,7 @@ Below are the first 25 rows of the `linelist` data frame:
 **ggplot2** benefits from a wide variety of supplementary R packages that extends its functionalities, such as **gganimate**, **ggthemr**, **ggdendro**, **gghighlight**, **ggforce**...  
 
 .footnote[
-Bonus question: What does the "gg” in these names represent?
+*Bonus question:* What does the "gg” in these names represent?
 ]
 
 ???
@@ -371,7 +366,7 @@ Remember that although the commands may be long, it is infinitely easier to edit
 
 
 ---
-# Syntax - open the plot  
+# Open the plot  
 
 .pull-left[
 
@@ -394,7 +389,7 @@ linelist %&gt;%
 
 .pull-right[
 
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-13-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-12-1.png" width="504" /&gt;
 ] 
 
 ???
@@ -413,9 +408,9 @@ Piping is useful to make one-time changes to a dataset prior to plotting.
 ```r
 ggplot(
   data = linelist,
-  mapping = aes(
-    x = age,
-    y = days_hosp)
+*  mapping = aes(
+*    x = age,
+*    y = days_hosp)
 )
 ```
 
@@ -430,7 +425,7 @@ Two core aesthetic mappings are assigning columns for axes positioning: `x=` and
 
 .pull-right[
 
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-15-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-14-1.png" width="504" /&gt;
 ] 
 
 
@@ -459,7 +454,7 @@ These commands are "added" with a `+` to the `ggplot()` command.
 
 .pull-right[
 
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-17-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-16-1.png" width="504" /&gt;
 
 ]
 
@@ -489,7 +484,7 @@ Full list [here](https://ggplot2.tidyverse.org/reference/)
 
 .pull-right[
 
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-18-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-17-1.png" width="504" /&gt;
 
 ]
 
@@ -506,8 +501,7 @@ Indentations, spaces, and newlines do not impact code execution, and can be vari
 
 
 ```r
-ggplot(data = linelist, mapping = aes(x = age, y = days_hosp))+
-  geom_point()
+ggplot(data = linelist, mapping = aes(x = age, y = days_hosp))+geom_point()
 ```
 
 is the same as:  
@@ -515,7 +509,7 @@ is the same as:
 
 ```r
 ggplot(data = linelist,
-       mapping = aes(x = age, y = days_hosp))+
+       mapping = aes(x = age, y = days_hosp)) +
   geom_point()
 ```
 
@@ -527,7 +521,7 @@ ggplot(
   data = linelist,        # use case linelist
   mapping = aes(          # make aesthetic mappings for all geoms
     x = age,              # assign x-axis to age column
-    y = days_hosp))+      # assign y-axis to duration of hospitalization
+    y = days_hosp)) +     # assign y-axis to duration of hospitalization
 geom_point()              # display data as points
 ```
 
@@ -535,7 +529,12 @@ geom_point()              # display data as points
 
 ???
 - Explain why you might use one or the other 
-long style can enable informative comments/annotations  
+long style can enable informative comments/annotations
+- short style very dense (harder to read for some). Shorter scripts, but so what? The number of lines of your code is not an informative metric.
+- very long lines =&gt; needs to scroll horizontally for people with smaller monitors (not nice)
+- long-ish style makes it easier to see which argument belongs to each function
+- spaces around "=" or "+" =&gt; make it easier to parse to many people
+- other?
 
 
 
@@ -549,17 +548,17 @@ long style can enable informative comments/annotations
 ---
 # Aesthetic mapping placement  
 
-* Mappings written in `ggplot()` apply to all geoms (e.g. axes)  
-* Mappings written within one geom apply only to it  
+* Mappings written in the initial `ggplot()` call apply to all following instructions (e.g. axes), *unless otherwise indicated*  
+* Mappings written within one geom apply only to that geom  
 
 
 ```r
-ggplot(                     # open the plot 
-  data = linelist,            # set dataset 
-* mapping = aes(              # map axes to columns
+ggplot(               # open the plot 
+  data = linelist,      # set dataset 
+* mapping = aes(        # map axes to columns
 *   x = age,
 *   y = days_hosp))+
-  geom_point()              # plot points
+  geom_point()        # plot points
 ```
 
 is the same as:  
@@ -609,7 +608,7 @@ But... trends are difficult to interpret because points may be overlapping.
 .pull-right[
 
 
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-25-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-24-1.png" width="504" /&gt;
 
 ] 
 
@@ -629,17 +628,18 @@ But... trends are difficult to interpret because points may be overlapping.
 .pull-left[
 
 
-
 ```r
 ggplot(data = linelist,
        mapping = aes(
          x = age,
-         y = days_hosp))+
-  geom_point()+
+         y = days_hosp)) +
+  geom_point() +
 * geom_smooth()
 ```
 
-Additional geoms can be added on top.  
+We can add additional geoms to the current plot.  
+
+Geoms are added to the graph **in the order they are written in**: the smoothed line appears on top of the points.  
 
 `geom_smooth()` gives smoothed conditional means, helping to show trends in presence of "over-plotting" (see [documentation](https://ggplot2.tidyverse.org/reference/geom_smooth.html)).  
 
@@ -647,7 +647,7 @@ Additional geoms can be added on top.
 
 .pull-right[
 
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-27-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-26-1.png" width="504" /&gt;
 ] 
 
 ???
@@ -669,15 +669,17 @@ Aside from axes, other common "aesthetics" include:
 
 Geometry        |Geom                
 ----------------|--------------------
-`shape = `      |Display point as dot, star, triangle, square...
-`fill =  `      |The *interior* color (e.g of bar or boxplot)  
-`color = `      |The *exterior* or bar, boxplot - OR point color  
-`size = `       |Line thickness, point size...
-`alpha = `      |Transparency (1 = opaque, 0 = invisible)
-`width = `      |Width of "bar plot" bars
-`linetype = `   |Either solid, dashed, dotted, etc.  
-`binwidth = `   |Width of histogram bins  
+`shape`      |Display point as dot, star, triangle, square...
+`fill`      |The *interior* color (e.g of bar or boxplot)  
+`color`      |The *exterior* or bar, boxplot - OR point color  
+`size`       |Line thickness, point size...
+`alpha`      |Transparency (1 = opaque, 0 = invisible)
+`width`      |Width of "bar plot" bars
+`linetype`   |Either solid, dashed, dotted, etc.  
+`binwidth`   |Width of histogram bins  
   
+.footnote[[Source](https://www.r-graph-gallery.com/ggplot2-color.html)
+]
 
 ]
 
@@ -686,11 +688,10 @@ Geometry        |Geom
 
 For color &amp; fill use names or hex code  
 
-&lt;img src="https://github.com/appliedepi/emory_training/blob/master/presentation/images/ggplot_colors.png?raw=true" height="80%" /&gt;
+![](https://github.com/appliedepi/emory_training/blob/master/presentation/images/ggplot_colors.png?raw=true)&lt;!-- --&gt;
 
 
-.footnote[[Source](https://www.r-graph-gallery.com/ggplot2-color.html)
-]
+
 
 ]
 
@@ -714,15 +715,16 @@ Aside from axes, other common "aesthetics" include:
 
 Geometry        |Geom                
 ----------------|--------------------
-`shape = `      |Display point as dot, star, triangle, square...
-`fill =  `      |The *interior* color (e.g of bar or boxplot)  
-`color = `      |The *exterior* or bar, boxplot - OR point color  
-`size = `       |Line thickness, point size...
-`alpha = `      |Transparency (1 = opaque, 0 = invisible)
-`width = `      |Width of "bar plot" bars
-`linetype = `   |Either solid, dashed, dotted, etc.  
-`binwidth = `   |Width of histogram bins  
+`shape`      |Display point as dot, star, triangle, square...
+`fill`      |The *interior* color (e.g of bar or boxplot)  
+`color`      |The *exterior* or bar, boxplot - OR point color  
+`size`       |Line thickness, point size...
+`alpha`      |Transparency (1 = opaque, 0 = invisible)
+`width`      |Width of "bar plot" bars
+`linetype`   |Either solid, dashed, dotted, etc.  
+`binwidth`   |Width of histogram bins  
   
+.footnote[[Source](http://www.sthda.com/english/wiki/ggplot2-point-shapes)]
 
 ]
 
@@ -734,7 +736,6 @@ For shapes, try these numeric codes:
 ![](https://github.com/appliedepi/emory_training/blob/master/presentation/images/ggplot_shapes.png?raw=true)&lt;!-- --&gt;
 
 
-.footnote[[Source](http://www.sthda.com/english/wiki/ggplot2-point-shapes)]
 
 ]
 
@@ -762,10 +763,10 @@ class: medium-text
 
 These aesthetics can be assigned to either:  
 
-* **Static values** (`color = "yellow"`)  
+* **Static values**: `color = "yellow"`  
   - Assigned *outside* `aes()`  
 
-* **A data column** (`aes(fill = died)`)  
+* **A data column**: `aes(fill = died)`  
   - Assigned *inside* `aes()`
   - Displays data as "groups"  
   
@@ -777,7 +778,7 @@ These aesthetics can be assigned to either:
 
 Some examples:  
 
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-30-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-29-1.png" width="504" /&gt;
 
 ]
 
@@ -803,18 +804,18 @@ ggplot(
 ```
 
 
-An aesthetic is *static*, applying the same display to all data points, if it is assigned to a number or character value and written *outside* `aes()`.  
+An aesthetic is *static* if it applies the same display to all data points in the geom or in the graph. Static aesthetics are defined *outside* `aes()` to a *number or character value*.  
 
 Other examples:  
 `size = 3`  
-`transparency = 0.5`  
+`alpha = 0.5`  
 `width = 1.2`  
 
 ]
 
 .pull-right[
 
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-32-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-31-1.png" width="504" /&gt;
 ] 
 
 
@@ -839,15 +840,16 @@ geom_point()
 ```
 
 
-An aesthetic is *dynamic*, varying for each data point, if it assigned to a *column name* and written *inside* an `aes()`.  
+An aesthetic is *dynamic*, if it varies between data points, based on the values in a column. Dynamic aesthetics are defined *inside* `aes()` and are assigned to a **column name**.  
 
 Above, `color=` is mapped to column `died`, and is inherited by `geom_point()`. This create "groups" in the plot and generates a legend.  
 
+Above, `color` is mapped to column `died` and is inherited by `geom_point()`.  
 ]
 
 .pull-right[
 
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-34-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-33-1.png" width="504" /&gt;
 ]
 
 ???
@@ -868,22 +870,22 @@ ggplot(
   mapping = aes(
     x = age,
     y = days_hosp,
-*   color = died))+   # color by outcome
-*geom_point(size = 7) # all points 7x size 
+*   color = died)) +     # color by outcome
+*geom_point(size = 7,    # all points 7x size
+*           alpha = 0.7) # transparency 
 ```
 
-Above, `size = 7` is a static aesthetic - it is not within any `aes()` function and therefore is not mapped to any column.  
-
+We can  mix static and dynamic aesthetics. Above, `size = 7` and `alpha = 0.7` are static aesthetics defined outside any `aes()` and therefore not mapped to any column.  
 ]
 
 .pull-right[
 
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-36-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-35-1.png" width="504" /&gt;
 ]
 
 ???
 
-As there is only one geom, all aesthetics can be writtein `ggplot()`, or in `geom_point()`
+As there is only one geom, all aesthetics can be written in `ggplot()`, or in `geom_point()`
 
 
 
@@ -893,7 +895,7 @@ As there is only one geom, all aesthetics can be writtein `ggplot()`, or in `geo
 
 .pull-left[
 
-Aesthetic mappings like `fill=` and `color=` create "groups" in the plot. Problems arise if your summarise your data "by group" but plot indescriminately - resulting in multiple y values per x value.  
+Aesthetic mappings like `fill=` and `color=` create "groups" in the plot. Problems arise if you summarise your data "by group" but plot indiscriminately - despite having multiple y values per x value.  
 
 Below, `outcome_time_data` has one row per unique week-outcome.  
 
@@ -941,8 +943,8 @@ ggplot(
   data = outcome_time_data,
   mapping = aes(
     x = week_onset,       
-    y = n_cases))+
-  geom_line()+
+    y = n_cases)) +
+  geom_line() +
   labs(title = "Weekly cases, by outcome (?)")
 ```
 
@@ -952,7 +954,7 @@ Above, the column `died` is not provided to any grouping argument, such as `colo
 
 .pull-right[
 
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-40-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-39-1.png" width="504" /&gt;
 ]
 
 
@@ -982,7 +984,7 @@ This version includes `color=` mapped to the `died` column.
 
 .pull-right[
 
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-42-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-41-1.png" width="504" /&gt;
 ]
 
 
@@ -993,14 +995,14 @@ This version includes `color=` mapped to the `died` column.
 
 .pull-left[
 
-Another way of displaying groups is via faceting.  
+Another way of *displaying groups* is via faceting.  
 
 
 ```r
 ggplot(
   data = linelist,
   mapping = aes(x = date_onset)) +
-geom_histogram() +
+  geom_histogram() +
 *facet_wrap(~eth_race)
 ```
 
@@ -1009,7 +1011,7 @@ geom_histogram() +
 
 
 .pull-right[
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-44-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-43-1.png" width="504" /&gt;
 
 ]
 
@@ -1020,7 +1022,7 @@ geom_histogram() +
 
 .pull-left[
 
-"Free" axes by setting `scales=` to "free_y", "free_x", or "free".  
+Free-ranging axes:  
 
 
 ```r
@@ -1031,15 +1033,22 @@ geom_histogram() +
 *facet_wrap(~ eth_race, scales = "free_y") #&lt;&lt;
 ```
 
+`scales=` settings:  
+- "free_y"  
+- "free_x"   
+- "free" (both x and y)  
+
 ] 
 
 .footnote[
-Alert your audience if you free an axis! Also, try `ncol=` and `nrow=`. 
+Alert your audience if you free an axis! 
+
+Also, try `ncol=` and `nrow=`. 
 ]
 
 
 .pull-right[
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-46-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-45-1.png" width="504" /&gt;
 
 ]
 
@@ -1051,6 +1060,8 @@ Alert your audience if you free an axis! Also, try `ncol=` and `nrow=`.
 
 
 .pull-left[
+
+**Facetting by two variables:**   
 
 To generate one graph per race/ethnicity AND gender:  
 
@@ -1059,19 +1070,20 @@ To generate one graph per race/ethnicity AND gender:
 ggplot(
   data = linelist,
   mapping = aes(x = date_onset)) +
-geom_histogram() +
-*facet_wrap(gender ~ eth_race) 
+  geom_histogram() +
+  *facet_wrap(gender ~ eth_race) 
 ```
 
 The "~" signifies "by"  
 
-] 
 
-By using `facet_wrap()` the plots appear sequentially by alphabet/factor level. Facet titles are combined.  
+Plots appear sequentially by alphabet/factor level. Facet titles are combined.  
+
+] 
 
 
 .pull-right[
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-48-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-47-1.png" width="504" /&gt;
 
 ]
 
@@ -1084,22 +1096,25 @@ By using `facet_wrap()` the plots appear sequentially by alphabet/factor level. 
 
 .pull-left[
 
-Try `facet_grid()` to show two variables in a grid. Note the labels along the sides.  
+**Show two variables in a grid: `facet_grid()`.   
+
 
 
 ```r
 ggplot(
   data = linelist,
   mapping = aes(x = date_onset)) +
-geom_histogram() +
-*facet_grid(gender ~ eth_race) 
+  geom_histogram() +
+  *facet_grid(gender ~ eth_race) 
 ```
+
+*Note the labels along the sides.*
 
 ] 
 
 
 .pull-right[
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-50-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-49-1.png" width="504" /&gt;
 
 ]
 
@@ -1110,13 +1125,16 @@ geom_histogram() +
 
 .pull-left[
 
-You can `filter()` or `drop_na()` in advance, to remove undesired levels  
+**Dropping levels you don't want**
+
+
+* You can `filter()` or `drop_na()` in advance, to remove undesired levels  
 
 
 ```r
 linelist %&gt;% 
-  drop_na(gender, eth_race) %&gt;% 
-  filter(gender != "Unknown") %&gt;% 
+  *drop_na(gender, eth_race) %&gt;% 
+  *filter(gender != "Unknown") %&gt;% 
   
   # begin plot
   ggplot(
@@ -1130,10 +1148,27 @@ Note above we pipe the adjusted data frame into `ggplot()`, for ease
 
 
 .pull-right[
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-52-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-51-1.png" width="504" /&gt;
 
 ]
 
+# Facets/small-multiples
+
+
+.pull-left[
+
+**Dropping empty levels or not?**
+
+By default, `facet_grid` and `facet_wrap` drop unused levels/categories. 
+
+Change `drop=` to `FALSE` to keep the empty facet
+]
+
+
+.pull-right[
+
+
+]
 
 
 ---
@@ -1149,25 +1184,23 @@ ggplot(
   data = linelist,
   mapping = aes(
     x = date_onset,
-*   fill = eth_race)) +
-geom_histogram() +
-facet_wrap(~ eth_race)+
-*gghighlight::gghighlight()
+    *fill = eth_race)) +
+  geom_histogram() +
+  facet_wrap(~ eth_race) +
+  *gghighlight::gghighlight()
 ```
 
 ] 
 
+
+.pull-right[
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-53-1.png" width="504" /&gt;
+
+]
+
 .footnote[
 Try `gghighlight()` with other plots! 
 ]
-
-
-.pull-right[
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-54-1.png" width="504" /&gt;
-
-]
-
-
 
 
 
@@ -1190,9 +1223,10 @@ linelist %&gt;%
     mapping = aes(
       x = date_report,
       y = n,
-      color = age_group))+
-  geom_line()+
-* gghighlight::gghighlight(age_group %in% c("40-49", "60-69)"))+
+      color = age_group)) +
+  geom_line() +
+* gghighlight::gghighlight(age_group %in% 
+                             c("40-49", "60-69)"))+
   theme(legend.position = "none")
 ```
 
@@ -1203,7 +1237,7 @@ linelist %&gt;%
 
 
 .pull-right[
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-56-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-55-1.png" width="504" /&gt;
 
 ]
 
@@ -1251,7 +1285,7 @@ color, manual assign|`scale_color_manual()`
 
 
 ```r
-ggplot(linelist)+
+ggplot(linelist) +
   geom_bar(aes(x = eth_race, fill = died))
 ```
 
@@ -1262,7 +1296,7 @@ Above, the fill of a bar plot uses the **default colors and axis breaks**:
 
 .pull-right[
 
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-58-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-57-1.png" width="504" /&gt;
 
 ]
 
@@ -1276,8 +1310,8 @@ Above, the fill of a bar plot uses the **default colors and axis breaks**:
 
 
 ```r
-ggplot(linelist)+
-geom_bar(aes(x = eth_race, fill = died))+
+ggplot(linelist) +
+geom_bar(aes(x = eth_race, fill = died)) +
 *scale_fill_manual(        
 *  values = c("Yes"    = "violetred", 
 *             "No"     = "aquamarine",
@@ -1294,7 +1328,7 @@ Adding `scale_fill_manual()`, we list the color assignments in a vector `c()`.
 
 .pull-right[
 
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-60-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-59-1.png" width="504" /&gt;
 ]
 
 ???
@@ -1308,12 +1342,12 @@ Discuss the na.value= arguments in most scale commands, and the difference betwe
 
 
 ```r
-ggplot(linelist)+
-geom_bar(aes(x = eth_race, fill = died))+
+ggplot(linelist) +
+geom_bar(aes(x = eth_race, fill = died)) +
 scale_fill_manual(        
   values = c("Yes"    = "violetred", 
              "No"     = "aquamarine",
-            "Unknown" = "grey"))+
+            "Unknown" = "grey")) +
 *scale_y_continuous(
 *  breaks = seq(from = 0,
 *               to = 35000,
@@ -1326,7 +1360,7 @@ Then, in `scale_y_continuous()` we adjust the y-axis breaks using `seq()` to def
 
 .pull-right[
 
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-62-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-61-1.png" width="504" /&gt;
 
 ]
 
@@ -1341,8 +1375,8 @@ Then, in `scale_y_continuous()` we adjust the y-axis breaks using `seq()` to def
 
 
 ```r
-ggplot(linelist)+
-geom_bar(aes(x = eth_race, fill = died))+
+ggplot(linelist) +
+geom_bar(aes(x = eth_race, fill = died)) +
 scale_fill_manual(        
   values = c("Yes"    = "violetred", 
              "No"     = "aquamarine",
@@ -1351,7 +1385,7 @@ scale_y_continuous(
   breaks = seq(from = 0,
                to = 35000,
                by = 5000),
-* expand = c(0,0))+
+* expand = c(0,0)) +
 *scale_x_discrete(
 *  expand = c(0,0))
 ```
@@ -1362,7 +1396,7 @@ In any `scale_x_` or `scale_y_` command, use `expand = c(0,0)` to remove excess 
 
 .pull-right[
 
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-64-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-63-1.png" width="504" /&gt;
 
 ]
 
@@ -1376,7 +1410,7 @@ In any `scale_x_` or `scale_y_` command, use `expand = c(0,0)` to remove excess 
 
 
 ```r
-ggplot(linelist)+
+ggplot(linelist) +
 geom_histogram(aes(x = date_onset))
 ```
 
@@ -1386,7 +1420,7 @@ Default scale of date axes reflect the range of your data, and will vary in form
 
 .pull-right[
 
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-66-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-65-1.png" width="504" /&gt;
 
 ]
 
@@ -1404,8 +1438,8 @@ Default scale of date axes reflect the range of your data, and will vary in form
 
 
 ```r
-ggplot(linelist)+
-geom_histogram(aes(x = date_onset))+
+ggplot(linelist) +
+geom_histogram(aes(x = date_onset)) +
 *scale_x_date(
 *  date_breaks = "3 months")
 ```
@@ -1420,7 +1454,7 @@ Specify break intervals using values like "1 week", or "2 weeks", or "3 months".
 
 .pull-right[
 
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-68-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-67-1.png" width="504" /&gt;
 
 ]
 
@@ -1436,7 +1470,7 @@ For tips on geom_histogram() bins, see Epi R Handbook epicurves page
 
 ```r
 ggplot(linelist)+
-geom_histogram(aes(x = date_onset))+
+geom_histogram(aes(x = date_onset)) +
 scale_x_date(
   date_breaks = "3 months",
 * date_labels = "%d %b\n%Y")  # \n is a newline
@@ -1451,7 +1485,7 @@ See Epi R Handbook [Epicurves](https://epirhandbook.com/epidemic-curves.html) an
 
 .pull-right[
 
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-70-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-69-1.png" width="504" /&gt;
 
 ]
 
@@ -1466,13 +1500,13 @@ See Epi R Handbook [Epicurves](https://epirhandbook.com/epidemic-curves.html) an
 
 
 ```r
-ggplot(data = linelist)+
+ggplot(data = linelist) +
 geom_point(
   mapping = aes(
     x = age,
     y = days_hosp,
     color = died),    
-  alpha = 0.3)+
+  alpha = 0.3) +
 *labs(
 *  title = "Duration of admission among hospitalized COVID-19 patients",
 *  x = "Age (years)",
@@ -1488,7 +1522,7 @@ Use `lab()` to edit title, subtitle, caption, axes labels, and legend title
 
 .pull-right[
 
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-72-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-71-1.png" width="504" /&gt;
 ]
 
 
@@ -1542,14 +1576,14 @@ ggplot(data = linelist,
          x = age,
          y = days_hosp,
          color = died),    
-       alpha = 0.3)+
-  geom_point()+
+       alpha = 0.3) +
+  geom_point() +
   labs(
      title = "Duration of admission among\nhospitalized COVID-19 patients",
      x = "Age (years)",
      y = "Duration (days)",
      caption = "Fictional COVID-19 data",
-     color = "Deceased")+
+     color = "Deceased") +
 * theme_minimal(base_size = 18)
 ```
 
@@ -1562,7 +1596,7 @@ Themes are non-data plot features (background, text side/color, etc).
 
 .pull-right[
 
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-77-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-76-1.png" width="504" /&gt;
 ]
 
 ???
@@ -1598,7 +1632,7 @@ theme_void()+
 
 .pull-right[
 
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-79-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-78-1.png" width="504" /&gt;
 
 
 
@@ -1620,14 +1654,14 @@ ggplot(
   data = linelist,
   mapping = aes(
     x = age, y = days_hosp, color = died),    
-    alpha = 0.3)+
-geom_point()+
+    alpha = 0.3) +
+geom_point() +
 labs(
   title = "Duration of admission among\nhospitalized COVID-19 patients",
   x = "Age (years)", y = "Duration (days)",
   caption = "Fictional COVID-19 data",
   color = "Deceased")+
-theme_minimal(base_size = 14)+
+theme_minimal(base_size = 14) +
 *theme(
 * legend.position = "bottom",
 * plot.title = element_text(color = "red",
@@ -1642,7 +1676,7 @@ Use `theme()` and [this list](https://ggplot2.tidyverse.org/reference/theme.html
 
 .pull-right[
 
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-81-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-80-1.png" width="504" /&gt;
 ]
 
 ???
@@ -1713,7 +1747,7 @@ plot(weekly)
 
 .pull-right[
 
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-85-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-84-1.png" width="504" /&gt;
 
 ]
 
@@ -1748,7 +1782,7 @@ Try "Sunday weeks" or "MMWR week" for Sunday weeks.
 
 .pull-right[
 
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-88-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-87-1.png" width="504" /&gt;
 
 ]
 
@@ -1792,7 +1826,7 @@ groups = c(eth_race, gender)
 
 
 
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-92-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-91-1.png" width="504" /&gt;
 
 ]
 
@@ -1814,14 +1848,14 @@ Add other **ggplot2** commands with `+`.
 
 
 ```r
-plot(weekly, fill = eth_race)+
+plot(weekly, fill = eth_race) +
 scale_y_continuous(
   expand = c(0,0),
-  breaks = seq(0,2000,250))+
+  breaks = seq(0,2000,250)) +
 *scale_y_continuous(
 * expand = c(0,0),
-* breaks = seq(0,2000,250))+
-*theme(legend.position = "top")+
+* breaks = seq(0,2000,250)) +
+*theme(legend.position = "top") +
 *labs(fill = "Race and\nEthnicity")
 ```
 
@@ -1831,7 +1865,7 @@ scale_y_continuous(
 
 
 
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-94-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-93-1.png" width="504" /&gt;
 
 ]
 
@@ -1851,8 +1885,8 @@ plot(weekly,
 *  angle = 30)+                           # angle of date labels)+
 scale_y_continuous(
   expand = c(0,0),
-  breaks = seq(0,2000,250))+
-theme(legend.position = "top")+
+  breaks = seq(0,2000,250)) +
+theme(legend.position = "top") +
 labs(fill = "Race and\nEthnicity")
 ```
 
@@ -1865,7 +1899,7 @@ Do adjust date axis with `scale_x_date()`. Instead, use custom **incidence2** ar
 
 
 
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-96-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-95-1.png" width="504" /&gt;
 
 ]
 
@@ -1908,7 +1942,7 @@ labs(title = "COVID-19 cases in ZIP 30024 from Dec 2020, by race/ethnicity")
 
 .pull-right[
 
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-99-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-98-1.png" width="504" /&gt;
 
 ]
 
@@ -1943,7 +1977,7 @@ Note a palette is an *object* and so not in quotes.
 
 
 
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-101-1.png" width="504" /&gt;
+
 
 
 
@@ -1985,7 +2019,7 @@ plot(weekly, fill = eth_race)+
 
 
 
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-103-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-102-1.png" width="504" /&gt;
 
 
 ]
@@ -2021,16 +2055,16 @@ A few rows:
 
 |day        |died    |  n|
 |:----------|:-------|--:|
-|2021-07-21 |No      |  1|
-|2021-07-21 |Unknown |  3|
-|2021-07-22 |No      |  1|
-|2021-07-22 |Unknown |  3|
-|2021-07-23 |No      |  2|
-|2021-07-23 |Unknown |  1|
-|2021-07-24 |No      |  2|
-|2021-07-24 |Unknown |  2|
-|2021-07-25 |Unknown |  1|
-|2021-07-27 |Unknown |  1|
+|2021-06-19 |No      | 11|
+|2021-06-19 |Unknown | 11|
+|2021-06-20 |No      | 10|
+|2021-06-20 |Unknown |  6|
+|2021-06-21 |No      | 12|
+|2021-06-21 |Unknown | 11|
+|2021-06-22 |No      |  9|
+|2021-06-22 |Unknown |  6|
+|2021-06-23 |No      |  7|
+|2021-06-23 |Unknown |  7|
 
 ]
 
@@ -2066,7 +2100,7 @@ plot(died_curve,    # incidence object
 
 
 
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-109-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-108-1.png" width="504" /&gt;
 
 ]
 
@@ -2111,7 +2145,7 @@ age_pyramid(
 
 .pull-right[
 
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-112-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-111-1.png" width="504" /&gt;
 
 ]
 
@@ -2143,7 +2177,7 @@ age_pyramid(
 
 .pull-right[
 
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-114-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-113-1.png" width="504" /&gt;
 
 ]
 
@@ -2163,8 +2197,8 @@ age_pyramid(
   age_group = "age_group",
   split_by = "gender",
   proportional = TRUE,
-  show_midpoint = FALSE)+
-*theme_minimal()+
+  show_midpoint = FALSE) +
+*theme_minimal() +
 *labs(
 *  title = "Age and Gender of COVID-19 cases",
 *  subtitle = "Fulton County, GA",
@@ -2178,7 +2212,7 @@ age_pyramid(
 
 .pull-right[
 
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-116-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-115-1.png" width="504" /&gt;
 
 ]
 
@@ -2198,7 +2232,7 @@ str_glue("n = {nrow(linelist)}")
 ```
 
 ```
-## n = 82062
+## n = 81757
 ```
 
 **Complex caption**  
@@ -2216,7 +2250,7 @@ str_glue("{missing} of cases missing either age or gender are not shown.",
 ```
 
 ```
-## 442 (0.5%) of cases missing either age or gender are not shown.
+## 405 (0.5%) of cases missing either age or gender are not shown.
 ```
 
 
@@ -2238,7 +2272,7 @@ str_glue("Fulton County, GA, reported {min_date} - {max_date}",
 ```
 
 ```
-## Fulton County, GA, reported January 03 2020 - July 27 2021
+## Fulton County, GA, reported January 03 2020 - June 23 2021
 ```
 
 
@@ -2264,8 +2298,8 @@ age_pyramid(
   age_group = "age_group",
   split_by = "gender",
   proportional = TRUE,
-  show_midpoint = FALSE)+
-theme_minimal()+
+  show_midpoint = FALSE) +
+theme_minimal() +
 labs(
   title = "Age and Gender of COVID-19 cases",
   subtitle = str_glue(
@@ -2292,7 +2326,7 @@ labs(
 
 .pull-right[
 
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-122-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-121-1.png" width="504" /&gt;
 
 ]
 
@@ -2310,7 +2344,7 @@ Use `geom_bar()` if bar height should reflect the number of rows in the data (e.
 
 
 ```r
-ggplot(linelist)+                        # begin with linelist       
+ggplot(linelist) +                       # begin with linelist       
 *  geom_bar(mapping = aes(x = eth_race)) # one bar per race/ethnicity. No y= argument. 
 ```
 
@@ -2320,7 +2354,7 @@ Use `geom_col()` if the data have a numeric column containing the desired bar he
 
 
 ```r
-ggplot(linelist_agg)+                             # begin with aggregated count data            
+ggplot(linelist_agg) +                            # begin with aggregated count data            
 *  geom_col(mapping = aes(x = eth_race, y = n))   # bar height is value in column "n"
 ```
 
@@ -2338,18 +2372,18 @@ If your data look like this (counts) and your plot looks like that (bars of same
 
 |eth_race            |     n|
 |:-------------------|-----:|
-|Asian, NH           |  2975|
-|Black, NH           | 34233|
-|White, NH           | 27040|
-|Hispanic, all races |  8621|
-|Other, NH           |  2746|
-|Unknown             |  6447|
+|Asian, NH           |  3022|
+|Black, NH           | 34395|
+|White, NH           | 27303|
+|Hispanic, all races |  8600|
+|Other, NH           |  2912|
+|Unknown             |  5525|
 
 ]
 
 .pull-right[
 
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-126-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-125-1.png" width="504" /&gt;
 
 This plot shows that there is one row per ethnicity/race!  
 
@@ -2382,7 +2416,7 @@ With `geom_bar()`, the height reflects the number of rows per x-axis group. This
 
 
 ```r
-ggplot(linelist)+             
+ggplot(linelist) +             
   geom_bar(           # height is num of rows
     mapping = aes(    # aesthetic mappings
       x = eth_race))  # one bar per ethnicity
@@ -2392,7 +2426,7 @@ ggplot(linelist)+
 
 .pull-right[
 
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-129-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-128-1.png" width="504" /&gt;
 ]
 
 ---
@@ -2417,7 +2451,7 @@ To achieve "stacked" bars with `geom_bar()`, simply assign the group column to `
 
 
 ```r
-ggplot(linelist)+             
+ggplot(linelist) +             
   geom_bar(           # height is num of rows
     mapping = aes(
       x = eth_race,   # one bar per ethnicity.
@@ -2428,7 +2462,7 @@ ggplot(linelist)+
 
 .pull-right[
 
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-132-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-131-1.png" width="504" /&gt;
 ]
 
 
@@ -2446,22 +2480,22 @@ In contrast, `geom_col()` uses a column of counts, such as column `n` in this `l
 
 |eth_race            |     n|
 |:-------------------|-----:|
-|Asian, NH           |  2975|
-|Black, NH           | 34233|
-|White, NH           | 27040|
-|Hispanic, all races |  8621|
-|Other, NH           |  2746|
-|Unknown             |  6447|
+|Asian, NH           |  3022|
+|Black, NH           | 34395|
+|White, NH           | 27303|
+|Hispanic, all races |  8600|
+|Other, NH           |  2912|
+|Unknown             |  5525|
 
 Column `n` provides the bar height.    
 
 
 ```r
-ggplot(linelist_eth)+ # use counts dataset             
-*  geom_col(          # height by value
+ggplot(linelist_eth) + # use counts dataset             
+*  geom_col(           # height by value
     mapping = aes(   
-      x = eth_race,   # one per ethnicity.
-*     y = n))         # y= for bar height    
+      x = eth_race,    # one per ethnicity.
+*     y = n))          # y= for bar height    
 ```
 
 
@@ -2469,7 +2503,7 @@ ggplot(linelist_eth)+ # use counts dataset
 
 .pull-right[
 
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-135-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-134-1.png" width="504" /&gt;
 
 
 ]
@@ -2490,27 +2524,27 @@ To have "stacked" bars using `geom_col()`, each plotting group must have its own
 |eth_race  |died    |     n|
 |:---------|:-------|-----:|
 |Asian, NH |Yes     |    30|
-|Asian, NH |No      |  1795|
-|Asian, NH |Unknown |  1150|
+|Asian, NH |No      |  1802|
+|Asian, NH |Unknown |  1190|
 |Black, NH |Yes     |  1037|
-|Black, NH |No      | 19196|
-|Black, NH |Unknown | 14000|
+|Black, NH |No      | 19204|
+|Black, NH |Unknown | 14154|
 
 
 ```r
-ggplot(linelist_eth_died)+ # use counts data              
-  geom_col(                # height by value
+ggplot(linelist_eth_died) + # use counts data              
+  geom_col(                 # height by value
     mapping = aes(
-      x = eth_race,        # one bar per ethnicity 
-      y = n,               # bar height from col "n"
-      fill = died))        # stacked bars by outcome
+      x = eth_race,         # one bar per ethnicity 
+      y = n,                # bar height from col "n"
+      fill = died))         # stacked bars by outcome
 ```
 
 ]
 
 .pull-right[
 
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-138-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-137-1.png" width="504" /&gt;
 
 ]
 
@@ -2526,11 +2560,11 @@ It is simple to flip the axes on any ggplot by adding `coord_flip()`
 
 
 ```r
-ggplot(linelist)+        # begin with case linelist    
+ggplot(linelist) +       # begin with case linelist    
   geom_bar(              # column height by number of rows
     mapping = aes(
       x = eth_race,           # one bar per ethnicity. No y= argument. 
-      fill = died))+     # stacked bars by outcome
+      fill = died)) +    # stacked bars by outcome
 * coord_flip()           # flip x and y axes
 ```
 
@@ -2539,7 +2573,7 @@ ggplot(linelist)+        # begin with case linelist
 
 .pull-right[
 
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-140-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-139-1.png" width="504" /&gt;
 ]
 
 
@@ -2558,7 +2592,7 @@ Changes can be made outside ggplot (a lasting change to the dataset), or inside 
 
 .pull-right[
 
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-141-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-140-1.png" width="504" /&gt;
 ]
 
 
@@ -2575,11 +2609,11 @@ Below, to order by frequency, `fct_infreq()` is applied to the x-axis column `et
 
 
 ```r
-ggplot(linelist)+          # begin with case linelist    
+ggplot(linelist) +        # begin with case linelist    
   geom_bar(                # column height by number of rows
     mapping = aes(
-*     x = fct_infreq(eth_race),  # bars ordered by frequency 
-*     fill = fct_infreq(died)))+ # stacks ordered by frequency
+*     x = fct_infreq(eth_race),   # bars ordered by frequency 
+*     fill = fct_infreq(died))) + # stacks ordered by frequency
  coord_flip()              # flip x and y axes
 ```
 
@@ -2589,7 +2623,7 @@ You will need to clean up the legend title now, with `labs(fill=)`.
 
 .pull-right[
 
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-143-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-142-1.png" width="504" /&gt;
 ]
 
 
@@ -2607,11 +2641,11 @@ The below reverses the previous frequency ordering from `fct_infreq()`.
 
 
 ```r
-ggplot(linelist)+              
+ggplot(linelist)  +              
   geom_bar(                
     mapping = aes(
-*     x = fct_rev(fct_infreq(eth_race)),  # reverse frequency
-*     fill = fct_rev(fct_infreq(died))))+ # reverse frequency      
+*     x = fct_rev(fct_infreq(eth_race)),   # reverse frequency
+*     fill = fct_rev(fct_infreq(died)))) + # reverse frequency      
  coord_flip()              
 ```
 
@@ -2620,7 +2654,7 @@ ggplot(linelist)+
 
 .pull-right[
 
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-145-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-144-1.png" width="504" /&gt;
 
 ]
 
@@ -2647,8 +2681,8 @@ ggplot(
     x = eth_race,
     y = n,
     fill = died,
-*   label = n))+             
-geom_col()+
+*   label = n)) +             
+geom_col() +
 *geom_text(
 * size = 3,
 * position = position_stack(vjust = 0.5))
@@ -2662,7 +2696,7 @@ Best to use `geom_col()` and not `geom_bar()` for this. Also, try `geom_label()`
 
 .pull-right[
 
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-147-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-146-1.png" width="504" /&gt;
 
 ]
 
@@ -2685,15 +2719,15 @@ ggplot(
   mapping = aes(
     x = eth_race,
     y = n,
-    fill = died))+             
-*geom_col(width = 0.5)+
+    fill = died)) +             
+*geom_col(width = 0.5) +
 ```
 
 ]
 
 .pull-right[
 
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-149-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-148-1.png" width="504" /&gt;
 
 ]
 
@@ -2720,7 +2754,7 @@ ggplot(
     x = eth_race,
     y = n,
     fill = died,
-    label = n))+             
+    label = n)) +             
 * geom_col(position = "dodge")
 ```
 
@@ -2732,7 +2766,7 @@ Adjust the order with via a **forcats** function that adjusts factor levels.
 
 .pull-right[
 
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-151-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-150-1.png" width="504" /&gt;
 
 ]
 
@@ -2756,8 +2790,8 @@ ggplot(
     y = n,
 *   group = died,
     fill = died,
-    label = n))+             
-  geom_col(position = "dodge")+
+    label = n)) +             
+  geom_col(position = "dodge") +
   geom_text(
     size = 3,
 *   position = position_dodge(width = 1),
@@ -2768,7 +2802,7 @@ ggplot(
 
 .pull-right[
 
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-153-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-152-1.png" width="504" /&gt;
 
 ]
 
@@ -2793,12 +2827,12 @@ ggplot(
     y = n,
     group = died,
     fill = died,
-    label = n))+             
+    label = n)) +             
   geom_col(position = "dodge")+
   geom_text(
     size = 3,
     position = position_dodge(width = 1),
-*   hjust = -1)+
+*   hjust = -1) +
 * coord_flip()    # flip axes
 ```
 
@@ -2806,7 +2840,7 @@ ggplot(
 
 .pull-right[
 
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-155-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-154-1.png" width="504" /&gt;
 
 ]
 
@@ -2846,11 +2880,11 @@ race_CFR_age &lt;- linelist %&gt;%
 
 |eth_race            | cases| deaths|       CFR| med_age| med_dur|
 |:-------------------|-----:|------:|---------:|-------:|-------:|
-|Asian, NH           |  2975|     23| 0.0077311|      34|       6|
-|Black, NH           | 34233|    833| 0.0243332|      39|       5|
-|White, NH           | 27040|    418| 0.0154586|      36|       5|
-|Hispanic, all races |  8621|     56| 0.0064958|      34|       4|
-|Other, NH           |  2746|      6| 0.0021850|      32|       3|
+|Asian, NH           |  3022|     23| 0.0076109|      34|     5.5|
+|Black, NH           | 34395|    833| 0.0242186|      39|     5.0|
+|White, NH           | 27303|    417| 0.0152730|      36|     5.0|
+|Hispanic, all races |  8600|     55| 0.0063953|      34|     4.0|
+|Other, NH           |  2912|      6| 0.0020604|      32|     3.0|
 ]
 
 
@@ -2876,8 +2910,8 @@ ggplot(
     x = med_age,
     y = CFR,
     size = cases,
-*   label = eth_race))+
-geom_point()+
+*   label = eth_race)) +
+geom_point() +
 *geom_text()
 ```
 
@@ -2886,7 +2920,7 @@ geom_point()+
 
 .pull-right[
 
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-159-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-158-1.png" width="504" /&gt;
 
 ]
 
@@ -2916,8 +2950,8 @@ ggplot(
     x = med_age,
     y = CFR,
     size = cases,
-*   label = eth_race))+     # text to display
-geom_point()+
+*   label = eth_race)) +     # text to display
+geom_point() +
 *geom_label_repel(         # add labels
 *   size = 5,               # text size
 *   min.segment.length = 0) # show connector lines
@@ -2928,7 +2962,7 @@ geom_point()+
 
 .pull-right[
 
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-161-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-160-1.png" width="504" /&gt;
 
 ]
 
@@ -2957,8 +2991,8 @@ ggplot(
     x = med_age,
     y = CFR,
     size = cases,
-*   label = str_glue("{eth_race}\n{cases} cases")))+
-geom_point()+
+*   label = str_glue("{eth_race}\n{cases} cases"))) +
+geom_point() +
 geom_label_repel(
     size = 5,
     min.segment.length = 0)
@@ -2969,7 +3003,7 @@ geom_label_repel(
 
 .pull-right[
 
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-163-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-162-1.png" width="504" /&gt;
 
 ]
 
@@ -2994,8 +3028,8 @@ ggplot(
     x = med_age,
     y = CFR,
     size = cases,
-*   label = str_glue("{eth_race}\n{scales::comma(cases)} cases")))+
-geom_point()+
+*   label = str_glue("{eth_race}\n{scales::comma(cases)} cases"))) +
+geom_point() +
 geom_label_repel(
     size = 4,
     min.segment.length = 0)
@@ -3007,7 +3041,7 @@ See the many other useful functions in [**scales**](https://scales.r-lib.org/).
 
 .pull-right[
 
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-165-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-164-1.png" width="504" /&gt;
 
 ]
 
@@ -3067,11 +3101,11 @@ month_plot &lt;- ggplot(
     x = cases,
     y = deaths,
     size = cases,
-    color = eth_race))+
-  geom_point(alpha = 0.5)+
-  labs(title = "Month: {month}")+
-  gganimate::transition_time(month)+
-  ease_aes('linear')
+    color = eth_race)) +
+geom_point(alpha = 0.5)+
+labs(title = "Month: {month}") +
+gganimate::transition_time(month) +
+ease_aes('linear')
   
   
   
@@ -3083,10 +3117,10 @@ zip_plot &lt;- ggplot(
     y = deaths,
     size = cases,
     color = zip))+
-  geom_point(alpha = 0.5)+
-  labs(title = "Month: {month}")+
+  geom_point(alpha = 0.5) +
+  labs(title = "Month: {month}") +
   theme(legend.position = "none")
-  #gganimate::transition_time(month)+
+  #gganimate::transition_time(month) +
   #ease_aes('linear')
 ```
 
@@ -3144,10 +3178,10 @@ These are the first 6 rows:
 |:----------|-----:|------:|---------:|
 |2020-01-01 |     1|      0| 0.0000000|
 |2020-02-01 |    54|      3| 0.0555556|
-|2020-03-01 |   859|     73| 0.0849825|
-|2020-04-01 |  1834|    152| 0.0828790|
-|2020-05-01 |  2078|    119| 0.0572666|
-|2020-06-01 |  4897|    117| 0.0238922|
+|2020-03-01 |   857|     73| 0.0851809|
+|2020-04-01 |  1832|    152| 0.0829694|
+|2020-05-01 |  2073|    119| 0.0574047|
+|2020-06-01 |  4892|    117| 0.0239166|
 ]
 
 
@@ -3163,7 +3197,7 @@ ggplot(
   mapping = aes(
     x = month,
     y = CFR))+
-  geom_line(size = 2)+
+  geom_line(size = 2) +
   scale_x_date(date_breaks = "3 months")
 ```
 
@@ -3175,7 +3209,7 @@ ggplot(
 
 .pull-right[
 
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-171-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-170-1.png" width="504" /&gt;
 
 The default date labels... not great.  
 
@@ -3195,7 +3229,7 @@ ggplot(
   mapping = aes(
     x = date_report,
     y = CFR))+
-  geom_line(size = 2)+
+  geom_line(size = 2) +
   scale_x_date(
     date_breaks = "3 months",
 *   date_labels = "%d %b \n %Y")
@@ -3209,7 +3243,7 @@ Note use of `date_labels=` here, not `labels=`.
 
 .pull-right[
 
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-173-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-172-1.png" width="504" /&gt;
 Better... but the years are redundant.  
 
 ]
@@ -3229,7 +3263,7 @@ ggplot(
   mapping = aes(
     x = date_report,
     y = CFR))+
-  geom_line(size = 2)+
+  geom_line(size = 2) +
   scale_x_date(
     date_breaks = "3 months",
 *   labels = scales::label_date_short())
@@ -3242,7 +3276,7 @@ Note use of `labels=` here, not `date_labels=`.
 ] 
 
 .pull-right[
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-175-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-174-1.png" width="504" /&gt;
 ]
 
 
@@ -3261,8 +3295,8 @@ ggplot(
   mapping = aes(
     x = med_age,
 *   y = scales::percent(CFR),
-    size = cases))+
-geom_point(alpha = 0.5)+
+    size = cases)) +
+geom_point(alpha = 0.5) +
 geom_label_repel(
  aes(label = str_glue("{eth_race}\n{scales::comma(cases)} cases")),
  size = 4)
@@ -3273,22 +3307,203 @@ geom_label_repel(
 ] 
 
 .pull-right[
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-177-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-176-1.png" width="504" /&gt;
+]
+
+
+
+---
+# Combining plots - plot 1
+
+The **cowplot** package facilitates combining multiple plots, while aligning elements such as axes.  
+
+
+
+.pull-left[
+
+
+```r
+plot1 &lt;- plot2 &lt;- linelist %&gt;% 
+  ggplot(
+    mapping = aes(
+      x = date_report),
+    binwidth = 7)+
+  geom_histogram()+
+  theme_minimal()+
+  scale_y_continuous(expand = c(0,0))+
+  scale_x_date(
+    expand = c(0,0),
+    limits = c(as.Date("2020-03-01"), max(linelist$date_report, na.rm=T)),
+    date_breaks = "months",
+    labels = scales::label_date_short())
+```
+]
+
+.pull-right[
+
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-179-1.png" width="504" /&gt;
+
+]
+
+---
+
+# Combining plots - plot 2 
+
+.pull-left[
+
+
+```r
+plot2 &lt;- linelist %&gt;% 
+  group_by(week = floor_date(date_report, "week")) %&gt;% 
+  summarise(ci = list(mean_cl_normal(age) %&gt;% rename(mean=y, lwr=ymin, upr=ymax))) %&gt;% 
+  unnest() %&gt;%  
+  ggplot(
+    mapping = aes(
+      x = week,
+      y = mean,
+      ymin = lwr,
+      ymax = upr))+
+  geom_ribbon(alpha = 0.5, fill = "green", color = "green")+
+  geom_line(size = 2, color = "darkgreen")+
+  scale_x_date(
+    limits = c(as.Date("2020-03-01"), max(linelist$date_report, na.rm=T)),
+    expand = c(0,0),
+    date_breaks = "months",
+    labels = scales::label_date_short()
+  )+
+  coord_cartesian(ylim = c(30, 60))+
+  theme_minimal()+
+  labs(
+    y = "Weekly mean age (95%CI)",
+    x = "Month")
+```
+
+]
+
+.pull-right[
+
+
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-181-1.png" width="504" /&gt;
+
 ]
 
 
 
 
 ---
-# Combining plots  
 
-DRAFT - The **cowplot** package
+# Combined plots  
+
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-182-1.png" width="504" /&gt;
+
+
+
+---
+# Dual axis - plot 1  
+
+.pull-left[
+You can also use **cowplot** to overlap two plots and create a "dual-axis" plot.  
+
+Create the first plot, assigning it a name:  
+
+
+```r
+plot1 &lt;- ggplot(
+  data = linelist,
+  mapping = aes(
+    x = date_report)) + 
+geom_histogram(color = "grey", alpha = 0.5)+
+theme_cowplot()+
+scale_x_date(
+  limits = c(as.Date("2020-03-01"), max(linelist$date_report, na.rm=T)),  
+  date_breaks = "months",
+  labels = scales::label_date_short(),
+  expand = c(0,0),
+  name = "")+
+scale_y_continuous(
+  expand = c(0,0),
+  name = "Weekly reported case incidence")
+```
+]
+
+
+.pull-right[
+
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-184-1.png" width="504" /&gt;
+
+]
+
+
+---
+
+# Dual-axis - plot 2
+
+.pull-left[
+
+
+```r
+plot2 &lt;- linelist %&gt;% 
+  group_by(epiweek) %&gt;% 
+  summarise(
+    CFR = sum(died == "Yes", na.rm=T) / n() 
+    ) %&gt;% 
+ggplot(
+  mapping = aes(
+    x = epiweek,
+    y = CFR))+
+    geom_line(size = 2, color = "orange")+
+  theme_cowplot()+
+  scale_y_continuous(
+    position = "right",
+    limits = c(0, 0.2),
+    expand = c(0,0),
+    name = "Weekly CFR")+
+  scale_x_date(
+    limits = c(as.Date("2020-03-01"), max(linelist$date_report, na.rm=T)),  
+    date_breaks = "months",
+    labels = scales::label_date_short(),
+    expand = c(0,0),
+    name = "Epiweek")+
+  theme(
+    axis.text.y = element_text(color = "orange", face = "bold"),
+    axis.title.y = element_text(color = "orange", face = "bold")
+  )
+```
+
+]
+
+.pull-right[
+
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-186-1.png" width="504" /&gt;
+
+]
+
+
+---
+
+# Dual-axis - combined
+
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-187-1.png" width="504" /&gt;
+
 
 
 
 
 ---
-# Final slide
+
+# Interactive plots  
+
+Use the **ggplotly** package to convert most ggplots to interactive plots.  
+
+
+
+
+
+
+---
+# Thank you  
+
+
 
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
