@@ -4398,8 +4398,23 @@ plotly::ggplotly(age_plot)
 ```
 
 
+
+---
+class: inverse, center, middle
+
+# Geographic Information Systems (GIS) 
+### An introduction with R 
+
+---
+# Coordinate reference systems 
+
+
+<iframe width="100%" height="676" frameborder="0"
+  src="https://observablehq.com/embed/@d3/projection-transitions?cells=viewof+context"></iframe>
+
+.footnote[
+Source: ![Mike Bostock]("https://observablehq.com/@d3/projection-transitions")
+]
+
 ---
 # Thank you  
-
-
-
