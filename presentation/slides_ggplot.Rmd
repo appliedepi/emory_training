@@ -4739,7 +4739,7 @@ choropleth
 - Placeholder for demo > see case study [weekly_report.Rmd](https://github.com/appliedepi/emory_training/blob/master/case_study/weekly_report.Rmd#L1894) for details 
 
 .center[
-```{r, bivarmap_demo}
+```{r bivarmap_demo, eval = FALSE}
 
 # prepare data for plotting 
 #############################
