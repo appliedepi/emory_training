@@ -2039,7 +2039,7 @@ ggplot(
   mapping = aes(
     x = month,
 *   y = CFR) +
-geom_line(size = 2, color = "brown")+
+geom_line(size = 2, color = "brown") +
 *scale_y_continuous(
 *  labels = scales::percent)
 ```
@@ -2380,7 +2380,7 @@ knitr::include_graphics("https://github.com/appliedepi/emory_training/blob/maste
 
 --
 
-Use `geom_bar()` if bar height should reflect the number of rows in the data (e.g. a case linelist).  
+Use `geom_bar()` if bar height should reflect the **number of rows** in the data (e.g. a case linelist).  
 
 ```{r, echo=T, eval=F}
 ggplot(
@@ -2391,7 +2391,7 @@ ggplot(
 
 --
 
-Use `geom_col()` if the data have a numeric column containing the desired bar height (e.g. aggregated count data).  
+Use `geom_col()` if the data have a numeric column containing the desired **bar height** (e.g. aggregated count data).  
 
 ```{r, eval=F, echo=T}
 ggplot(
