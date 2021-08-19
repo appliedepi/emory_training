@@ -1973,7 +1973,7 @@ scale_x_date(
 
 ```
 
-Alternatively, simplify by assigning `labels=` to `label_date_short()` from [**scales**](https://scales.r-lib.org/)  
+Alternatively, simplify by assigning `labels=` to `label_date_short()` from [**the scales package**](https://scales.r-lib.org/)  
 
 This reduces times the times "year" appears.  
 
