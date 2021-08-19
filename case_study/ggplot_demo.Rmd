@@ -1,6 +1,8 @@
 ---
 title: "ggplot2 demo"
 output: html_document
+author: "EpiRHandbook Team"
+date: "20 August 2021"
 ---
 
 ```{r setup, include=FALSE}
@@ -8,6 +10,16 @@ knitr::opts_chunk$set(echo = TRUE,
                       warning = FALSE,
                       message = FALSE)
 ```
+
+
+# Introduction  
+
+This R markdown script contains the R code used in the ggplot2 / data visualization demonstration.  
+The intention is that you can run these codes at your leisure and explore how the syntax works.  
+
+* Each code chunk below corresponds to a topic covered in the accompanying slide deck.  
+* Note:  some of the early slide deck plots had their text size enlarged with `theme_grey(base_size = 16)` to ease readability on the slides. This modification is not added in this script, until the standard theme commands are introduced.  
+
 
 This script includes the R code to produce the **ggplot2** figures in these [presentation slides](https://appliedepi.github.io/emory_training/presentation/slides_ggplot.html) 
 
@@ -32,6 +44,9 @@ pacman::p_load(
 
 
 # Import cleaned linelist data
+
+We assume that you are running this script from within the downloadable (zipped folder) R project called "case_study".  
+The directory structure assumed by the below command is that the "linelist_cleaned.rds" dataset is stored within at the file path "data/covid_example_data/linelist_cleaned.rds", from the R project root folder.  
 
 ```{r}
 linelist <- import(here::here("data", "covid_example_data", "linelist_cleaned.rds"))
@@ -181,7 +196,7 @@ ggplot(
 
 # Facets/small multiples
 
-```{r}
+```{r, fig.width=10, fig.height=10}
 
 # facet wrap by ethnicity/race value
 ggplot(data = linelist,
@@ -272,7 +287,22 @@ ggplot(linelist) +
 
 # Scales - adjusted fill  
 
+
+
 ```{r}
+ggplot(linelist) +
+geom_bar(aes(x = eth_race, fill = died)) +
+scale_fill_manual(        
+  values = c("Yes" = "violetred", 
+             "No" = "aquamarine",
+            "Unknown" = "grey")) +
+theme_gray(base_size = 18)
+```
+
+Note that you can adjust the `fig.width=` and `fig.height=` parameters of the R Markdown chunk to make the image larger or smaller.
+This can resolve the problem of text being too large.  
+
+```{r, fig.width=12, fig.height=8}
 ggplot(linelist) +
 geom_bar(aes(x = eth_race, fill = died)) +
 scale_fill_manual(        
