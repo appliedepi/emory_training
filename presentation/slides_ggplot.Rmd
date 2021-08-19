@@ -1523,7 +1523,7 @@ ggplot(
     fill = eth_race)) +
 geom_histogram() +
 facet_wrap(~ eth_race) +
-gghighlight::gghighlight()+
+gghighlight::gghighlight() +
 theme_minimal(base_size = 14)
 ```
 
@@ -1596,11 +1596,11 @@ Scale commands replace defaults of *how* the aesthetic mappings manifest, such a
 * The min/max of point sizes  
 * The min/max and frequency of axes breaks  
 
-As a generic formula, these commands are written as: `scale_AESTHETIC_METHOD()`.  
+As a generic formula, these commands are written as: **`scale_AESTHETIC_METHOD()`**.  
 
-1) `scale_` : this prefix never changes  
-2) Aesthetics like: `_fill_` , `_color_` , `_x_` , `_y_` , etc.  
-3) Methods like: `_continuous()`, `_discrete()`, `_manual()`, `_date()` etc.
+1) `scale_`: this prefix never changes  
+2) AESTHETIC: `_fill_` , `_color_` , `_x_` , `_y_` , etc.  
+3) METHOD: `_continuous()`, `_discrete()`, `_manual()`, `_date()` etc.
 
 
 
