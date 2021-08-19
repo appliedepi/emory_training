@@ -197,7 +197,7 @@ Our objectives today are to:
 
 Today's work is within an R project, which can be [downloaded as a zipped file](https://minhaskamal.github.io/DownGit/#/home?url=https://github.com/appliedepi/emory_training/tree/master/case_study).  
 
-Today's code is available to you in `ggplot_demo.Rmd` (can also be viewed online [here](https://github.com/appliedepi/emory_training/blob/master/case_study/ggplot_demo.Rmd)).  
+Today's code is available to you in `ggplot_demo.Rmd` (also online [here](https://github.com/appliedepi/emory_training/blob/master/case_study/ggplot_demo.Rmd)).  
 
 R project file (`case_study.Rproj`)  
   * `data/` folder  
@@ -355,7 +355,7 @@ The order of layers will usually look like this:
 
 --
 
-2) **"Map" data columns** to features of the plot such as axes, color, size, shape, fill, transparency  
+2) **"Map" data columns** to "aesthetic" features of the plot such as axes, color, size, shape, fill, transparency  
 
 --
 
@@ -431,9 +431,9 @@ ggplot(
 *  y = days_hosp))
 ```
 
-`mapping = aes()` assigns plot "aesthetics" to columns in the data. Its inputs must be placed within `aes()`.  
-
 "Aesthetics" are features *whose display could vary for each data point* (position, color, shape...)  
+
+`mapping = aes()` assigns plot "aesthetics" to columns in the data. Inputs must be placed within `aes()`.  
 
 Two basic aesthetic mappings are axes, via `x=` and `y=`.  
 
@@ -726,10 +726,11 @@ theme_grey(base_size = 16)
 .pull-left[
 
 ```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
-ggplot(data = linelist,
-       mapping = aes(
-         x = age,
-         y = days_hosp)) +
+ggplot(
+  data = linelist,
+  mapping = aes(
+   x = age,
+   y = days_hosp)) +
 geom_point() +
 *geom_smooth()
 ```
@@ -841,41 +842,6 @@ Argument        |Controls
 Note that “aesthetic” in ggplot has a specific meaning that you might associate with the word “aesthetics” in common English. In ggplot those details are called “themes” and are adjusted within a theme() command
 
 Each geom accepts certain aesthetics, like `binwidth=` for `geom_histogram()`
-
-
-
-
----
-# Aesthetic mapping placement  
-
-* Mappings written in the initial `ggplot()` call apply to all following instructions (e.g. axes), *unless otherwise indicated*  
-* Mappings written within one geom apply only to that geom  
-
-```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
-ggplot(                
-  data = linelist,      
-* mapping = aes(        
-*   x = age,
-*   y = days_hosp)) +
-geom_point()        
-```
-
-is the same as:  
-
-```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
-ggplot(data = linelist)+    
-  geom_point(               
-*   mapping = aes(           
-*    x = age,
-*    y = days_hosp))
-```
-
-(but only because there is only one geom)  
-
-
-???
-- Explain why you might use one or the other  
-
 
 
 
@@ -1163,10 +1129,69 @@ theme_grey(base_size = 16)
 ```
 ]
 
-???
+.footnote[Read more about ggplot aesthetics [here](https://ggplot2.tidyverse.org/articles/ggplot2-specs.html)]  
 
+
+???
 As there is only one geom, all aesthetics can be written in `ggplot()`, or in `geom_point()`
 
+
+
+
+---
+# Aesthetic mapping placement  
+
+* Dynamic mappings in the initial `ggplot()` call will apply to subsequent geoms, *unless otherwise indicated*  
+* Static aesthetics (e.g. `color = "blue"`) are not inherited by subsequent geoms  
+* Mappings written within one geom apply only to that geom  
+
+.pull-left[
+```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
+ggplot(                
+  data = linelist,      
+  mapping = aes(        
+    x = age,
+    y = days_hosp)) +
+# points colored by outcome
+  geom_point(
+  mapping = aes(color = died),
+  size = 1) +
+# smoothed means by outcome
+geom_smooth(
+  mapping = aes(color = died),
+  size = 3) +
+# smoothed mean of entire dataset
+geom_smooth(color = "black")
+```
+]
+
+.pull-right[
+```{r, echo = F, eval = T, tidy = FALSE}
+ggplot(                
+  data = linelist,      
+  mapping = aes(        
+    x = age,
+    y = days_hosp)) +
+# points colored by outcome
+  geom_point(
+  mapping = aes(color = died),
+  size = 1) +
+# smoothed means by outcome
+geom_smooth(
+  mapping = aes(color = died),
+  size = 3) +
+# smoothed mean of entire dataset
+geom_smooth(color = "black") +
+theme_minimal(base_size = 16)
+```
+]
+
+
+???
+- Which is cleaner and easier to read?
+- When would you want to assign different dynamic aesthetics for different layers? E.g. Points colored by outcome, but geom_text in black only. 
+- Explain why you might use one or the other  
+- Note that aesthetics written outside will not automatically be inherited. 
 
 
 
@@ -1175,18 +1200,16 @@ As there is only one geom, all aesthetics can be written in `ggplot()`, or in `g
 
 .pull-left[
 
-If you plot "grouped" data indiscriminately, without corresponding dynamic aesthetics in `ggplot()`, you get multiple y values per x value.  
+If your data are "grouped", yet you plot indiscriminately without the grouping assigned to a dynamic aesthetic, you get multiple y values per x value.  
 
-Dataset `outcome_week_data` has one row per unique week-outcome.  
-
+Below, `linelist` is aggregated into counts per unique week-outcome.  
 
 ```{r, eval=F, echo = T, warning=F, message=F}
 outcome_week_data <- linelist %>% 
-* count(
-*   died,
-*   week_onset = floor_date(
-*     x = date_onset,
-*     unit = "week")) %>% 
+* count(died,
+*       week_onset = floor_date(
+*        x = date_onset,
+*        unit = "week")) %>% 
   select(week_onset, everything()) %>% 
   arrange(week_onset) %>% 
   drop_na(week_onset)
@@ -1195,7 +1218,7 @@ outcome_week_data <- linelist %>%
 
 
 .pull-right[
-First 6 rows:  
+First few rows:  
 
 ```{r, eval=T, echo = F, warning=F, message=F}
 outcome_week_data <- linelist %>% 
@@ -1210,7 +1233,7 @@ outcome_week_data <- linelist %>%
   drop_na(week_onset)
 
 outcome_week_data %>%
-  head() %>% 
+  head(8) %>% 
   knitr::kable()
 ```
 
@@ -1225,14 +1248,14 @@ outcome_week_data %>%
 
 ```{r, echo=T, eval=F}
 ggplot(
-  data = outcome_week_data,
+* data = outcome_week_data,
   mapping = aes(
     x = week_onset,       
     y = n)) +
 geom_line()
 ```
 
-Above, the column `died` is not provided to any grouping argument.  
+Above, the column `died` is not provided to any grouping aesthetic.  
 
 `ggplot()` does not know how to display the multiple values for each week.  
 
@@ -1598,7 +1621,7 @@ Scale commands replace defaults of *how* the aesthetic mappings manifest, such a
 
 As a generic formula, these commands are written as: **`scale_AESTHETIC_METHOD()`**.  
 
-1) `scale_`: this prefix never changes  
+1) `scale_` : this prefix never changes  
 2) AESTHETIC: `_fill_` , `_color_` , `_x_` , `_y_` , etc.  
 3) METHOD: `_continuous()`, `_discrete()`, `_manual()`, `_date()` etc.
 
@@ -1697,9 +1720,10 @@ ggplot(
     fill = died)) +
   geom_bar() +
 scale_fill_manual(        
-  values = c("Yes" = "violetred", 
-             "No" = "aquamarine",
-            "Unknown" = "grey")) +
+  values = c(
+    "Yes" = "violetred", 
+    "No" = "aquamarine",
+    "Unknown" = "grey")) +
 theme_gray(base_size = 16)
 ```
 ]
@@ -1721,9 +1745,10 @@ ggplot(
     fill = died)) +
   geom_bar() +
 scale_fill_manual(        
-  values = c("Yes"     = "violetred", 
-             "No"      = "aquamarine",
-             "Unknown" = "grey")) +
+  values = c(
+    "Yes"     = "violetred", 
+    "No"      = "aquamarine",
+    "Unknown" = "grey")) +
 *scale_y_continuous(
 *  breaks = seq(from = 0,
 *               to = 35000,
@@ -1975,7 +2000,7 @@ scale_x_date(
 
 Alternatively, simplify by assigning `labels=` to `label_date_short()` from [**the scales package**](https://scales.r-lib.org/)  
 
-The year is not repeted on each label anymore.  
+The year is not repeated on each label anymore.  
 
 ]
 
@@ -2005,7 +2030,7 @@ theme_grey(base_size = 18)
 
 ---
 
-class: small-table  
+class: medium-large-table  
 
 # Scales - display percents  
 
@@ -2040,8 +2065,7 @@ ggplot(
     x = month,
 *   y = CFR) +
 geom_line(size = 2, color = "brown") +
-*scale_y_continuous(
-*  labels = scales::percent)
+*scale_y_continuous(labels = percent)
 ```
 
 ] 
@@ -2055,14 +2079,15 @@ ggplot(
     x = month,
     y = CFR)) +
 geom_line(size = 2, color = "brown")+
-scale_y_continuous(labels = scales::percent) +
-theme_grey(base_size = 16)
+scale_y_continuous(labels = percent) +
+theme_grey(base_size = 18)
 
 ```
 ]
 
 
-
+???
+Remember to load the scales package
 
 
 
@@ -2122,27 +2147,24 @@ theme_grey(base_size = 18)
 See the [Epi R Handbook page](https://epirhandbook.com/characters-and-strings.html#dynamic-strings) on adjusting characters with the **stringr** package
 
 **New lines**  
-Use `\n` within the string to bump to a new line, or place the text in [`str_wrap()`](https://stringr.tidyverse.org/reference/str_wrap.html)
 
 ```{r, eval=F, echo=T}
-title = "Top line\nNextline"                        # \n creates new line
-title = str_wrap("This is a really long title", 30) # wrap at 30 characters
+"Top line\nNextline"                        # \n creates new line
+str_wrap("This is a really long title", 30) # wrap at 30 characters
 ```
 
 
 --
 
 
-**Dynamic labels**  
-Use `str_glue()` to imbed R code that updates with the data.  
+**Dynamic labels** - Imbed code in `str_glue()` that updates with the data  
 
-```{r, eval=F, echo=T}
-caption = str_glue("Data as of {Sys.Date()}")
+```{r, eval=T, echo=T}
+str_glue("Data as of {Sys.Date()}")
 ```
 
-```{r, eval=F, echo=T}
-caption = str_glue("{nrow(linelist %>% filter(is.na(date_onset)))} cases \\
-                   missing date of onset and not shown")
+```{r, eval=T, echo=T}
+str_glue("{fmt_count(linelist, is.na(date_onset))} cases missing onset and not shown")
 ```
 
 
@@ -2150,7 +2172,7 @@ caption = str_glue("{nrow(linelist %>% filter(is.na(date_onset)))} cases \\
 
 
 **Legend title**  
-In `labs()`, write the aesthetic that created the legend, like `fill=`, `color=`, or `shape=`, and provide a title.  
+In `labs()`, write the aesthetic (e.g. `fill=`, `color=`) and provide a title.  
 
 
 
@@ -2359,19 +2381,6 @@ Remember to add them AFTER any complete themes.
 
 
 
----
-
-# Point-and-click ggplot2  
-
-Now that you've learned the basic syntax... the [**esquisse**](https://cran.r-project.org/web/packages/esquisse/vignettes/get-started.html]) package allows point-and-click creation of (simple) ggplots! (esquisse means "sketch" in French)  
-
-```{r, eval = TRUE, echo = FALSE}
-knitr::include_graphics("https://github.com/appliedepi/emory_training/blob/master/presentation/images/esquisse1.gif?raw=true")
-```
-
-
-
-
 
 ---
 # Bar plots  
@@ -2380,7 +2389,8 @@ knitr::include_graphics("https://github.com/appliedepi/emory_training/blob/maste
 
 --
 
-Use `geom_bar()` if bar height should reflect the **number of rows** in the data (e.g. a case linelist).  
+Use `geom_bar()` if bar height should reflect the **number of rows** in the data
+(e.g. a case linelist).  
 
 ```{r, echo=T, eval=F}
 ggplot(
@@ -2391,7 +2401,8 @@ ggplot(
 
 --
 
-Use `geom_col()` if the data have a numeric column containing the desired **bar height** (e.g. aggregated count data).  
+Use `geom_col()` there is a numeric column containing the desired **bar height**
+(e.g. aggregated count data).  
 
 ```{r, eval=F, echo=T}
 ggplot(
@@ -2428,7 +2439,7 @@ ggplot(
   data = linelist,
   mapping = aes(x = eth_race)) +             
 geom_bar() +
-theme(axis.text.x = element_text(angle = 30))  
+theme(axis.text.x= element_text(angle=30))  
 ```
 
 ]
@@ -2441,7 +2452,7 @@ ggplot(
   mapping = aes(x = eth_race)) +             
 geom_bar()+                  
 theme_grey(base_size = 16) +
-theme(axis.text.x = element_text(angle = 30))
+theme(axis.text.x= element_text(angle = 30))
 ```
 ]
 
@@ -2469,7 +2480,7 @@ ggplot(
       x = eth_race,   
 *     fill = died)) +             
 geom_bar() + 
-theme(axis.text.x = element_text(angle = 30))
+theme(axis.text.x= element_text(angle=30))
 ```
 
 ]
@@ -2484,7 +2495,7 @@ ggplot(
       fill = died)) +             
 geom_bar()+   # stack bars by column "died"  
 theme_grey(base_size = 16)+
-theme(axis.text.x = element_text(angle = 30))
+theme(axis.text.x= element_text(angle = 30))
 ```
 ]
 
@@ -2512,11 +2523,12 @@ linelist_eth %>%
 Column `n` provides the bar height.    
 
 ```{r, echo=T, eval=F}
-ggplot(linelist_eth) + # use counts dataset             
-*  geom_col(           # height by value
+ggplot(linelist_eth) +             
+*  geom_col(           
     mapping = aes(   
-      x = eth_race,    # one per ethnicity.
-*     y = n))          # y= for bar height    
+      x = eth_race,    
+*     y = n))+
+theme(axis.text.x= element_text(angle = 30))         
 ```
 
 
@@ -2526,11 +2538,12 @@ ggplot(linelist_eth) + # use counts dataset
 
 ```{r, eval=T, echo=F}
 ggplot(linelist) +             
-  geom_bar(              # column height by number of rows
+  geom_bar(              
     mapping = aes(
-      x = eth_race,           # one bar per ethnicity. No y= argument. 
-    )
-  )
+      x = eth_race))+
+theme_grey(base_size = 16)+
+theme(axis.text.x= element_text(angle = 30))
+  
 ```
 
 
@@ -2589,11 +2602,12 @@ linelist_eth_died %>%
 
 ```{r, echo=T, eval=F}
 ggplot(linelist_eth_died) +               
-  geom_col(                 
-    mapping = aes(
-      x = eth_race,          
-*     y = n,                
-*     fill = died))         
+geom_col(                 
+  mapping = aes(
+    x = eth_race,          
+*   y = n,                
+*   fill = died)) +
+theme(axis.text.x= element_text(angle=30))
 ```
 
 ]
@@ -2607,7 +2621,8 @@ ggplot(linelist_eth_died) + # begin with data aggregated by day/ethnicity
       x = eth_race,            # one bar per ethnicity. 
       y = n,               # bar height from column "n"
       fill = died)) +        # stacked bars by outcome
-theme_grey(base_size = 16)
+theme_grey(base_size = 16)+
+theme(axis.text.x= element_text(angle = 30))
 ```
 
 ]
@@ -2624,10 +2639,11 @@ It is simple to flip the axes on any ggplot by adding `coord_flip()`
 
 ```{r, echo=T, eval=F}
 ggplot(linelist) +        
-  geom_bar(              
-    mapping = aes(
-      x = eth_race,            
-      fill = died)) +    
+geom_bar(              
+  mapping = aes(
+    x = eth_race,            
+    fill = died)) +
+theme(legend.position = "top") +  
 * coord_flip()           
 ```
 
@@ -2641,38 +2657,13 @@ ggplot(linelist) +
   geom_bar(              
     mapping = aes(
       x = eth_race,          
-      fill = died)) +    
-  coord_flip() + 
-  theme_grey(base_size = 16)
+      fill = died)) + 
+coord_flip() + 
+theme_grey(base_size = 16)+
+theme(legend.position = "top")  
+
 ```
 ]
-
-
----
-# Bar plot - adjust order  
-
-.pull-left[
-
-Use functions from the **forcats** package to convert the column to class *factor* and adjust the "levels".  
-
-Changes can be made outside ggplot (a lasting change to the dataset), or inside (applies only to this plot).  
-
-[1] See the Epi R Handbook page on [factors](https://epirhandbook.com/factors.html#within-a-plot). 
-
-]
-
-.pull-right[
-
-```{r, eval=T, echo=F}
-ggplot(linelist) +             
-  geom_bar(              # column height by number of rows
-    mapping = aes(
-      x = eth_race,      # one bar per ethnicity. No y= argument. 
-      fill = died)) +    # divide into stacked bars by outcome
-  coord_flip()           # flip x and y axes
-```
-]
-
 
 
 
@@ -2683,18 +2674,21 @@ ggplot(linelist) +
 
 .pull-left[
 
-Below, to order by frequency, `fct_infreq()` is applied to the x-axis column `eth_race` and the fill column `died`.
+
 
 ```{r, echo=T, eval=F}
 ggplot(linelist) +        
-  geom_bar(                
-    mapping = aes(
-*     x = fct_infreq(eth_race),   
-*     fill = fct_infreq(died))) + 
- coord_flip()
+geom_bar(                
+  mapping = aes(
+*   x = fct_infreq(eth_race),   
+*   fill = fct_infreq(died))) + 
+theme(legend.position = "top") +  
+coord_flip()
 ```
 
-You will need to clean up the legend title now, with `labs(fill=)`.  
+Use the **forcats** package to convert to class *factor* and adjust "level" order.  
+
+Above, `fct_infreq()` orders x-axis position and stacks (fill) by frequency.  
 
 ]
 
@@ -2702,16 +2696,24 @@ You will need to clean up the legend title now, with `labs(fill=)`.
 
 ```{r, eval=T, echo=F}
 ggplot(linelist) +             
-  geom_bar(              
-    mapping = aes(
-      x = fct_infreq(eth_race),   
-      fill = fct_infreq(died))) +  
-  coord_flip() + 
-  theme_grey(base_size = 16)
+geom_bar(              
+  mapping = aes(
+    x = fct_infreq(eth_race),   
+    fill = fct_infreq(died))) +  
+coord_flip() + 
+theme_grey(base_size = 16)+
+theme(legend.position = "top") 
 ```
 ]
 
 
+
+.footnote[See the Epi R Handbook page on [factors](https://epirhandbook.com/factors.html#within-a-plot).]  
+
+
+
+???
+You will need to clean up the axes and legend titles now.  
 
 
 ---
@@ -2719,38 +2721,125 @@ ggplot(linelist) +
 
 .pull-left[
 
-To *reverse* bar order, use `fct_rev()` from the **forcats** package. It can be wrapped around other functions. 
-
-The below reverses the previous frequency ordering from `fct_infreq()`.  
-
 
 ```{r, echo=T, eval=F}
 ggplot(linelist)  +              
-  geom_bar(                
-    mapping = aes(
-*     x = fct_rev(fct_infreq(eth_race)),   
-*     fill = fct_rev(fct_infreq(died)))) +       
- coord_flip()              
+geom_bar(                
+  mapping = aes(
+*   x = fct_rev(fct_infreq(eth_race)),   
+*   fill = fct_rev(fct_infreq(died)))) +      
+theme(legend.position = "top") + 
+coord_flip()              
 ```
 
-[1] See the Epi R Handbook page on [factors](https://epirhandbook.com/factors.html#within-a-plot). 
+
+To *reverse* order, use `fct_rev()`, which can be wrapped around other functions. 
+
 ]
 
 .pull-right[
 
 ```{r, eval=T, echo=F}
 ggplot(linelist) +             
-  geom_bar(              # column height by number of rows
-    mapping = aes(
-      x = fct_rev(fct_infreq(eth_race)),            
-      fill = fct_rev(fct_infreq(died)))) +     
-  coord_flip() + 
-  theme_grey(base_size = 16)          
+geom_bar(              # column height by number of rows
+  mapping = aes(
+    x = fct_rev(fct_infreq(eth_race)),            
+    fill = fct_rev(fct_infreq(died)))) +     
+coord_flip() + 
+theme_grey(base_size = 16) +
+theme(legend.position = "top") 
 ```
 
 ]
 
 
+
+
+
+
+---
+
+
+# Bar plot - adjust width  
+
+.pull-left[
+
+```{r, echo = T, eval=F}
+ggplot(
+  data = linelist_eth_died,
+  mapping = aes(
+    x = eth_race,
+    y = n,
+    fill = died)) +             
+*geom_col(width = 0.5) +
+theme(axis.text.x = element_text(angle = 30))
+
+```
+
+Adjust bar width with `width=`.  
+
+]
+
+.pull-right[
+
+```{r, echo=F, eval=T}
+ggplot(linelist_eth_died,
+       aes(x = eth_race, y = n, fill = died)) +             
+  geom_col(width = 0.5) + 
+  theme_grey(base_size = 16)+
+theme(axis.text.x = element_text(angle = 30))
+```
+
+]
+
+???
+Be wary of adjusting width for date bars (e.g. month) - use `geom_histogram()` instead with bin breaks.  
+
+
+
+
+---
+
+
+# Bar plot - adjacent  
+
+.pull-left[
+
+
+```{r, echo = T, eval=F}
+ggplot(
+  data = linelist_eth_died,
+  mapping = aes(
+    x = eth_race,
+    y = n,
+    fill = fct_infreq(died),
+    label = n)) +             
+*geom_col(position = "dodge")+
+theme(axis.text.x = element_text(angle = 30))
+```
+
+To make the bars adjacent, specify `position = "dodge"` in `geom_col()`.  
+
+.footnote[Adjust the order with via a **forcats** function.]
+
+]
+
+.pull-right[
+
+```{r, echo=F, eval=T}
+ggplot(
+  data = linelist_eth_died,
+  mapping = aes(
+    x = eth_race,
+    y = n,
+    fill = fct_infreq(died),
+    label = n)) +             
+  geom_col(position = "dodge") + 
+  theme_grey(base_size = 16)+
+theme(axis.text.x = element_text(angle = 30))
+```
+
+]
 
 
 
@@ -2776,11 +2865,13 @@ ggplot(
 geom_col() +
 *geom_text(
 * size = 3,
-* position = position_stack(vjust = 0.5))
+* position = position_stack(vjust = 0.5)) +
+theme(axis.text.x = element_text(angle=30))
 ```
 
 .footnote[
-Best to use `geom_col()` and not `geom_bar()` for this. Also, try `geom_label()` if you want a box around the text.  
+It is best to use `geom_col()` if displaying text.
+Also, try `geom_label()` for boxes around the text.  
 ]
 
 ]
@@ -2790,195 +2881,34 @@ Best to use `geom_col()` and not `geom_bar()` for this. Also, try `geom_label()`
 ```{r, echo=F, eval=T}
 ggplot(linelist_eth_died,
        aes(x = eth_race, y = n, fill = died, label = n)) +             
-  geom_col() +
-  geom_text(size = 3, position = position_stack(vjust = 0.5)) + 
-  theme_grey(base_size = 16)
+geom_col() +
+geom_text(size = 3, position = position_stack(vjust = 0.5)) + 
+theme_grey(base_size = 16) +
+theme(axis.text.x = element_text(angle=30))
 ```
 
 ]
+
+
+
+
+
+
 
 
 
 
 ---
 
+# Point-and-click ggplot2  
 
-# Bar plot - adjust width  
+Now that you've learned the basic syntax... the [**esquisse**](https://cran.r-project.org/web/packages/esquisse/vignettes/get-started.html]) package allows point-and-click creation of (simple) ggplots! (esquisse means "sketch" in French)  
 
-.pull-left[
-
-Adjust bar width with `width=`.  
-
-```{r, echo = T, eval=F}
-ggplot(
-  data = linelist_eth_died,
-  mapping = aes(
-    x = eth_race,
-    y = n,
-    fill = died)) +             
-*geom_col(width = 0.5) +
-
+```{r, eval = TRUE, echo = FALSE}
+knitr::include_graphics("https://github.com/appliedepi/emory_training/blob/master/presentation/images/esquisse1.gif?raw=true")
 ```
 
-]
 
-.pull-right[
-
-```{r, echo=F, eval=T}
-ggplot(linelist_eth_died,
-       aes(x = eth_race, y = n, fill = died)) +             
-  geom_col(width = 0.5) + 
-  theme_grey(base_size = 16)
-```
-
-]
-
-???
-Be wary of adjusting width for date bars (e.g. month) - use `geom_histogram()` instead with bin breaks.  
-
-
-
-
----
-
-
-# Bar plot - adjacent  
-
-.pull-left[
-
-To make the bars adjacent, specify `position = "dodge"` in `geom_col()`.  
-
-```{r, echo = T, eval=F}
-ggplot(
-  data = linelist_eth_died,
-  mapping = aes(
-    x = eth_race,
-    y = n,
-    fill = died,
-    label = n)) +             
-* geom_col(position = "dodge")
-```
-
-.footnote[
-Adjust the order with via a **forcats** function that adjusts factor levels.  
-]
-
-]
-
-.pull-right[
-
-```{r, echo=F, eval=T}
-ggplot(
-  data = linelist_eth_died,
-  mapping = aes(
-    x = eth_race,
-    y = n,
-    fill = died,
-    label = n)) +             
-  geom_col(position = "dodge") + 
-  theme_grey(base_size = 16)
-```
-
-]
-
-
-
----
-
-
-# Bar plot - adjacent with text  
-
-.pull-left[
-
-To display text on adjacent bars, add the `group=` argument in `aes()`, and adjust `geom_text(position=)` as below.  
-
-```{r, echo = T, eval=F}
-ggplot(
-  data = linelist_eth_died,
-  mapping = aes(
-    x = eth_race,
-    y = n,
-*   group = died,
-    fill = died,
-    label = n)) +             
-  geom_col(position = "dodge") +
-  geom_text(
-    size = 3,
-*   position = position_dodge(width = 1),
-    vjust = -1)
-```
-
-]
-
-.pull-right[
-
-```{r, echo=F, eval=T}
-ggplot(
-  data = linelist_eth_died,
-  mapping = aes(
-    x = eth_race,
-    y = n,
-    fill = died,
-    group = died,
-    label = n)) +             
-geom_col(position = "dodge") +
-geom_text(size = 3, position = position_dodge(width = 1), vjust = -1) + 
-theme_grey(base_size = 16)
-
-```
-
-]
-
-
-
-
----
-
-
-# Bar plot - flip axes with text  
-
-.pull-left[
-
-If flipping axes, you will need to manually adjust `hjust=` in `geom_text()` to meet your needs.  
-
-```{r, echo = T, eval=F}
-ggplot(
-  data = linelist_eth_died,
-  mapping = aes(
-    x = eth_race,
-    y = n,
-    group = died,
-    fill = died,
-    label = n)) +             
-geom_col(position = "dodge")+
-geom_text(
-  size = 3,
-  position = position_dodge(width = 1),
-* hjust = -1) +
-*coord_flip()    # flip axes
-```
-
-]
-
-.pull-right[
-
-```{r, echo=F, eval=T}
-ggplot(
-  data = linelist_eth_died,
-  mapping = aes(
-    x = eth_race,
-    y = n,
-    fill = died,
-    group = died,
-    label = n)) +             
-geom_col(position = "dodge")+
-geom_text(size = 3, position = position_dodge(width = 1), hjust = 1) +
-coord_flip() + 
-theme_grey(base_size = 16)
-
-```
-
-]
 
 
 
@@ -3000,8 +2930,6 @@ Two approaches that we suggest:
 Today's demonstration will focus on **incidence2**.  
 
 .footnote[See the Epi R handbook's [Epicurves page](https://epirhandbook.com/epidemic-curves.html) for detailed examples of both methods]  
-
-
 
 
 

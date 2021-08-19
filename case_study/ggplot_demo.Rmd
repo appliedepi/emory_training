@@ -147,7 +147,7 @@ ggplot(
   mapping = aes(
     x = age,
     y = days_hosp,
-    color = died))+ # color varies by outcome
+    color = died))+     # color varies by outcome
 geom_point(size = 7,    # all points 7x size
            alpha = 0.7) # transparency    
 ```
@@ -158,10 +158,9 @@ geom_point(size = 7,    # all points 7x size
 ```{r}
 # create data
 outcome_time_data <- linelist %>% 
-  group_by(died,
-           week_onset = lubridate::floor_date(date_onset, "week")) %>% 
-  summarise(n_cases = n()) %>%
-
+  count(
+    died,
+    week_onset = lubridate::floor_date(date_onset, "week")) %>% 
   select(week_onset, everything()) %>% 
   arrange(week_onset) %>% 
   drop_na(week_onset)
@@ -176,7 +175,7 @@ ggplot(
   data = outcome_time_data,
   mapping = aes(
     x = week_onset,       
-    y = n_cases)) +
+    y = n)) +
   geom_line() +
   labs(title = "Weekly cases, by outcome (?)")
 
@@ -185,7 +184,7 @@ ggplot(
   data = outcome_time_data,
   mapping = aes(
     x = week_onset,       
-    y = n_cases,
+    y = n,
     color = died)) +
   geom_line() +
   labs(title = "Weekly cases, by outcome")
