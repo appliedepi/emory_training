@@ -4173,8 +4173,12 @@ plot2
 
 # Combined plots  
 
-```{r}
-plot_grid(plot1, plot2, rel_heights = c(1,1), ncol = 1, align = "hv")
+```{r, echo = TRUE}
+plot_grid(plot1, 
+          plot2, 
+          rel_heights = c(1, 1), 
+          ncol = 1, 
+          align = "hv")
 ```
 
 
@@ -4314,8 +4318,8 @@ plot2
 
 # Dual-axis - combined
 
-```{r}
-aligned <- align_plots(plot1, plot2, align = "hv")
+```{r echo = TRUE}
+aligned  <- align_plots(plot1, plot2, align = "hv")
 combined <- ggdraw(aligned[[1]]) + draw_plot(aligned[[2]])
 combined
 ```
@@ -4328,7 +4332,7 @@ combined
 
 Use the **ggplotly** package to convert most ggplots to interactive plots.  
 
-```{r}
+```{r echo = TRUE}
 age_plot <- linelist %>% 
   group_by(week = floor_date(date_report, "week")) %>% 
   summarise(ci = list(mean_cl_normal(age) %>% rename(mean=y, lwr=ymin, upr=ymax))) %>% 
