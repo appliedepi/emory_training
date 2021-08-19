@@ -1868,10 +1868,16 @@ geom_histogram() +
 
 ```
 
-Adjust axis labels with `scale_x_date()` Use `date_breaks=` values like "1 week", "2 weeks", or "3 months".  
-Note these are the *axis* label breaks, not histogram bin breaks!  
+Adjust axis labels with `scale_x_date()`.  
 
-.footnote[Note: Default "weeks" start on Mondays. See epiRhandbook epicurves page for alternatives.]
+Use `date_breaks=` values like "1 week", "2 weeks", or "3 months". 
+
+
+Note: these are the *axis* label breaks, not histogram bin breaks!  
+
+.footnote[
+Note: Default "weeks" start on Mondays. See [epiRhandbook epicurves](https://epirhandbook.com/epidemic-curves.html) page for alternatives.
+]
 
 ]
 
