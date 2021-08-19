@@ -1721,9 +1721,9 @@ ggplot(
     fill = died)) +
   geom_bar() +
 scale_fill_manual(        
-  values = c("Yes"    = "violetred", 
-             "No"     = "aquamarine",
-            "Unknown" = "grey")) +
+  values = c("Yes"     = "violetred", 
+             "No"      = "aquamarine",
+             "Unknown" = "grey")) +
 *scale_y_continuous(
 *  breaks = seq(from = 0,
 *               to = 35000,
@@ -1744,8 +1744,8 @@ ggplot(
     fill = died)) +
   geom_bar() +
 scale_fill_manual(        
-  values = c("Yes" = "violetred", 
-             "No" = "aquamarine",
+  values = c("Yes"    = "violetred", 
+             "No"     = "aquamarine",
             "Unknown" = "grey")) +
 scale_y_continuous(
   breaks = seq(from = 0,
@@ -1775,14 +1775,14 @@ ggplot(
 scale_fill_manual(        
   values = c("Yes"    = "violetred", 
              "No"     = "aquamarine",
-            "Unknown" = "grey"))+
+            "Unknown" = "grey")) +
 scale_y_continuous(
   breaks = seq(from = 0,
                to = 35000,
                by = 5000),
-* expand = c(0,0)) +
+* expand = c(0, 0)) +
 *scale_x_discrete(
-*  expand = c(0,0))
+*  expand = c(0, 0))
 ```
 
 In any `scale_x_` or `scale_y_` command, use `expand = c(0,0)` to remove excess space around the plot features.  
