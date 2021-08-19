@@ -2634,9 +2634,6 @@ theme(axis.text.x= element_text(angle = 30))
 
 .pull-left[
 
-It is simple to flip the axes on any ggplot by adding `coord_flip()`  
-
-
 ```{r, echo=T, eval=F}
 ggplot(linelist) +        
 geom_bar(              
@@ -2644,8 +2641,10 @@ geom_bar(
     x = eth_race,            
     fill = died)) +
 theme(legend.position = "top") +  
-* coord_flip()           
+*coord_flip()           
 ```
+
+It is simple to flip the axes on any ggplot by adding `coord_flip()`  
 
 
 ]
@@ -2850,7 +2849,7 @@ theme(axis.text.x = element_text(angle = 30))
 
 .pull-left[
 
-To display text, add `geom_text()` with `aes(label=)` assigned to the height column.  
+To display text, use `geom_col()` with `geom_text()`. Assign `aes(label=)` to the height values.  
 
 The `position=` arg in `geom_text()` can specify display at mid-bar.  
 
@@ -2869,10 +2868,6 @@ geom_col() +
 theme(axis.text.x = element_text(angle=30))
 ```
 
-.footnote[
-It is best to use `geom_col()` if displaying text.
-Also, try `geom_label()` for boxes around the text.  
-]
 
 ]
 
