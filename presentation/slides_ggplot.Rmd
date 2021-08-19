@@ -4171,7 +4171,7 @@ plot2
 
 ---
 
-# Combined plots  
+# Combining plots - result  
 
 ```{r, echo = TRUE}
 plot_grid(plot1, 
@@ -4184,7 +4184,7 @@ plot_grid(plot1,
 
 
 ---
-# Dual axis - plot 1  
+# Dual-axis - plot 1  
 
 .pull-left[
 You can also use **cowplot** to overlap two plots and create a "dual-axis" plot.  
@@ -4197,19 +4197,19 @@ plot1 <- ggplot(
   mapping = aes(
     x = date_report)) + 
 geom_histogram(color = "grey",
-               alpha = 0.5)+
-*theme_cowplot()+
+               alpha = 0.5) +
+*theme_cowplot() +
 scale_x_date(
 * limits = c(
 *   as.Date("2020-03-01"),
-*   max(linelist$date_report, na.rm=T)),  
+*   max(linelist$date_report, na.rm = TRUE)),  
   date_breaks = "months",
   labels = scales::label_date_short(),
-  expand = c(0,0),
-  name = "")+
+  expand = c(0, 0),
+  name = "") +
 scale_y_continuous(
   expand = c(0,0),
-  name = "Weekly reported case incidence")
+  name   = "Weekly reported case incidence")
 ```
 ]
 
