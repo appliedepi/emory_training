@@ -1423,7 +1423,7 @@ theme_grey(base_size = 16)
 
 .pull-left[
 
-**Show a grid layout, use `facet_grid()`. Labels appear on top and side.  
+Use `facet_grid()`. Labels appear on top and side.  
 
 ```{r , echo = TRUE, eval = FALSE, tidy = FALSE}
 ggplot(
@@ -1523,7 +1523,7 @@ ggplot(
     fill = eth_race)) +
 geom_histogram() +
 facet_wrap(~ eth_race) +
-gghighlight::gghighlight()+
+gghighlight::gghighlight() +
 theme_minimal(base_size = 14)
 ```
 
@@ -1596,11 +1596,11 @@ Scale commands replace defaults of *how* the aesthetic mappings manifest, such a
 * The min/max of point sizes  
 * The min/max and frequency of axes breaks  
 
-As a generic formula, these commands are written as: `scale_AESTHETIC_METHOD()`.  
+As a generic formula, these commands are written as: **`scale_AESTHETIC_METHOD()`**.  
 
-1) `scale_` : this prefix never changes  
-2) Aesthetics like: `_fill_` , `_color_` , `_x_` , `_y_` , etc.  
-3) Methods like: `_continuous()`, `_discrete()`, `_manual()`, `_date()` etc.
+1) `scale_`: this prefix never changes  
+2) AESTHETIC: `_fill_` , `_color_` , `_x_` , `_y_` , etc.  
+3) METHOD: `_continuous()`, `_discrete()`, `_manual()`, `_date()` etc.
 
 
 
@@ -1673,14 +1673,17 @@ ggplot(
   geom_bar() +
 *scale_fill_manual(        
 *  values = c(
-*   "Yes"    = "violetred", 
-*   "No"     = "aquamarine",
+*   "Yes"     = "violetred", 
+*   "No"      = "aquamarine",
 *   "Unknown" = "grey"))
 
-#use na.value = "grey"  for missing values
+
 ```
 
 Within `scale_fill_manual()` we provide assignments within a vector `c()`.  
+
+
+.footnote[Use *na.value = "grey"* for missing values]  
 
 ]
 
@@ -1718,9 +1721,9 @@ ggplot(
     fill = died)) +
   geom_bar() +
 scale_fill_manual(        
-  values = c("Yes"    = "violetred", 
-             "No"     = "aquamarine",
-            "Unknown" = "grey")) +
+  values = c("Yes"     = "violetred", 
+             "No"      = "aquamarine",
+             "Unknown" = "grey")) +
 *scale_y_continuous(
 *  breaks = seq(from = 0,
 *               to = 35000,
@@ -1741,8 +1744,8 @@ ggplot(
     fill = died)) +
   geom_bar() +
 scale_fill_manual(        
-  values = c("Yes" = "violetred", 
-             "No" = "aquamarine",
+  values = c("Yes"    = "violetred", 
+             "No"     = "aquamarine",
             "Unknown" = "grey")) +
 scale_y_continuous(
   breaks = seq(from = 0,
@@ -1772,14 +1775,14 @@ ggplot(
 scale_fill_manual(        
   values = c("Yes"    = "violetred", 
              "No"     = "aquamarine",
-            "Unknown" = "grey"))+
+            "Unknown" = "grey")) +
 scale_y_continuous(
   breaks = seq(from = 0,
                to = 35000,
                by = 5000),
-* expand = c(0,0)) +
+* expand = c(0, 0)) +
 *scale_x_discrete(
-*  expand = c(0,0))
+*  expand = c(0, 0))
 ```
 
 In any `scale_x_` or `scale_y_` command, use `expand = c(0,0)` to remove excess space around the plot features.  
@@ -1865,10 +1868,16 @@ geom_histogram() +
 
 ```
 
-Adjust axis labels with `scale_x_date()` Use `date_breaks=` values like "1 week", "2 weeks", or "3 months".  
-Note these are the *axis* label breaks, not histogram bin breaks!  
+Adjust axis labels with `scale_x_date()`.  
 
-.footnote[Note: Default "weeks" start on Mondays. See epiRhandbook epicurves page for alternatives.]
+Use `date_breaks=` values like "1 week", "2 weeks", or "3 months". 
+
+
+Note: these are the *axis* label breaks, not histogram bin breaks!  
+
+.footnote[
+Note: Default "weeks" start on Mondays. See [epiRhandbook epicurves](https://epirhandbook.com/epidemic-curves.html) page for alternatives.
+]
 
 ]
 
@@ -1964,9 +1973,9 @@ scale_x_date(
 
 ```
 
-Alternatively, simplify by assigning `labels=` to `label_date_short()` from [**scales**](https://scales.r-lib.org/)  
+Alternatively, simplify by assigning `labels=` to `label_date_short()` from [**the scales package**](https://scales.r-lib.org/)  
 
-This reduces times the times "year" appears.  
+The year is not repeted on each label anymore.  
 
 ]
 
@@ -2030,7 +2039,7 @@ ggplot(
   mapping = aes(
     x = month,
 *   y = CFR) +
-geom_line(size = 2, color = "brown")+
+geom_line(size = 2, color = "brown") +
 *scale_y_continuous(
 *  labels = scales::percent)
 ```
@@ -2371,7 +2380,7 @@ knitr::include_graphics("https://github.com/appliedepi/emory_training/blob/maste
 
 --
 
-Use `geom_bar()` if bar height should reflect the number of rows in the data (e.g. a case linelist).  
+Use `geom_bar()` if bar height should reflect the **number of rows** in the data (e.g. a case linelist).  
 
 ```{r, echo=T, eval=F}
 ggplot(
@@ -2382,7 +2391,7 @@ ggplot(
 
 --
 
-Use `geom_col()` if the data have a numeric column containing the desired bar height (e.g. aggregated count data).  
+Use `geom_col()` if the data have a numeric column containing the desired **bar height** (e.g. aggregated count data).  
 
 ```{r, eval=F, echo=T}
 ggplot(
@@ -2606,7 +2615,7 @@ theme_grey(base_size = 16)
 
 
 ---
-# Bar plots (flip axes)  
+# Bar plot - flip axes  
 
 .pull-left[
 
@@ -2640,7 +2649,7 @@ ggplot(linelist) +
 
 
 ---
-# Bar plots (adjust order)  
+# Bar plot - adjust order  
 
 .pull-left[
 
@@ -2670,7 +2679,7 @@ ggplot(linelist) +
 
 
 ---
-# Bar plots (adjust order)  
+# Bar plot - adjust order    
 
 .pull-left[
 
@@ -2706,7 +2715,7 @@ ggplot(linelist) +
 
 
 ---
-# Bar plots (reverse order)  
+# Bar plot - reverse order  
 
 .pull-left[
 
@@ -4162,16 +4171,20 @@ plot2
 
 ---
 
-# Combined plots  
+# Combining plots - result  
 
-```{r}
-plot_grid(plot1, plot2, rel_heights = c(1,1), ncol = 1, align = "hv")
+```{r, echo = TRUE}
+plot_grid(plot1, 
+          plot2, 
+          rel_heights = c(1, 1), 
+          ncol = 1, 
+          align = "hv")
 ```
 
 
 
 ---
-# Dual axis - plot 1  
+# Dual-axis - plot 1  
 
 .pull-left[
 You can also use **cowplot** to overlap two plots and create a "dual-axis" plot.  
@@ -4184,19 +4197,19 @@ plot1 <- ggplot(
   mapping = aes(
     x = date_report)) + 
 geom_histogram(color = "grey",
-               alpha = 0.5)+
-*theme_cowplot()+
+               alpha = 0.5) +
+*theme_cowplot() +
 scale_x_date(
 * limits = c(
 *   as.Date("2020-03-01"),
-*   max(linelist$date_report, na.rm=T)),  
+*   max(linelist$date_report, na.rm = TRUE)),  
   date_breaks = "months",
   labels = scales::label_date_short(),
-  expand = c(0,0),
-  name = "")+
+  expand = c(0, 0),
+  name = "") +
 scale_y_continuous(
   expand = c(0,0),
-  name = "Weekly reported case incidence")
+  name   = "Weekly reported case incidence")
 ```
 ]
 
@@ -4305,8 +4318,8 @@ plot2
 
 # Dual-axis - combined
 
-```{r}
-aligned <- align_plots(plot1, plot2, align = "hv")
+```{r echo = TRUE}
+aligned  <- align_plots(plot1, plot2, align = "hv")
 combined <- ggdraw(aligned[[1]]) + draw_plot(aligned[[2]])
 combined
 ```
@@ -4319,7 +4332,7 @@ combined
 
 Use the **ggplotly** package to convert most ggplots to interactive plots.  
 
-```{r}
+```{r echo = TRUE}
 age_plot <- linelist %>% 
   group_by(week = floor_date(date_report, "week")) %>% 
   summarise(ci = list(mean_cl_normal(age) %>% rename(mean=y, lwr=ymin, upr=ymax))) %>% 
