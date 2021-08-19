@@ -1673,14 +1673,17 @@ ggplot(
   geom_bar() +
 *scale_fill_manual(        
 *  values = c(
-*   "Yes"    = "violetred", 
-*   "No"     = "aquamarine",
+*   "Yes"     = "violetred", 
+*   "No"      = "aquamarine",
 *   "Unknown" = "grey"))
 
-#use na.value = "grey"  for missing values
+
 ```
 
 Within `scale_fill_manual()` we provide assignments within a vector `c()`.  
+
+
+.footnote[Use *na.value = "grey"* for missing values]  
 
 ]
 
