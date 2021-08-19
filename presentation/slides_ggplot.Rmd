@@ -1423,7 +1423,7 @@ theme_grey(base_size = 16)
 
 .pull-left[
 
-**Show a grid layout, use `facet_grid()`. Labels appear on top and side.  
+Use `facet_grid()`. Labels appear on top and side.  
 
 ```{r , echo = TRUE, eval = FALSE, tidy = FALSE}
 ggplot(
