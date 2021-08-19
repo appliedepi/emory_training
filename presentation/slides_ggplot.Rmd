@@ -2615,7 +2615,7 @@ theme_grey(base_size = 16)
 
 
 ---
-# Bar plots (flip axes)  
+# Bar plot - flip axes  
 
 .pull-left[
 
@@ -2649,7 +2649,7 @@ ggplot(linelist) +
 
 
 ---
-# Bar plots (adjust order)  
+# Bar plot - adjust order  
 
 .pull-left[
 
@@ -2679,7 +2679,7 @@ ggplot(linelist) +
 
 
 ---
-# Bar plots (adjust order)  
+# Bar plot - adjust order    
 
 .pull-left[
 
@@ -2715,7 +2715,7 @@ ggplot(linelist) +
 
 
 ---
-# Bar plots (reverse order)  
+# Bar plot - reverse order  
 
 .pull-left[
 
