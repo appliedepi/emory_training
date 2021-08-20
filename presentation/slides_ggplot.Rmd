@@ -92,8 +92,7 @@ pacman::p_load(
   tidyverse,  # data management and visualization
   xaringanthemer,  # for styling presentation 
   sf,         # spatial data
-  ggspatial,  # basemaps and scalebars 
-  patchwork   # combine plots
+  ggspatial  # basemaps and scalebars 
 )
 
 
@@ -4535,7 +4534,7 @@ basemap <- ggplot() +
   # this defines the area to download map tiles for
   geom_sf(data = st_as_sfc(bounding_box)) +
   # download map tiles and add to the plot
-  annotation_map_tile(
+  annotation_map_tile(                               #<<
     # define what map tiles to use
     type =  "cartolight",
     # define folder to store tile images 
@@ -4611,18 +4610,26 @@ shapefile <- shapefile %>%
     # clean up calculations 
     incidence = case_when(
            # fix the outliers: set infinity to NA and cases less than 10 to NA
-           cases < 10             ~ NA_real_,
+           cases < 5              ~ NA_real_,
            is.infinite(incidence) ~ NA_real_,  ## nb. infinite due to zero denominator
            TRUE                   ~ incidence)
     )
 
+
+
+```
+
+---
+# Choropleths - prepare data
+
+```{r choropleths_data_two, echo = TRUE}
 
 # define breaks (for plotting groups)
 breakers <- shapefile %>% 
   # change shapefile to a tibble (otherwise geometry pulled with)
   as_tibble() %>% 
   # only keep zips with more than ten cases
-  filter(cases > 10) %>% 
+  filter(cases > 5) %>% 
   # pull the incidence column
   select(incidence) %>% 
   # define grouping cut-offs based on quartiles of observations 
@@ -4638,8 +4645,8 @@ shapefile <- shapefile %>%
                          # add labels by using the cut-offs
                          labels = str_glue("<={breakers}"))
     )
-
 ```
+
 
 ---
 # Choropleths - plot data
@@ -4658,7 +4665,7 @@ choropleth <- basemap +
                     # rename the missing group to be fewer than 10 cases
                     labels = c(
                       levels(shapefile$incidence_cats),
-                      "Fewer than 10 cases")) + 
+                      "Fewer than 5 cases")) + 
   # add in text labels for each zip code 
   geom_sf_text(data = shapefile, 
                aes(label = ZipCode), 
@@ -4679,8 +4686,16 @@ choropleth
 # Bivariate choropleths 
 - Placeholder for demo > see case study [weekly_report.Rmd](https://github.com/appliedepi/emory_training/blob/master/case_study/weekly_report.Rmd#L1894) for details 
 
+```{r load_patchork}
+## loaded here only because conflicts with cowplot
+pacman::p_load(
+  patchwork   # combine plots
+)
+```
+
+
 .center[
-```{r bivarmap_demo, eval = FALSE}
+```{r bivarmap_demo}
 
 # prepare data for plotting 
 #############################
@@ -4740,7 +4755,8 @@ bivar_map <- basemap +
           size = 0.1) + 
   # fill polygons by the colours as they are named clrs column
   scale_fill_identity(drop = FALSE, 
-          na.value = "grey90")
+          na.value = "grey90") + 
+  theme_void()
 
 
 
@@ -4801,7 +4817,7 @@ bivar_map + legend + plot_layout(design = layout)
 ![](https://github.com/appliedepi/emory_training/blob/master/presentation/images/heatmap.png?raw=true)
 
 ---
-# Heatmaps - bounding box distance
+# Heatmaps - distance
 - How many x-units in one kilometre? 
 
 .pull-left[
@@ -4809,12 +4825,11 @@ bivar_map + legend + plot_layout(design = layout)
 ]
 
 .pull-right[
-$$
-x_{units} = \frac{x_{max}-x_{min}}{x_{metres}}
-$$
+
+$$x_{units} = \frac{x_{max}-x_{min}}{x_{metres}}$$
 ]
 
---- 
+---
 # Heatmaps - calculating 
 
 ```{r heatmaps_distance, echo = TRUE}
@@ -4847,7 +4862,7 @@ yfact <- as.numeric(yunits / ydist)                               #<<
 ```
 
 
---- 
+---
 # Heatmaps - plotting 
 
 .pull-left[
@@ -4880,7 +4895,7 @@ heatmap <- basemap +
 
 .pull-right[
 ```{r}
-heatmap
+heatmap + theme_void()
 ```
 ]
 
