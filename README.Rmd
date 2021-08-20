@@ -58,7 +58,7 @@ Session 1: Case study walk-through - data cleaning and analytic workflow in an R
 Session 2: Data visualization with **ggplot2**  
 
 -   [Data visualization presentation slides](https://appliedepi.github.io/emory_training/presentation/slides_ggplot.html)
--   [R markdown script](https://github.com/appliedepi/emory_training/blob/master/presentation/slides_ggplot.Rmd)
+-   [R markdown script](https://github.com/appliedepi/emory_training/blob/master/case_study/ggplot_demo.Rmd)
 
 
 Please note that all these training materials use *fake example data* in which no person is identifiable and the actual values have been scrambled.  
