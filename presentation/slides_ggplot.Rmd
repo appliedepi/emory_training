@@ -194,7 +194,7 @@ Our objectives today are to:
 2) Demonstrate core `geom_()` commands  
 3) Introduce helpful "wrapper" packages like **incidence2** and **apyramid**  
 4) Touch upon advanced tips with packages **ggExtra**, **ggrepel**, **gghighlight**, **scales**, **plotly**, and **esquisse**  
-
+5) Introduce mapping (GIS) with **sf**
 
 .footnote[The [Epi R Handbook](https://epirhandbook.com/index.html) contains many more examples.]  
 
@@ -4368,7 +4368,10 @@ class: inverse, center, middle
 ]
 
 .pull-right[
-![](https://github.com/appliedepi/emory_training/blob/master/presentation/images/shapefiles.png?raw=true)
+
+```{r, out.width = "80%"}
+knitr::include_graphics("https://github.com/appliedepi/emory_training/blob/master/presentation/images/shapefiles.png?raw=true")
+```
 ]
 
 .footnote[
@@ -4517,7 +4520,11 @@ linelist_sf %>%
 ---
 # Bounding boxes
 
-![](https://github.com/appliedepi/emory_training/blob/master/presentation/images/bounding_box.png?raw=true)
+.center[
+```{r, out.height = "60%", out.width = "70%"}
+knitr::include_graphics("https://github.com/appliedepi/emory_training/blob/master/presentation/images/bounding_box.png?raw=true")
+```
+]
 
 ---
 # Download & plot basemap
@@ -4814,7 +4821,9 @@ bivar_map + legend + plot_layout(design = layout)
 ---
 # Heatmaps 
 
-![](https://github.com/appliedepi/emory_training/blob/master/presentation/images/heatmap.png?raw=true)
+- Three dimensional distribution over each point and then interpolated
+  
+![](https://github.com/appliedepi/emory_training/blob/master/presentation/images/heatmaps.png?raw=true)
 
 ---
 # Heatmaps - distance
