@@ -14,6 +14,10 @@
     <script src="libs/dt-core/js/jquery.dataTables.min.js"></script>
     <link href="libs/crosstalk/css/crosstalk.css" rel="stylesheet" />
     <script src="libs/crosstalk/js/crosstalk.min.js"></script>
+    <script src="libs/plotly-binding/plotly.js"></script>
+    <script src="libs/typedarray/typedarray.min.js"></script>
+    <link href="libs/plotly-htmlwidgets-css/plotly-htmlwidgets.css" rel="stylesheet" />
+    <script src="libs/plotly-main/plotly-latest.min.js"></script>
     <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
   </head>
   <body>
@@ -77,7 +81,7 @@ class: center, middle, inverse, title-slide
 ![](https://github.com/appliedepi/epiRhandbook_eng/raw/master/images/Epi%20R%20Handbook%20Banner%20Beige%201500x500.png)
 
 * We are a grassroots collaborative of applied epidemiologists  
-* Our (free) **Epi R Handbook** has been used by 50,000 people worldwide
+* Our (free) **Epi R Handbook** has been used by 60,000 people worldwide
 * Now we offer customized training to health departments and NGOs  
 
 
@@ -121,7 +125,9 @@ We assume you have reviewed the Handbook pages on [R Basics](https://epirhandboo
 
 
 ???
-- The learning process can be summarised into this acronym "EDGE". Today's session is primarily a *demonstration* with question &amp; answer session. We assume that you have read at least some of the relevant pages in the Epi R Handbook prior to this session. We also offer training in which we guide you through case studies with hands-on coaching. 
+- Today's session is primarily a *demonstration* with question &amp; answer session.  
+- We assume that you have read at least some of the relevant pages in the Epi R Handbook prior to this session.  
+- We also offer training in which we guide you through case studies with hands-on coaching. 
 
 
 ---
@@ -139,7 +145,9 @@ Our objectives today are to:
 
 
 
-
+???
+- There will be a LOT of content and we will move quickly.  
+- The objective is not that you understand completely now, but that you understand the core syntax and are exposed to the potential universe of adjustments  
 
 
 
@@ -214,8 +222,8 @@ class: medium-large-table
 
 Below are the first 25 rows of the `linelist` data frame:  
 
-<div id="htmlwidget-779bb8960f38a9dcd007" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-779bb8960f38a9dcd007">{"x":{"filter":"none","data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25"],["3a85e6992a5ac52f","c6b5281d5fc50b96","53495ad0dca4e22c","2948a265da0d081b","a5524aadd1ca0458","db14eeabe531fab7","8bd07af27a9095e2","b0fb67854aaeb475","bf9099af39be433a","c01011bc9755eb3a","27b97d577fb9a30d","932f146c3860e756","44655181e230b95c","a951cb110aacd31f","7288a58b47539174","dfbc141429716762","033e8eb949e30135","a254eb953370eb3d","2ebf4b64459ff07c","8285906d7277879a","75ed6eb8e8a5373a","bee0aecf4384dbc8","147251528ba0e86c","3517a48c39570377","ddfe45263e67714b"],["2020-03-22","2020-02-01","2020-02-10","2020-03-20","2020-02-26","2020-02-11","2020-03-01","2020-03-01","2020-03-18","2020-03-12","2020-02-26","2020-04-10","2020-04-06","2020-03-20","2020-03-05","2020-03-05","2020-02-24","2020-04-04","2020-03-28","2020-04-07","2020-04-06","2020-02-26","2020-04-12","2020-04-01","2020-02-28"],["2004-11-08","1964-06-07","1944-04-06","1964-06-25","1964-12-21","1956-06-21","1974-05-25","1960-02-17","1985-06-09","1978-11-26","1946-12-21","1993-10-27","1941-06-04","1954-03-19","1958-10-22","1929-10-22","1952-01-11","1994-01-01","1995-12-25","1987-09-14","1981-12-12","1975-07-11","1948-01-11","1974-05-30","1977-01-04"],[16,57,77,57,56,65,47,61,36,42,74,27,80,67,62,91,69,27,25,33,39,46,73,47,44],["Male","Male","Female","Female","Male","Male","Male","Female","Male","Female","Male","Female","Female","Male","Female","Male","Male","Male","Male","Female","Female","Female","Male","Male","Female"],["WHITE","WHITE","BLACK","BLACK","WHITE","BLACK","BLACK","BLACK","ASIAN","BLACK","BLACK","BLACK","BLACK","BLACK","BLACK","BLACK","WHITE","BLACK","WHITE","BLACK","BLACK","BLACK","BLACK","WHITE","BLACK"],["NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NOT SPECIFIED","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO"],["30308","30308","30315","30213","30004","30314","30313","30350","30324","30305","30315","30308","30312","30213","30311","30311","30327","30349","30009","30337","30344","30315","30349","30327","30318"],["Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields"],["PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)"],["Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia"],["Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes"],["2020-03-20","2020-01-28","2020-02-10","2021-05-19","2020-02-20","2020-01-17","2020-02-21","2020-02-25","2020-03-17","2020-11-21","2020-02-15","2020-04-02","2020-03-22","2020-03-10","2020-03-02","2020-02-29","2020-02-19",null,"2020-03-25","2020-03-30","2020-03-29","2020-02-17","2020-03-30","2020-03-28","2020-02-26"],["Yes","No","Yes","No","Yes","Yes","No","Yes","No","Yes","Unknown","Unk","No","Yes","Yes","Yes","Yes","Yes","No","No","No","Yes","Yes","No","No"],["Yes","No","Unknown","Yes","Yes","Yes","No","Yes","Yes","No","Unknown","Yes","No","Yes","Unk","Yes","Yes","No","No","Yes","No","Yes","No","Yes","Unknown"],["No","Yes","Yes","Yes","Yes","No","Unk","No","No","Yes","Unknown","No","No","Yes","Unk","No","Unknown","Yes","No","Yes","No","No","Yes","Yes","Unknown"],["Unknown","Unknown","Unknown","Unknown","Unknown","Unknown","Unknown","Unknown","Unknown","Yes","Unknown","Unknown","Unknown","Unknown","Unknown","Unknown","Unknown","Unknown","No","Unknown","Unknown","Unknown","Unknown","Unknown","Unknown"],["Yes","No","Yes","Yes","No","Unk","Yes","Yes","Yes","Yes","Unknown","No","No","No","Unk","No","Unknown","No","Yes","No","No","Yes","No","Unknown","Unknown"],["Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Unk","Yes","Yes","Yes","No","Yes","Yes","Yes","Yes","Unknown","Yes"],["Yes","No","Unknown","Yes","No","Unk","Yes","No","Yes","No","Unknown","No","No","Yes","Unk","No","Unknown","No","No","No","No","No","No","Unknown","Unknown"],["No","No","No","No","No","Yes","No","No","No","No","No","No","Yes","Yes","No","No","Unknown","No","No","Yes","No","No","No","No","No"],[null,null,null,null,null,"2020-02-21",null,null,null,null,null,null,"2020-04-16",null,null,null,null,null,null,"2020-04-10",null,null,null,null,null],["Yes","No","Unknown","No","No","No","No","No","No","Yes","No","No","Yes","No","Unk","No","Unknown","No","No","No","No","No","No","No","No"],["No","No","Yes","Unknown","Yes","Yes","Yes","No","No","Yes","Unknown","No","Yes","Yes","Yes","Yes","No","Yes","No","Yes","No","Yes","Yes","No","Yes"],[null,null,"2020-02-08",null,"2020-02-26","2020-01-27","2020-03-01",null,null,"2020-11-28",null,null,"2020-04-06","2020-03-19","2020-03-03","2020-03-03",null,"2020-04-03",null,"2020-04-06",null,"2020-02-22","2020-04-15",null,"2020-02-27"],[null,null,null,null,null,"2020-02-21",null,null,null,"2020-12-02",null,null,"2020-04-16",null,null,null,null,null,null,"2020-04-10",null,"2020-03-10","2020-04-18",null,"2020-02-27"],["No","No","No","No","Unknown","Yes","No","Unknown","No","No","Unknown","No","Yes","No","No","No","Unknown","No","No","No","No","No","No","No","No"],["No","No","No","No","Unknown","Yes","No","Unknown","No","No","Unknown","No","Yes","No","No","No","Unknown","No","No","No","No","No","No","No","No"],[null,null,null,null,null,"2020-02-21",null,null,null,null,null,null,"2020-04-16",null,null,null,null,null,null,null,null,null,null,null,null],["Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes"],["Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed"],["2020-03-22","2020-02-01","2020-02-10","2021-01-17","2020-02-25","2020-02-20","2020-03-02","2020-02-29","2020-03-17","2020-11-21","2020-03-02","2020-04-10","2020-04-15","2020-03-20","2020-03-07","2020-03-05","2020-02-21","2020-12-16","2021-01-28","2020-04-08","2020-04-02","2020-02-22","2020-04-11","2020-03-29","2020-02-27"],[33.77664546,33.78051014,33.73023331,33.55506787,34.10608705,33.75937142,33.76269487,33.99152006,33.81818887,0.000509015,33.7247196,33.76662936,33.73726168,33.58325606,33.73072166,33.74443579,33.84942894,33.61755356,34.09972633,33.65329287,33.69052246,33.71013231,33.64674578,33.84126361,33.80477485],[-84.38568523,-84.38947474,-84.38425189,-84.62885167,-84.27453508,-84.42582354,-84.40045162,-84.35447278,-84.37365369,-0.000975479,-84.38623582,-84.38936047,-84.38274508,-84.63672804,-84.44208134,-84.47630174,-84.41986975,-84.46304234,-84.31308119,-84.45800906,-84.46524239,-84.38555839,-84.57468022,-84.42349808,-84.45733019],["2020-03-18","2020-01-29","2020-02-05","2020-03-18","2020-02-26","2020-02-05","2020-02-26","2020-02-26","2020-03-18","2020-03-11","2020-02-26","2020-04-08","2020-04-01","2020-03-18","2020-03-04","2020-03-04","2020-02-19","2020-04-01","2020-03-25","2020-04-01","2020-04-01","2020-02-26","2020-04-08","2020-04-01","2020-02-26"],[null,null,null,null,6,10,9,null,null,7,null,null,15,9,1,3,null,null,null,7,null,5,16,null,1],[null,null,null,null,null,"2020-02-21",null,null,null,"2020-12-02",null,null,"2020-04-16",null,null,null,null,null,null,"2020-04-10",null,"2020-03-10","2020-04-18",null,"2020-02-27"],[null,null,null,null,null,25,null,null,null,4,null,null,10,null,null,null,null,null,null,4,null,17,3,null,0],["10-19","50-59","70+","50-59","50-59","60-69","40-49","60-69","30-39","40-49","70+","20-29","70+","60-69","60-69","70+","60-69","20-29","20-29","30-39","30-39","40-49","70+","40-49","40-49"],["White, NH","White, NH","Black, NH","Black, NH","White, NH","Black, NH","Black, NH","Black, NH","Asian, NH","Black, NH","Black, NH","Black, NH","Black, NH","Black, NH","Black, NH","Black, NH","White, NH","Black, NH","White, NH","Black, NH","Black, NH","Black, NH","Black, NH","White, NH","Black, NH"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>pid<\/th>\n      <th>date_report<\/th>\n      <th>date_dob<\/th>\n      <th>age<\/th>\n      <th>gender<\/th>\n      <th>race<\/th>\n      <th>eth<\/th>\n      <th>zip<\/th>\n      <th>county<\/th>\n      <th>district<\/th>\n      <th>state<\/th>\n      <th>contact_id<\/th>\n      <th>date_onset<\/th>\n      <th>sym_fever<\/th>\n      <th>sym_subjfever<\/th>\n      <th>sym_myalgia<\/th>\n      <th>sym_losstastesmell<\/th>\n      <th>sym_sorethroat<\/th>\n      <th>sym_cough<\/th>\n      <th>sym_headache<\/th>\n      <th>sym_resolved<\/th>\n      <th>date_recovery<\/th>\n      <th>contact_hh<\/th>\n      <th>hospitalized<\/th>\n      <th>date_hospitalized<\/th>\n      <th>date_discharge<\/th>\n      <th>died<\/th>\n      <th>died_covid<\/th>\n      <th>date_died<\/th>\n      <th>confirmed_case<\/th>\n      <th>covid_dx<\/th>\n      <th>date_positive<\/th>\n      <th>lat<\/th>\n      <th>lon<\/th>\n      <th>epiweek<\/th>\n      <th>days_onset_hosp<\/th>\n      <th>date_outcome<\/th>\n      <th>days_hosp<\/th>\n      <th>age_group<\/th>\n      <th>eth_race<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"scrollY":300,"scrollX":600,"pageLength":25,"fontSize":"25%","dom":"ti","ordering":false,"rownames":false,"options":{"pageLength":5,"scrollX":true},"class":"white-space: nowrap","columnDefs":[{"className":"dt-right","targets":[4,33,34,36,38]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-2c609260c17abd608d5c" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-2c609260c17abd608d5c">{"x":{"filter":"none","data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25"],["3a85e6992a5ac52f","c6b5281d5fc50b96","53495ad0dca4e22c","2948a265da0d081b","a5524aadd1ca0458","db14eeabe531fab7","8bd07af27a9095e2","b0fb67854aaeb475","bf9099af39be433a","c01011bc9755eb3a","27b97d577fb9a30d","932f146c3860e756","44655181e230b95c","a951cb110aacd31f","7288a58b47539174","dfbc141429716762","033e8eb949e30135","a254eb953370eb3d","2ebf4b64459ff07c","8285906d7277879a","75ed6eb8e8a5373a","bee0aecf4384dbc8","147251528ba0e86c","3517a48c39570377","ddfe45263e67714b"],["2020-03-22","2020-02-01","2020-02-10","2020-03-20","2020-02-26","2020-02-11","2020-03-01","2020-03-01","2020-03-18","2020-03-12","2020-02-26","2020-04-10","2020-04-06","2020-03-20","2020-03-05","2020-03-05","2020-02-24","2020-04-04","2020-03-28","2020-04-07","2020-04-06","2020-02-26","2020-04-12","2020-04-01","2020-02-28"],["2004-11-08","1964-06-07","1944-04-06","1964-06-25","1964-12-21","1956-06-21","1974-05-25","1960-02-17","1985-06-09","1978-11-26","1946-12-21","1993-10-27","1941-06-04","1954-03-19","1958-10-22","1929-10-22","1952-01-11","1994-01-01","1995-12-25","1987-09-14","1981-12-12","1975-07-11","1948-01-11","1974-05-30","1977-01-04"],[16,57,77,57,56,65,47,61,36,42,74,27,80,67,62,91,69,27,25,33,39,46,73,47,44],["Male","Male","Female","Female","Male","Male","Male","Female","Male","Female","Male","Female","Female","Male","Female","Male","Male","Male","Male","Female","Female","Female","Male","Male","Female"],["WHITE","WHITE","BLACK","BLACK","WHITE","BLACK","BLACK","BLACK","ASIAN","BLACK","BLACK","BLACK","BLACK","BLACK","BLACK","BLACK","WHITE","BLACK","WHITE","BLACK","BLACK","BLACK","BLACK","WHITE","BLACK"],["NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NOT SPECIFIED","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO"],["30308","30308","30315","30213","30004","30314","30313","30350","30324","30305","30315","30308","30312","30213","30311","30311","30327","30349","30009","30337","30344","30315","30349","30327","30318"],["Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields"],["PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)"],["Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia"],["Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes"],["2020-03-20","2020-01-28","2020-02-10","2021-05-19","2020-02-20","2020-01-17","2020-02-21","2020-02-25","2020-03-17","2020-11-21","2020-02-15","2020-04-02","2020-03-22","2020-03-10","2020-03-02","2020-02-29","2020-02-19",null,"2020-03-25","2020-03-30","2020-03-29","2020-02-17","2020-03-30","2020-03-28","2020-02-26"],["Yes","No","Yes","No","Yes","Yes","No","Yes","No","Yes","Unknown","Unk","No","Yes","Yes","Yes","Yes","Yes","No","No","No","Yes","Yes","No","No"],["Yes","No","Unknown","Yes","Yes","Yes","No","Yes","Yes","No","Unknown","Yes","No","Yes","Unk","Yes","Yes","No","No","Yes","No","Yes","No","Yes","Unknown"],["No","Yes","Yes","Yes","Yes","No","Unk","No","No","Yes","Unknown","No","No","Yes","Unk","No","Unknown","Yes","No","Yes","No","No","Yes","Yes","Unknown"],["Unknown","Unknown","Unknown","Unknown","Unknown","Unknown","Unknown","Unknown","Unknown","Yes","Unknown","Unknown","Unknown","Unknown","Unknown","Unknown","Unknown","Unknown","No","Unknown","Unknown","Unknown","Unknown","Unknown","Unknown"],["Yes","No","Yes","Yes","No","Unk","Yes","Yes","Yes","Yes","Unknown","No","No","No","Unk","No","Unknown","No","Yes","No","No","Yes","No","Unknown","Unknown"],["Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Unk","Yes","Yes","Yes","No","Yes","Yes","Yes","Yes","Unknown","Yes"],["Yes","No","Unknown","Yes","No","Unk","Yes","No","Yes","No","Unknown","No","No","Yes","Unk","No","Unknown","No","No","No","No","No","No","Unknown","Unknown"],["No","No","No","No","No","Yes","No","No","No","No","No","No","Yes","Yes","No","No","Unknown","No","No","Yes","No","No","No","No","No"],[null,null,null,null,null,"2020-02-21",null,null,null,null,null,null,"2020-04-16",null,null,null,null,null,null,"2020-04-10",null,null,null,null,null],["Yes","No","Unknown","No","No","No","No","No","No","Yes","No","No","Yes","No","Unk","No","Unknown","No","No","No","No","No","No","No","No"],["No","No","Yes","Unknown","Yes","Yes","Yes","No","No","Yes","Unknown","No","Yes","Yes","Yes","Yes","No","Yes","No","Yes","No","Yes","Yes","No","Yes"],[null,null,"2020-02-08",null,"2020-02-26","2020-01-27","2020-03-01",null,null,"2020-11-28",null,null,"2020-04-06","2020-03-19","2020-03-03","2020-03-03",null,"2020-04-03",null,"2020-04-06",null,"2020-02-22","2020-04-15",null,"2020-02-27"],[null,null,null,null,null,"2020-02-21",null,null,null,"2020-12-02",null,null,"2020-04-16",null,null,null,null,null,null,"2020-04-10",null,"2020-03-10","2020-04-18",null,"2020-02-27"],["No","No","No","No","Unknown","Yes","No","Unknown","No","No","Unknown","No","Yes","No","No","No","Unknown","No","No","No","No","No","No","No","No"],["No","No","No","No","Unknown","Yes","No","Unknown","No","No","Unknown","No","Yes","No","No","No","Unknown","No","No","No","No","No","No","No","No"],[null,null,null,null,null,"2020-02-21",null,null,null,null,null,null,"2020-04-16",null,null,null,null,null,null,null,null,null,null,null,null],["Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes"],["Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed"],["2020-03-22","2020-02-01","2020-02-10","2021-01-17","2020-02-25","2020-02-20","2020-03-02","2020-02-29","2020-03-17","2020-11-21","2020-03-02","2020-04-10","2020-04-15","2020-03-20","2020-03-07","2020-03-05","2020-02-21","2020-12-16","2021-01-28","2020-04-08","2020-04-02","2020-02-22","2020-04-11","2020-03-29","2020-02-27"],[33.77664546,33.78051014,33.73023331,33.55506787,34.10608705,33.75937142,33.76269487,33.99152006,33.81818887,0.000509015,33.7247196,33.76662936,33.73726168,33.58325606,33.73072166,33.74443579,33.84942894,33.61755356,34.09972633,33.65329287,33.69052246,33.71013231,33.64674578,33.84126361,33.80477485],[-84.38568523,-84.38947474,-84.38425189,-84.62885167,-84.27453508,-84.42582354,-84.40045162,-84.35447278,-84.37365369,-0.000975479,-84.38623582,-84.38936047,-84.38274508,-84.63672804,-84.44208134,-84.47630174,-84.41986975,-84.46304234,-84.31308119,-84.45800906,-84.46524239,-84.38555839,-84.57468022,-84.42349808,-84.45733019],["2020-03-18","2020-01-29","2020-02-05","2020-03-18","2020-02-26","2020-02-05","2020-02-26","2020-02-26","2020-03-18","2020-03-11","2020-02-26","2020-04-08","2020-04-01","2020-03-18","2020-03-04","2020-03-04","2020-02-19","2020-04-01","2020-03-25","2020-04-01","2020-04-01","2020-02-26","2020-04-08","2020-04-01","2020-02-26"],[null,null,null,null,6,10,9,null,null,7,null,null,15,9,1,3,null,null,null,7,null,5,16,null,1],[null,null,null,null,null,"2020-02-21",null,null,null,"2020-12-02",null,null,"2020-04-16",null,null,null,null,null,null,"2020-04-10",null,"2020-03-10","2020-04-18",null,"2020-02-27"],[null,null,null,null,null,25,null,null,null,4,null,null,10,null,null,null,null,null,null,4,null,17,3,null,0],["10-19","50-59","70+","50-59","50-59","60-69","40-49","60-69","30-39","40-49","70+","20-29","70+","60-69","60-69","70+","60-69","20-29","20-29","30-39","30-39","40-49","70+","40-49","40-49"],["White, NH","White, NH","Black, NH","Black, NH","White, NH","Black, NH","Black, NH","Black, NH","Asian, NH","Black, NH","Black, NH","Black, NH","Black, NH","Black, NH","Black, NH","Black, NH","White, NH","Black, NH","White, NH","Black, NH","Black, NH","Black, NH","Black, NH","White, NH","Black, NH"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>pid<\/th>\n      <th>date_report<\/th>\n      <th>date_dob<\/th>\n      <th>age<\/th>\n      <th>gender<\/th>\n      <th>race<\/th>\n      <th>eth<\/th>\n      <th>zip<\/th>\n      <th>county<\/th>\n      <th>district<\/th>\n      <th>state<\/th>\n      <th>contact_id<\/th>\n      <th>date_onset<\/th>\n      <th>sym_fever<\/th>\n      <th>sym_subjfever<\/th>\n      <th>sym_myalgia<\/th>\n      <th>sym_losstastesmell<\/th>\n      <th>sym_sorethroat<\/th>\n      <th>sym_cough<\/th>\n      <th>sym_headache<\/th>\n      <th>sym_resolved<\/th>\n      <th>date_recovery<\/th>\n      <th>contact_hh<\/th>\n      <th>hospitalized<\/th>\n      <th>date_hospitalized<\/th>\n      <th>date_discharge<\/th>\n      <th>died<\/th>\n      <th>died_covid<\/th>\n      <th>date_died<\/th>\n      <th>confirmed_case<\/th>\n      <th>covid_dx<\/th>\n      <th>date_positive<\/th>\n      <th>lat<\/th>\n      <th>lon<\/th>\n      <th>epiweek<\/th>\n      <th>days_onset_hosp<\/th>\n      <th>date_outcome<\/th>\n      <th>days_hosp<\/th>\n      <th>age_group<\/th>\n      <th>eth_race<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"scrollY":300,"scrollX":600,"pageLength":25,"fontSize":"25%","dom":"ti","ordering":false,"rownames":false,"options":{"pageLength":5,"scrollX":true},"class":"white-space: nowrap","columnDefs":[{"className":"dt-right","targets":[4,33,34,36,38]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 
 .footnote[Tip: Use `skim()` from **skimr** package to review all columns with summary statistics]  
 
@@ -834,7 +842,7 @@ geom_point(
 
 Above, `size = 7` and `alpha = 0.7` are static aesthetics defined outside any `aes()` and apply to `geom_point()`.  
 
-`color =` is within an `aes()`, and maps to values in column `died`.  
+`color=` is within an `aes()`, and maps to values in column `died`.  
 
 ]
 
@@ -868,7 +876,7 @@ ggplot(
     x = age,
     y = days_hosp)) +
 # points colored by outcome
-  geom_point(
+geom_point(
   mapping = aes(color = died),
   size = 1) +
 # smoothed means by outcome
@@ -907,8 +915,8 @@ Below, `linelist` is aggregated into counts per unique week-outcome.
 outcome_week_data &lt;- linelist %&gt;% 
 * count(died,
 *       week_onset = floor_date(
-*        x = date_onset,
-*        unit = "week")) %&gt;% 
+*         x = date_onset,
+*         unit = "week")) %&gt;% 
   select(week_onset, everything()) %&gt;% 
   arrange(week_onset) %&gt;% 
   drop_na(week_onset)
@@ -1012,9 +1020,10 @@ geom_histogram() +
 
 Another way of *displaying groups* is via faceting. 
 
+`facet_wrap()` produces one facet per unique value.  
+
 Place a "~" before the column name.  
 
-`facet_wrap()` produces one facet per unique value.  
 
 ] 
 
@@ -1201,7 +1210,7 @@ Add `gghighlight()` to other plots, and specify specific values (or criteria) to
 
 ```r
 linelist %&gt;% 
-  # get daily counts by zip code
+  # get daily counts by age group
   group_by(age_group, date_report) %&gt;%
   count() %&gt;% 
   
@@ -1243,7 +1252,7 @@ As a generic formula, these commands are written as: **`scale_AESTHETIC_METHOD()
 
 1) `scale_` : this prefix never changes  
 2) AESTHETIC: `_fill_` , `_color_` , `_x_` , `_y_` , etc.  
-3) METHOD: `_continuous()`, `_discrete()`, `_manual()`, `_date()` etc.
+3) METHOD: `_continuous()`, `_discrete()`, `_manual()`, `_date()`, etc.
 
 
 
@@ -1278,7 +1287,7 @@ ggplot(
   mapping = aes(
     x = eth_race,
     fill = died)) +
-  geom_bar()
+geom_bar()
 ```
 
 
@@ -1307,7 +1316,7 @@ ggplot(
   mapping = aes(
     x = eth_race,
     fill = died)) +
-  geom_bar() +
+geom_bar() +
 *scale_fill_manual(        
 *  values = c(
 *   "Yes"     = "violetred", 
@@ -1343,7 +1352,7 @@ ggplot(
   mapping = aes(
     x = eth_race,
     fill = died)) +
-  geom_bar() +
+geom_bar() +
 scale_fill_manual(        
   values = c(
     "Yes"     = "violetred", 
@@ -1381,7 +1390,7 @@ ggplot(
   mapping = aes(
     x = eth_race,
     fill = died)) +
-  geom_bar() +
+geom_bar() +
 scale_fill_manual(        
   values = c("Yes"    = "violetred", 
              "No"     = "aquamarine",
@@ -1607,7 +1616,7 @@ Remember to load the scales package
 
 
 ---
-# Labels  
+# Plot labels  
 
 .pull-left[
 
@@ -1641,7 +1650,7 @@ Use `lab()` to edit title, subtitle, caption, axes labels, and legend title
 
 
 ---
-# Label tips  
+# Plot label tips  
 
 See the [Epi R Handbook page](https://epirhandbook.com/characters-and-strings.html#dynamic-strings) on adjusting characters with the **stringr** package
 
@@ -1843,7 +1852,8 @@ With `geom_bar()`, the height reflects the number of rows per x-axis group. This
 ```r
 ggplot(
   data = linelist,
-  mapping = aes(x = eth_race)) +             
+  mapping = aes(
+    x = eth_race)) +             
 geom_bar() +
 theme(axis.text.x= element_text(angle=30))  
 ```
@@ -1944,7 +1954,7 @@ theme(axis.text.x= element_text(angle = 30))
 
 .pull-left[
 
-If your data look like this (counts) and your plot looks like that (bars of same height), ensure you are using `geom_col()` and not `geom_bar()`!  
+If your data look like below (counts) and your plot looks like that (bars of same height), ensure you are using `geom_col()` and not `geom_bar()`!  
 
 
 |eth_race            |     n|
@@ -2003,6 +2013,8 @@ theme(axis.text.x= element_text(angle=30))
 
 &lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-100-1.png" width="504" /&gt;
 
+.footnote[See the pivoting page in the Epi R Handbook]
+
 ]
 
 
@@ -2012,9 +2024,6 @@ theme(axis.text.x= element_text(angle=30))
 
 .pull-left[
 
-It is simple to flip the axes on any ggplot by adding `coord_flip()`  
-
-
 
 ```r
 ggplot(linelist) +        
@@ -2023,9 +2032,12 @@ geom_bar(
     x = eth_race,            
     fill = died)) +
 theme(legend.position = "top") +  
-* coord_flip()           
+*coord_flip()           
 ```
 
+It is simple to flip the axes on any ggplot by adding `coord_flip()`  
+
+This is useful in bar plot to improve readability.  
 
 ]
 
@@ -2187,7 +2199,7 @@ To make the bars adjacent, specify `position = "dodge"` in `geom_col()`.
 
 .pull-left[
 
-To display text, add `geom_text()` with `aes(label=)` assigned to the height column.  
+To display text, use `geom_col()` with `geom_text()`. Assign `aes(label=)` to the height values.  
 
 The `position=` arg in `geom_text()` can specify display at mid-bar.  
 
@@ -2207,10 +2219,6 @@ geom_col() +
 theme(axis.text.x = element_text(angle=30))
 ```
 
-.footnote[
-It is best to use `geom_col()` if displaying text.
-Also, try `geom_label()` for boxes around the text.  
-]
 
 ]
 
@@ -2268,7 +2276,7 @@ Today's demonstration will focus on **incidence2**.
 
 
 ---
-# Epicurve - make incidence object 
+# Epicurve - incidence object 
 
 .pull-left[
 
@@ -2389,11 +2397,11 @@ groups = c(eth_race, gender)
 
 .pull-left[
 
-Add other **ggplot2** commands with `+`.  
 
 
 ```r
-plot(weekly, fill = eth_race) +
+plot(weekly,
+     fill = eth_race) +
 scale_y_continuous(
   expand = c(0,0),
   breaks = seq(0,2000,250)) + 
@@ -2404,6 +2412,9 @@ scale_y_continuous(
 *theme(legend.position = "top") +
 *labs(fill = "Race and\nEthnicity")
 ```
+
+Add other **ggplot2** commands with `+`.  
+
 
 ]
 
@@ -2469,13 +2480,13 @@ For small outbreaks, the style `show_cases = TRUE` may be helpful:
 
 ```r
 small_outbreak &lt;- linelist %&gt;% 
-  filter(
-    zip == 30024,
-    date_report &gt;= as.Date("2020-12-01")) %&gt;% 
-  incidence(
-    date_index = date_onset,               
-    interval = "Sunday weeks",             
-    groups = eth_race)
+filter(
+ zip == 30024,
+ date_report &gt;= as.Date("2020-12-01")) %&gt;% 
+incidence(
+  date_index = date_onset,               
+  interval = "Sunday weeks",             
+  groups = eth_race)
 ```
 
 
@@ -2485,7 +2496,7 @@ plot(small_outbreak,
 * show_cases = TRUE)+
 theme(legend.position = "bottom")+
 labs(
-  title = "ZIP 30024 from Dec 2020 by race")
+  title = "ZIP 30024 by race")
 ```
 
 ]
@@ -2552,7 +2563,7 @@ You can also use **incidence2** on data that are aggregated counts...
 
 ```r
 # For demo: aggregate linelist
-linelist_day_counts &lt;-linelist %&gt;% 
+linelist_day_counts &lt;- linelist %&gt;% 
 *  count(
 *    day = floor_date(date_report, "day"),
 *    died) %&gt;% 
@@ -2638,7 +2649,6 @@ Today we will demonstrate **apyramid**.
 ---
 # Demographic pyramids
 
-The function `age_pyramid()` from **apyramid** offers an easy interface:  
 
 .pull-left[
 
@@ -2651,6 +2661,9 @@ age_pyramid(
   age_group = "age_group",
   split_by = "gender")
 ```
+
+The function `age_pyramid()` from **apyramid** offers an easy interface.  
+
 
 .footnote[We have cleaned `gender` to only two values]  
 
@@ -2670,11 +2683,6 @@ age_pyramid(
 
 .pull-left[
 
-Further modifications:  
-
-* Percents instead of raw counts on the x-axis  
-* No mid-point designation  
-* Specified colors  
 
 
 ```r
@@ -2686,6 +2694,13 @@ age_pyramid(
 * show_midpoint = FALSE,
 * pal = c("darkgreen", "brown"))
 ```
+
+
+Further modifications:  
+
+* Percents instead of raw counts on the x-axis  
+* No mid-point designation  
+* Specified colors  
 
 ]
 
@@ -2712,7 +2727,8 @@ age_pyramid(
 * stack_by = "hospitalized"
  proportional = TRUE,
  show_midpoint = FALSE,
- pal = c("darkgreen", "brown", "yellow", "orange"))
+ pal = c("darkgreen", "brown",
+         "yellow", "orange"))
 ```
 
 ]
@@ -2901,7 +2917,8 @@ race_CFR_age &lt;- linelist %&gt;%
   group_by(eth_race) %&gt;% 
   summarise(
     cases = n(),
-    deaths = sum(died_covid == "Yes", na.rm=T),
+    deaths = sum(died_covid == "Yes",
+                 na.rm=T),
     CFR = deaths/cases,
     med_age = median(age, na.rm=T),
     med_dur = median(days_hosp, na.rm=T)
@@ -2985,11 +3002,11 @@ ggplot(
     x = med_age,
     y = CFR,
     size = cases,
-*   label = eth_race)) +     # text to display
+*   label = eth_race)) +     
 geom_point() +
-*geom_label_repel(         # add labels
-*   size = 5,               # text size
-*   min.segment.length = 0) # show connector lines
+*geom_label_repel(         
+*   size = 5,               
+*   min.segment.length = 0)
 ```
 
 
@@ -3026,7 +3043,8 @@ ggplot(
     x = med_age,
     y = CFR,
     size = cases,
-*   label = str_glue("{eth_race}\n{cases} cases"))) +
+*   label = str_glue(
+      "{eth_race}\n{cases} cases"))) +
 geom_point() +
 geom_label_repel(
     size = 5,
@@ -3063,7 +3081,8 @@ ggplot(
     x = med_age,
     y = CFR,
     size = cases,
-*   label = str_glue("{eth_race}\n{scales::comma(cases)} cases"))) +
+*   label = str_glue(
+      "{eth_race}\n{comma(cases)} cases"))) +
 geom_point() +
 geom_label_repel(
     size = 4,
@@ -3127,11 +3146,13 @@ ggExtra::ggMarginal(
 ---
 # Combining plots - plot 1
 
-The **cowplot** package facilitates combining multiple plots, while aligning elements such as axes.  
+The **cowplot** package facilitates combining multiple plots, while aligning elements such as axes. For date axes, ensure the same limits in both plots.   
 
 
 
 .pull-left[
+
+Define the first plot.
 
 
 ```r
@@ -3168,26 +3189,25 @@ plot1 &lt;- plot2 &lt;- linelist %&gt;%
 
 ```r
 plot2 &lt;- linelist %&gt;% 
-  group_by(week = floor_date(date_report, "week")) %&gt;% 
-  summarise(ci = list(mean_cl_normal(age) %&gt;% rename(mean=y, lwr=ymin, upr=ymax))) %&gt;% 
-  unnest() %&gt;%  
+group_by(week = floor_date(date_report, "week")) %&gt;% 
+summarise(ci = list(mean_cl_normal(age) %&gt;% rename(mean=y, lwr=ymin, upr=ymax))) %&gt;% 
+unnest() %&gt;%  
   
-  ggplot(
-    mapping = aes(
-      x = week,
-      y = mean,
-      ymin = lwr,
-      ymax = upr))+
-  geom_ribbon(alpha = 0.5, fill = "green", color = "green")+
-  geom_line(size = 2, color = "darkgreen")+
-  scale_x_date(
-*   limits = c(
-*     as.Date("2020-03-01"),
-*     max(linelist$date_report, na.rm=T)),
-    expand = c(0,0),
-    date_breaks = "months",
-    labels = scales::label_date_short()
-  )+
+ggplot(
+  mapping = aes(
+    x = week,
+    y = mean,
+    ymin = lwr,
+    ymax = upr))+
+geom_ribbon(alpha = 0.5, fill = "green", color = "green")+
+geom_line(size = 2, color = "darkgreen")+
+scale_x_date(
+*  limits = c(
+*    as.Date("2020-03-01"),
+*    max(linelist$date_report, na.rm=T)),
+  expand = c(0,0),
+  date_breaks = "months",
+  labels = scales::label_date_short())+
   coord_cartesian(ylim = c(30, 60))+
   theme_minimal()+
   labs(
@@ -3213,14 +3233,10 @@ plot2 &lt;- linelist %&gt;%
 
 
 ```r
-plot_grid(plot1, 
-          plot2, 
-          rel_heights = c(1, 1), 
-          ncol = 1, 
-          align = "hv")
+plot_grid(plot1, plot2, rel_heights = c(1, 1), ncol = 1, align = "hv")
 ```
 
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-174-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-174-1.png" width="648" /&gt;
 
 
 
@@ -3273,9 +3289,7 @@ scale_y_continuous(
 ```r
 plot2 &lt;- linelist %&gt;% 
   group_by(epiweek) %&gt;% 
-  summarise(
-    CFR = sum(died == "Yes", na.rm=T) / n() 
-    ) %&gt;% 
+  summarise(CFR = sum(died == "Yes", na.rm=T) / n() ) %&gt;% 
 ggplot(
   mapping = aes(
     x = epiweek,
@@ -3297,8 +3311,7 @@ ggplot(
     name = "Epiweek")+
   theme(
     axis.text.y = element_text(color = "orange", face = "bold"),
-    axis.title.y = element_text(color = "orange", face = "bold")
-  )
+    axis.title.y = element_text(color = "orange", face = "bold"))
 ```
 
 ]
@@ -3321,7 +3334,7 @@ combined &lt;- ggdraw(aligned[[1]]) + draw_plot(aligned[[2]])
 combined
 ```
 
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-179-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-179-1.png" width="648" /&gt;
 
 
 
@@ -3329,35 +3342,18 @@ combined
 
 # Interactive plots  
 
-Use the **ggplotly** package to convert most ggplots to interactive plots.  
+Use `ggplotly()` from the **plotly** package to easily make most ggplots interactive.  
+
+
 
 
 ```r
-age_plot &lt;- linelist %&gt;% 
-  group_by(week = floor_date(date_report, "week")) %&gt;% 
-  summarise(ci = list(mean_cl_normal(age) %&gt;% rename(mean=y, lwr=ymin, upr=ymax))) %&gt;% 
-  unnest() %&gt;%  
-  ggplot(
-    mapping = aes(
-      x = week,
-      y = mean,
-      ymin = lwr,
-      ymax = upr))+
-  geom_ribbon(alpha = 0.5, fill = "green", color = "green")+
-  geom_line(size = 2, color = "darkgreen")+
-  scale_x_date(
-    limits = c(as.Date("2020-03-01"), max(linelist$date_report, na.rm=T)),
-    expand = c(0,0),
-    date_breaks = "months",
-    labels = scales::label_date_short()
-  )+
-  coord_cartesian(ylim = c(30, 60))+
-  theme_minimal()+
-  labs(
-    y = "Weekly mean age (95%CI)",
-    x = "Month")
+# Provide the name of a defined plot into ggplotly()  
+plotly::ggplotly(bar_plot)
 ```
 
+<div id="htmlwidget-dba02793122ea2c49b77" style="width:648px;height:432px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-dba02793122ea2c49b77">{"x":{"data":[{"orientation":"v","width":[0.9,0.9,0.9,0.9,0.9],"base":[2992,33358,26747,8532,2902],"x":[1,2,3,4,5],"y":[30,1037,556,68,10],"text":["count:    30<br />eth_race: Asian, NH<br />died: Yes","count:  1037<br />eth_race: Black, NH<br />died: Yes","count:   556<br />eth_race: White, NH<br />died: Yes","count:    68<br />eth_race: Hispanic, all races<br />died: Yes","count:    10<br />eth_race: Other, NH<br />died: Yes"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(248,118,109,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Yes","legendgroup":"Yes","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.9,0.9,0.9,0.9,0.9,0.9],"base":[1190,14154,11877,3303,1771,4513],"x":[1,2,3,4,5,6],"y":[1802,19204,14870,5229,1131,1012],"text":["count:  1802<br />eth_race: Asian, NH<br />died: No","count: 19204<br />eth_race: Black, NH<br />died: No","count: 14870<br />eth_race: White, NH<br />died: No","count:  5229<br />eth_race: Hispanic, all races<br />died: No","count:  1131<br />eth_race: Other, NH<br />died: No","count:  1012<br />eth_race: Unknown<br />died: No"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(0,186,56,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"No","legendgroup":"No","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.9,0.9,0.9,0.9,0.9,0.9],"base":[0,0,0,0,0,0],"x":[1,2,3,4,5,6],"y":[1190,14154,11877,3303,1771,4513],"text":["count:  1190<br />eth_race: Asian, NH<br />died: Unknown","count: 14154<br />eth_race: Black, NH<br />died: Unknown","count: 11877<br />eth_race: White, NH<br />died: Unknown","count:  3303<br />eth_race: Hispanic, all races<br />died: Unknown","count:  1771<br />eth_race: Other, NH<br />died: Unknown","count:  4513<br />eth_race: Unknown<br />died: Unknown"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(97,156,255,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Unknown","legendgroup":"Unknown","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":26.958904109589,"r":7.30593607305936,"b":40.9132420091324,"l":54.7945205479452},"plot_bgcolor":"rgba(235,235,235,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[0.4,6.6],"tickmode":"array","ticktext":["Asian, NH","Black, NH","White, NH","Hispanic, all races","Other, NH","Unknown"],"tickvals":[1,2,3,4,5,6],"categoryorder":"array","categoryarray":["Asian, NH","Black, NH","White, NH","Hispanic, all races","Other, NH","Unknown"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.65296803652968,"tickwidth":0.66417600664176,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.689497716895},"tickangle":-30,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.66417600664176,"zeroline":false,"anchor":"y","title":{"text":"eth_race","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-1719.75,36114.75],"tickmode":"array","ticktext":["0","10000","20000","30000"],"tickvals":[0,10000,20000,30000],"categoryorder":"array","categoryarray":["0","10000","20000","30000"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.65296803652968,"tickwidth":0.66417600664176,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.689497716895},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.66417600664176,"zeroline":false,"anchor":"x","title":{"text":"count","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":1.88976377952756,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.689497716895},"y":0.97594050743657},"annotations":[{"text":"died","x":1.02,"y":1,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187},"xref":"paper","yref":"paper","textangle":-0,"xanchor":"left","yanchor":"bottom","legendTitle":true}],"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","showSendToCloud":false},"source":"A","attrs":{"5b9c70da147d":{"x":{},"fill":{},"type":"bar"}},"cur_data":"5b9c70da147d","visdat":{"5b9c70da147d":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
 
 
 
