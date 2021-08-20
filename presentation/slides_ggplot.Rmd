@@ -4900,4 +4900,10 @@ heatmap + theme_void()
 ]
 
 ---
+class: center, middle
+
 # Thank you  
+
+.footnote[
+Slides created via the [{xaringan}](https://github.com/yihui/xaringan) R package
+]
