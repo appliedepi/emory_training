@@ -139,16 +139,18 @@ contents %>%
 contents <- tribble(
       ~duration,       ~session,                                    ~author,           ~type, 
        5,              "Introduction to part two of series",        "Neale",           "lecture", 
-       10,             "Introduction to visualisation (ggplot2)",   "Neale",           "lecture",
-       10,             "Case study: basic plots",                   "Neale",           "demo", 
-       10,             "Epicurves",                                 "Mathilde",        "lecture", 
-       10,             "Case study: epicurves",                     "Mathilde",        "demo", 
+       5,              "Introduction to visualisation (ggplot2)",   "Neale",           "lecture",
+       5,              "{ggplot2} syntax & geometries",             "Neale",           "lecture", 
+       5,              "{ggplot2} aesthetics",                      "Neale",           "lecture", 
+       5,              "Faceting & highlighting",                   "Neale",           "lecture", 
+       5,              "Scales & axis labels",                      "Neale",           "lecture",
+       5,              "Themes",                                    "Neale",           "lecture",
+       5,              "Barplots",                                  "Neale",           "lecture",
+       5,              "Epicurves",                                 "Neale",           "lecture", 
        5,              "Demographic pyramids",                      "Neale",           "lecture", 
-       5,              "Case study: demographic pyramids",          "Neale",           "demo", 
-       5,              "Heat plots",                                "Mathilde",        "lecture", 
-       5,              "Case study: heat plots",                    "Mathilde",        "demo",
-       5,              "Basic GIS",                                 "Neale",           "lecture", 
-       5,              "Case study: basic GIS",                     "Neale",           "demo", 
+       5,              "Dynamic labels & captions",                 "Neale",           "lecture",   
+       5,              "Combining plots",                           "Neale",           "lecture", 
+       15,             "Basic GIS",                                 "Alex",            "lecture", 
        15,             "Q&A session",                               "Team",            "demo"
       ) 
 
