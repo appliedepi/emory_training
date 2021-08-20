@@ -4894,7 +4894,7 @@ heatmap <- basemap +
 ]
 
 .pull-right[
-```{r}
+```{r heatmaps_plotting_show}
 heatmap + theme_void()
 ```
 ]
