@@ -146,13 +146,16 @@ Our objectives today are to:
 
 
 ???
-- There will be a LOT of content and we will move quickly.  
-- The objective is not that you understand completely now, but that you understand the core syntax and are exposed to the potential universe of adjustments  
+- 1 - core syntax and 2 - exposure
+- Ready yourself because today will be a whirlwind.
+- There will be a LOT of content and we will move quickly.
+- Type questions in the chat, or hold them to the end.  
+- We will do understanding checks throughout  
 
 
 
 ---
-# Directory structure  
+# Resources for you  
 
 Today's work is within an R project, which can be [downloaded as a zipped file](https://minhaskamal.github.io/DownGit/#/home?url=https://github.com/appliedepi/emory_training/tree/master/case_study).  
 
@@ -170,32 +173,41 @@ R project file (`case_study.Rproj`)
   * `ggplot_demo.Rmd` (R markdown script)  
 
 
+???
+- Do NOT download and try it now. Too distracting.  
+- Today will move fast, but just like last time the REAL opportunity for you is to review at your own pace.  
+- We've spent a lot of time developing materials for you.  
+- SHOW SCRIPT AND OUTPUT IN FOLDER  
+
 
 
 ---
 # Load packages and import data  
 
-Load packages, as covered in previous demonstration.  
-**ggplot2** is included within [**tidyverse**](https://www.tidyverse.org/).  
+Load packages (**ggplot2** is within [**tidyverse**](https://www.tidyverse.org/)) and import the cleaned (fake) dataset from [last session](https://github.com/appliedepi/emory_training/blob/master/case_study/weekly_report.Rmd).  
 
 
 ```r
+## install and load necessary packages 
 pacman::p_load(
-  rio,            # import/export
-  here,           # file locator
-  lubridate,      # working with dates
-  epikit,         # age categories, helper functions
-  incidence2,     # epidemic curves
-  apyramid,       # demographic pyramids
-  gghighlight,    # specialized highlight plots
-  ggrepel,        # smart labels
-  ggExtra,        # marginal distributions and other extras
-  esquisse,       # point-and-click ggplot2
-* tidyverse       # mega-package for data management and visualization
-  )
+  rio,        # importing data  
+  here,       # relative file pathways  
+  skimr,      # review data
+  DT,         # visualize data frame
+  janitor,    # data cleaning and tables
+  epikit,     # age categories
+  lubridate,  # working with dates
+  incidence2, # epidemic curves
+  ggrepel,    # smart labels
+  ggExtra,    # extras
+  esquisse,   # point-and-click for simple ggplots
+  apyramid,   # age pyramids
+  scales,     # formatting of scales
+  plotly,     # interactive plots
+  cowplot,    # combine plots
+* tidyverse   # ggplot2 &amp; data management
+)
 ```
-
-For today's purposes, we import the cleaned linelist of *fake* example data, produced from the [last demonstration](https://github.com/appliedepi/emory_training/blob/master/case_study/weekly_report.Rmd).  
 
 
 
@@ -222,8 +234,8 @@ class: medium-large-table
 
 Below are the first 25 rows of the `linelist` data frame:  
 
-<div id="htmlwidget-2c609260c17abd608d5c" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-2c609260c17abd608d5c">{"x":{"filter":"none","data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25"],["3a85e6992a5ac52f","c6b5281d5fc50b96","53495ad0dca4e22c","2948a265da0d081b","a5524aadd1ca0458","db14eeabe531fab7","8bd07af27a9095e2","b0fb67854aaeb475","bf9099af39be433a","c01011bc9755eb3a","27b97d577fb9a30d","932f146c3860e756","44655181e230b95c","a951cb110aacd31f","7288a58b47539174","dfbc141429716762","033e8eb949e30135","a254eb953370eb3d","2ebf4b64459ff07c","8285906d7277879a","75ed6eb8e8a5373a","bee0aecf4384dbc8","147251528ba0e86c","3517a48c39570377","ddfe45263e67714b"],["2020-03-22","2020-02-01","2020-02-10","2020-03-20","2020-02-26","2020-02-11","2020-03-01","2020-03-01","2020-03-18","2020-03-12","2020-02-26","2020-04-10","2020-04-06","2020-03-20","2020-03-05","2020-03-05","2020-02-24","2020-04-04","2020-03-28","2020-04-07","2020-04-06","2020-02-26","2020-04-12","2020-04-01","2020-02-28"],["2004-11-08","1964-06-07","1944-04-06","1964-06-25","1964-12-21","1956-06-21","1974-05-25","1960-02-17","1985-06-09","1978-11-26","1946-12-21","1993-10-27","1941-06-04","1954-03-19","1958-10-22","1929-10-22","1952-01-11","1994-01-01","1995-12-25","1987-09-14","1981-12-12","1975-07-11","1948-01-11","1974-05-30","1977-01-04"],[16,57,77,57,56,65,47,61,36,42,74,27,80,67,62,91,69,27,25,33,39,46,73,47,44],["Male","Male","Female","Female","Male","Male","Male","Female","Male","Female","Male","Female","Female","Male","Female","Male","Male","Male","Male","Female","Female","Female","Male","Male","Female"],["WHITE","WHITE","BLACK","BLACK","WHITE","BLACK","BLACK","BLACK","ASIAN","BLACK","BLACK","BLACK","BLACK","BLACK","BLACK","BLACK","WHITE","BLACK","WHITE","BLACK","BLACK","BLACK","BLACK","WHITE","BLACK"],["NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NOT SPECIFIED","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO"],["30308","30308","30315","30213","30004","30314","30313","30350","30324","30305","30315","30308","30312","30213","30311","30311","30327","30349","30009","30337","30344","30315","30349","30327","30318"],["Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields"],["PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)"],["Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia"],["Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes"],["2020-03-20","2020-01-28","2020-02-10","2021-05-19","2020-02-20","2020-01-17","2020-02-21","2020-02-25","2020-03-17","2020-11-21","2020-02-15","2020-04-02","2020-03-22","2020-03-10","2020-03-02","2020-02-29","2020-02-19",null,"2020-03-25","2020-03-30","2020-03-29","2020-02-17","2020-03-30","2020-03-28","2020-02-26"],["Yes","No","Yes","No","Yes","Yes","No","Yes","No","Yes","Unknown","Unk","No","Yes","Yes","Yes","Yes","Yes","No","No","No","Yes","Yes","No","No"],["Yes","No","Unknown","Yes","Yes","Yes","No","Yes","Yes","No","Unknown","Yes","No","Yes","Unk","Yes","Yes","No","No","Yes","No","Yes","No","Yes","Unknown"],["No","Yes","Yes","Yes","Yes","No","Unk","No","No","Yes","Unknown","No","No","Yes","Unk","No","Unknown","Yes","No","Yes","No","No","Yes","Yes","Unknown"],["Unknown","Unknown","Unknown","Unknown","Unknown","Unknown","Unknown","Unknown","Unknown","Yes","Unknown","Unknown","Unknown","Unknown","Unknown","Unknown","Unknown","Unknown","No","Unknown","Unknown","Unknown","Unknown","Unknown","Unknown"],["Yes","No","Yes","Yes","No","Unk","Yes","Yes","Yes","Yes","Unknown","No","No","No","Unk","No","Unknown","No","Yes","No","No","Yes","No","Unknown","Unknown"],["Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Unk","Yes","Yes","Yes","No","Yes","Yes","Yes","Yes","Unknown","Yes"],["Yes","No","Unknown","Yes","No","Unk","Yes","No","Yes","No","Unknown","No","No","Yes","Unk","No","Unknown","No","No","No","No","No","No","Unknown","Unknown"],["No","No","No","No","No","Yes","No","No","No","No","No","No","Yes","Yes","No","No","Unknown","No","No","Yes","No","No","No","No","No"],[null,null,null,null,null,"2020-02-21",null,null,null,null,null,null,"2020-04-16",null,null,null,null,null,null,"2020-04-10",null,null,null,null,null],["Yes","No","Unknown","No","No","No","No","No","No","Yes","No","No","Yes","No","Unk","No","Unknown","No","No","No","No","No","No","No","No"],["No","No","Yes","Unknown","Yes","Yes","Yes","No","No","Yes","Unknown","No","Yes","Yes","Yes","Yes","No","Yes","No","Yes","No","Yes","Yes","No","Yes"],[null,null,"2020-02-08",null,"2020-02-26","2020-01-27","2020-03-01",null,null,"2020-11-28",null,null,"2020-04-06","2020-03-19","2020-03-03","2020-03-03",null,"2020-04-03",null,"2020-04-06",null,"2020-02-22","2020-04-15",null,"2020-02-27"],[null,null,null,null,null,"2020-02-21",null,null,null,"2020-12-02",null,null,"2020-04-16",null,null,null,null,null,null,"2020-04-10",null,"2020-03-10","2020-04-18",null,"2020-02-27"],["No","No","No","No","Unknown","Yes","No","Unknown","No","No","Unknown","No","Yes","No","No","No","Unknown","No","No","No","No","No","No","No","No"],["No","No","No","No","Unknown","Yes","No","Unknown","No","No","Unknown","No","Yes","No","No","No","Unknown","No","No","No","No","No","No","No","No"],[null,null,null,null,null,"2020-02-21",null,null,null,null,null,null,"2020-04-16",null,null,null,null,null,null,null,null,null,null,null,null],["Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes"],["Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed"],["2020-03-22","2020-02-01","2020-02-10","2021-01-17","2020-02-25","2020-02-20","2020-03-02","2020-02-29","2020-03-17","2020-11-21","2020-03-02","2020-04-10","2020-04-15","2020-03-20","2020-03-07","2020-03-05","2020-02-21","2020-12-16","2021-01-28","2020-04-08","2020-04-02","2020-02-22","2020-04-11","2020-03-29","2020-02-27"],[33.77664546,33.78051014,33.73023331,33.55506787,34.10608705,33.75937142,33.76269487,33.99152006,33.81818887,0.000509015,33.7247196,33.76662936,33.73726168,33.58325606,33.73072166,33.74443579,33.84942894,33.61755356,34.09972633,33.65329287,33.69052246,33.71013231,33.64674578,33.84126361,33.80477485],[-84.38568523,-84.38947474,-84.38425189,-84.62885167,-84.27453508,-84.42582354,-84.40045162,-84.35447278,-84.37365369,-0.000975479,-84.38623582,-84.38936047,-84.38274508,-84.63672804,-84.44208134,-84.47630174,-84.41986975,-84.46304234,-84.31308119,-84.45800906,-84.46524239,-84.38555839,-84.57468022,-84.42349808,-84.45733019],["2020-03-18","2020-01-29","2020-02-05","2020-03-18","2020-02-26","2020-02-05","2020-02-26","2020-02-26","2020-03-18","2020-03-11","2020-02-26","2020-04-08","2020-04-01","2020-03-18","2020-03-04","2020-03-04","2020-02-19","2020-04-01","2020-03-25","2020-04-01","2020-04-01","2020-02-26","2020-04-08","2020-04-01","2020-02-26"],[null,null,null,null,6,10,9,null,null,7,null,null,15,9,1,3,null,null,null,7,null,5,16,null,1],[null,null,null,null,null,"2020-02-21",null,null,null,"2020-12-02",null,null,"2020-04-16",null,null,null,null,null,null,"2020-04-10",null,"2020-03-10","2020-04-18",null,"2020-02-27"],[null,null,null,null,null,25,null,null,null,4,null,null,10,null,null,null,null,null,null,4,null,17,3,null,0],["10-19","50-59","70+","50-59","50-59","60-69","40-49","60-69","30-39","40-49","70+","20-29","70+","60-69","60-69","70+","60-69","20-29","20-29","30-39","30-39","40-49","70+","40-49","40-49"],["White, NH","White, NH","Black, NH","Black, NH","White, NH","Black, NH","Black, NH","Black, NH","Asian, NH","Black, NH","Black, NH","Black, NH","Black, NH","Black, NH","Black, NH","Black, NH","White, NH","Black, NH","White, NH","Black, NH","Black, NH","Black, NH","Black, NH","White, NH","Black, NH"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>pid<\/th>\n      <th>date_report<\/th>\n      <th>date_dob<\/th>\n      <th>age<\/th>\n      <th>gender<\/th>\n      <th>race<\/th>\n      <th>eth<\/th>\n      <th>zip<\/th>\n      <th>county<\/th>\n      <th>district<\/th>\n      <th>state<\/th>\n      <th>contact_id<\/th>\n      <th>date_onset<\/th>\n      <th>sym_fever<\/th>\n      <th>sym_subjfever<\/th>\n      <th>sym_myalgia<\/th>\n      <th>sym_losstastesmell<\/th>\n      <th>sym_sorethroat<\/th>\n      <th>sym_cough<\/th>\n      <th>sym_headache<\/th>\n      <th>sym_resolved<\/th>\n      <th>date_recovery<\/th>\n      <th>contact_hh<\/th>\n      <th>hospitalized<\/th>\n      <th>date_hospitalized<\/th>\n      <th>date_discharge<\/th>\n      <th>died<\/th>\n      <th>died_covid<\/th>\n      <th>date_died<\/th>\n      <th>confirmed_case<\/th>\n      <th>covid_dx<\/th>\n      <th>date_positive<\/th>\n      <th>lat<\/th>\n      <th>lon<\/th>\n      <th>epiweek<\/th>\n      <th>days_onset_hosp<\/th>\n      <th>date_outcome<\/th>\n      <th>days_hosp<\/th>\n      <th>age_group<\/th>\n      <th>eth_race<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"scrollY":300,"scrollX":600,"pageLength":25,"fontSize":"25%","dom":"ti","ordering":false,"rownames":false,"options":{"pageLength":5,"scrollX":true},"class":"white-space: nowrap","columnDefs":[{"className":"dt-right","targets":[4,33,34,36,38]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-4dfeba113185532c52d0" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-4dfeba113185532c52d0">{"x":{"filter":"none","data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25"],["3a85e6992a5ac52f","c6b5281d5fc50b96","53495ad0dca4e22c","2948a265da0d081b","a5524aadd1ca0458","db14eeabe531fab7","8bd07af27a9095e2","b0fb67854aaeb475","bf9099af39be433a","c01011bc9755eb3a","27b97d577fb9a30d","932f146c3860e756","44655181e230b95c","a951cb110aacd31f","7288a58b47539174","dfbc141429716762","033e8eb949e30135","a254eb953370eb3d","2ebf4b64459ff07c","8285906d7277879a","75ed6eb8e8a5373a","bee0aecf4384dbc8","147251528ba0e86c","3517a48c39570377","ddfe45263e67714b"],["2020-03-22","2020-02-01","2020-02-10","2020-03-20","2020-02-26","2020-02-11","2020-03-01","2020-03-01","2020-03-18","2020-03-12","2020-02-26","2020-04-10","2020-04-06","2020-03-20","2020-03-05","2020-03-05","2020-02-24","2020-04-04","2020-03-28","2020-04-07","2020-04-06","2020-02-26","2020-04-12","2020-04-01","2020-02-28"],["2004-11-08","1964-06-07","1944-04-06","1964-06-25","1964-12-21","1956-06-21","1974-05-25","1960-02-17","1985-06-09","1978-11-26","1946-12-21","1993-10-27","1941-06-04","1954-03-19","1958-10-22","1929-10-22","1952-01-11","1994-01-01","1995-12-25","1987-09-14","1981-12-12","1975-07-11","1948-01-11","1974-05-30","1977-01-04"],[16,57,77,57,56,65,47,61,36,42,74,27,80,67,62,91,69,27,25,33,39,46,73,47,44],["Male","Male","Female","Female","Male","Male","Male","Female","Male","Female","Male","Female","Female","Male","Female","Male","Male","Male","Male","Female","Female","Female","Male","Male","Female"],["WHITE","WHITE","BLACK","BLACK","WHITE","BLACK","BLACK","BLACK","ASIAN","BLACK","BLACK","BLACK","BLACK","BLACK","BLACK","BLACK","WHITE","BLACK","WHITE","BLACK","BLACK","BLACK","BLACK","WHITE","BLACK"],["NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NOT SPECIFIED","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO","NON-HISPANIC/LATINO"],["30308","30308","30315","30213","30004","30314","30313","30350","30324","30305","30315","30308","30312","30213","30311","30311","30327","30349","30009","30337","30344","30315","30349","30327","30318"],["Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields","Fields"],["PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)","PIEDMONT (12-2)"],["Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia","Georgia"],["Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes"],["2020-03-20","2020-01-28","2020-02-10","2021-05-19","2020-02-20","2020-01-17","2020-02-21","2020-02-25","2020-03-17","2020-11-21","2020-02-15","2020-04-02","2020-03-22","2020-03-10","2020-03-02","2020-02-29","2020-02-19",null,"2020-03-25","2020-03-30","2020-03-29","2020-02-17","2020-03-30","2020-03-28","2020-02-26"],["Yes","No","Yes","No","Yes","Yes","No","Yes","No","Yes","Unknown","Unk","No","Yes","Yes","Yes","Yes","Yes","No","No","No","Yes","Yes","No","No"],["Yes","No","Unknown","Yes","Yes","Yes","No","Yes","Yes","No","Unknown","Yes","No","Yes","Unk","Yes","Yes","No","No","Yes","No","Yes","No","Yes","Unknown"],["No","Yes","Yes","Yes","Yes","No","Unk","No","No","Yes","Unknown","No","No","Yes","Unk","No","Unknown","Yes","No","Yes","No","No","Yes","Yes","Unknown"],["Unknown","Unknown","Unknown","Unknown","Unknown","Unknown","Unknown","Unknown","Unknown","Yes","Unknown","Unknown","Unknown","Unknown","Unknown","Unknown","Unknown","Unknown","No","Unknown","Unknown","Unknown","Unknown","Unknown","Unknown"],["Yes","No","Yes","Yes","No","Unk","Yes","Yes","Yes","Yes","Unknown","No","No","No","Unk","No","Unknown","No","Yes","No","No","Yes","No","Unknown","Unknown"],["Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Unk","Yes","Yes","Yes","No","Yes","Yes","Yes","Yes","Unknown","Yes"],["Yes","No","Unknown","Yes","No","Unk","Yes","No","Yes","No","Unknown","No","No","Yes","Unk","No","Unknown","No","No","No","No","No","No","Unknown","Unknown"],["No","No","No","No","No","Yes","No","No","No","No","No","No","Yes","Yes","No","No","Unknown","No","No","Yes","No","No","No","No","No"],[null,null,null,null,null,"2020-02-21",null,null,null,null,null,null,"2020-04-16",null,null,null,null,null,null,"2020-04-10",null,null,null,null,null],["Yes","No","Unknown","No","No","No","No","No","No","Yes","No","No","Yes","No","Unk","No","Unknown","No","No","No","No","No","No","No","No"],["No","No","Yes","Unknown","Yes","Yes","Yes","No","No","Yes","Unknown","No","Yes","Yes","Yes","Yes","No","Yes","No","Yes","No","Yes","Yes","No","Yes"],[null,null,"2020-02-08",null,"2020-02-26","2020-01-27","2020-03-01",null,null,"2020-11-28",null,null,"2020-04-06","2020-03-19","2020-03-03","2020-03-03",null,"2020-04-03",null,"2020-04-06",null,"2020-02-22","2020-04-15",null,"2020-02-27"],[null,null,null,null,null,"2020-02-21",null,null,null,"2020-12-02",null,null,"2020-04-16",null,null,null,null,null,null,"2020-04-10",null,"2020-03-10","2020-04-18",null,"2020-02-27"],["No","No","No","No","Unknown","Yes","No","Unknown","No","No","Unknown","No","Yes","No","No","No","Unknown","No","No","No","No","No","No","No","No"],["No","No","No","No","Unknown","Yes","No","Unknown","No","No","Unknown","No","Yes","No","No","No","Unknown","No","No","No","No","No","No","No","No"],[null,null,null,null,null,"2020-02-21",null,null,null,null,null,null,"2020-04-16",null,null,null,null,null,null,null,null,null,null,null,null],["Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes"],["Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed","Confirmed"],["2020-03-22","2020-02-01","2020-02-10","2021-01-17","2020-02-25","2020-02-20","2020-03-02","2020-02-29","2020-03-17","2020-11-21","2020-03-02","2020-04-10","2020-04-15","2020-03-20","2020-03-07","2020-03-05","2020-02-21","2020-12-16","2021-01-28","2020-04-08","2020-04-02","2020-02-22","2020-04-11","2020-03-29","2020-02-27"],[33.77664546,33.78051014,33.73023331,33.55506787,34.10608705,33.75937142,33.76269487,33.99152006,33.81818887,0.000509015,33.7247196,33.76662936,33.73726168,33.58325606,33.73072166,33.74443579,33.84942894,33.61755356,34.09972633,33.65329287,33.69052246,33.71013231,33.64674578,33.84126361,33.80477485],[-84.38568523,-84.38947474,-84.38425189,-84.62885167,-84.27453508,-84.42582354,-84.40045162,-84.35447278,-84.37365369,-0.000975479,-84.38623582,-84.38936047,-84.38274508,-84.63672804,-84.44208134,-84.47630174,-84.41986975,-84.46304234,-84.31308119,-84.45800906,-84.46524239,-84.38555839,-84.57468022,-84.42349808,-84.45733019],["2020-03-18","2020-01-29","2020-02-05","2020-03-18","2020-02-26","2020-02-05","2020-02-26","2020-02-26","2020-03-18","2020-03-11","2020-02-26","2020-04-08","2020-04-01","2020-03-18","2020-03-04","2020-03-04","2020-02-19","2020-04-01","2020-03-25","2020-04-01","2020-04-01","2020-02-26","2020-04-08","2020-04-01","2020-02-26"],[null,null,null,null,6,10,9,null,null,7,null,null,15,9,1,3,null,null,null,7,null,5,16,null,1],[null,null,null,null,null,"2020-02-21",null,null,null,"2020-12-02",null,null,"2020-04-16",null,null,null,null,null,null,"2020-04-10",null,"2020-03-10","2020-04-18",null,"2020-02-27"],[null,null,null,null,null,25,null,null,null,4,null,null,10,null,null,null,null,null,null,4,null,17,3,null,0],["10-19","50-59","70+","50-59","50-59","60-69","40-49","60-69","30-39","40-49","70+","20-29","70+","60-69","60-69","70+","60-69","20-29","20-29","30-39","30-39","40-49","70+","40-49","40-49"],["White, NH","White, NH","Black, NH","Black, NH","White, NH","Black, NH","Black, NH","Black, NH","Asian, NH","Black, NH","Black, NH","Black, NH","Black, NH","Black, NH","Black, NH","Black, NH","White, NH","Black, NH","White, NH","Black, NH","Black, NH","Black, NH","Black, NH","White, NH","Black, NH"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>pid<\/th>\n      <th>date_report<\/th>\n      <th>date_dob<\/th>\n      <th>age<\/th>\n      <th>gender<\/th>\n      <th>race<\/th>\n      <th>eth<\/th>\n      <th>zip<\/th>\n      <th>county<\/th>\n      <th>district<\/th>\n      <th>state<\/th>\n      <th>contact_id<\/th>\n      <th>date_onset<\/th>\n      <th>sym_fever<\/th>\n      <th>sym_subjfever<\/th>\n      <th>sym_myalgia<\/th>\n      <th>sym_losstastesmell<\/th>\n      <th>sym_sorethroat<\/th>\n      <th>sym_cough<\/th>\n      <th>sym_headache<\/th>\n      <th>sym_resolved<\/th>\n      <th>date_recovery<\/th>\n      <th>contact_hh<\/th>\n      <th>hospitalized<\/th>\n      <th>date_hospitalized<\/th>\n      <th>date_discharge<\/th>\n      <th>died<\/th>\n      <th>died_covid<\/th>\n      <th>date_died<\/th>\n      <th>confirmed_case<\/th>\n      <th>covid_dx<\/th>\n      <th>date_positive<\/th>\n      <th>lat<\/th>\n      <th>lon<\/th>\n      <th>epiweek<\/th>\n      <th>days_onset_hosp<\/th>\n      <th>date_outcome<\/th>\n      <th>days_hosp<\/th>\n      <th>age_group<\/th>\n      <th>eth_race<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"scrollY":300,"scrollX":600,"pageLength":25,"fontSize":"25%","dom":"ti","ordering":false,"rownames":false,"options":{"pageLength":5,"scrollX":true},"class":"white-space: nowrap","columnDefs":[{"className":"dt-right","targets":[4,33,34,36,38]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 
 .footnote[Tip: Use `skim()` from **skimr** package to review all columns with summary statistics]  
 
@@ -262,7 +274,7 @@ See the [R graph gallery](https://www.r-graph-gallery.com/ggplot2-package.html) 
 
 --
 
-- This whole approach is colloquially known as “ggploting”  
+- This whole approach is colloquially known as “ggplotting”  
 
 --
 
@@ -309,7 +321,7 @@ The order of layers will usually look like this:
 
 --
 
-5) **Add design elements** such as axis labels, title, caption, fonts, text sizes, background themes, or axes rotation  
+5) **Add "theme" plot design elements** such as axis labels, title, caption, fonts, text sizes, background themes, or axes rotation  
 
 --
 
@@ -656,7 +668,7 @@ Argument        |Controls
 `fill`       |The *interior* color (e.g of bar or boxplot)  
 `color`      |The *exterior* or bar, boxplot - OR point color  
 `size`       |Line thickness, point size...
-`alpha`      |Transparency (1 = opaque, 0 = invisible)
+`alpha`      |Transparency: 0 (invisible) to 1 (opaque) 
 `width`      |Width of "bar plot" bars
 `linetype`   |Either solid, dashed, dotted, etc.  
 `binwidth`   |Width of histogram bins  
@@ -822,7 +834,7 @@ Above, `color=` is mapped to column `died`, and is inherited by `geom_point()`.
 
 
 ---
-# Multiple aesthetics - example  
+# Static and dynamic  
 
 .pull-left[
 
@@ -844,6 +856,7 @@ Above, `size = 7` and `alpha = 0.7` are static aesthetics defined outside any `a
 
 `color=` is within an `aes()`, and maps to values in column `died`.  
 
+
 ]
 
 .pull-right[
@@ -863,9 +876,9 @@ As there is only one geom, all aesthetics can be written in `ggplot()`, or in `g
 ---
 # Aesthetic mapping placement  
 
-* Dynamic mappings in the initial `ggplot()` call will apply to subsequent geoms, *unless otherwise indicated*  
-* Static aesthetics (e.g. `color = "blue"`) are not inherited by subsequent geoms  
-* Mappings written within one geom apply only to that geom  
+1) Dynamic mappings in the initial `ggplot()` call will apply to subsequent geoms, *unless otherwise indicated*  
+2) Static aesthetics (e.g. `color = "blue"`) are not inherited by subsequent geoms  
+3) Mappings written within one geom apply only to that geom  
 
 .pull-left[
 
@@ -886,18 +899,18 @@ geom_smooth(
 # smoothed mean of entire dataset
 geom_smooth(color = "black")
 ```
+
 ]
 
 .pull-right[
+
 &lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-35-1.png" width="504" /&gt;
 ]
 
 
 ???
-- Which is cleaner and easier to read?
-- When would you want to assign different dynamic aesthetics for different layers? E.g. Points colored by outcome, but geom_text in black only. 
-- Explain why you might use one or the other  
-- Note that aesthetics written outside will not automatically be inherited. 
+- Three rules to remember as you decide where to place aesthetic mappings
+- This is rather complex example, but serves to demonstrate the above guidelines.  
 
 
 
@@ -1379,7 +1392,7 @@ In `scale_y_continuous()` we adjust the y-axis breaks using `seq()` to define a 
 
 
 ---
-# Scales - "Floating plots" 
+# Scales - Start axes at 0 
 
 .pull-left[
 
@@ -1631,6 +1644,7 @@ geom_point(
   alpha = 0.3) +
 *labs(
 *  title = "Duration of admission",
+*  subtitle = "Fulton County, GA",
 *  x = "Age (years)",
 *  y = "Duration (days)",
 *  caption = "Fictional COVID-19 data",
@@ -1638,7 +1652,10 @@ geom_point(
 )
 ```
 
-Use `lab()` to edit title, subtitle, caption, axes labels, and legend title  
+
+Use `labs()` as above. 
+
+Note: to edit legend title, use the aesthetic that created the legend (e.g. `color=`).  
 
 ]
 
@@ -1666,7 +1683,7 @@ str_wrap("This is a really long title", 30) # wrap at 30 characters
 --
 
 
-**Dynamic labels** - Imbed code in `str_glue()` that updates with the data  
+**Dynamic labels** - Embed code in `str_glue()` that updates with the data  
 
 
 ```r
@@ -1674,7 +1691,7 @@ str_glue("Data as of {Sys.Date()}")
 ```
 
 ```
-## Data as of 2021-08-19
+## Data as of 2021-08-20
 ```
 
 
@@ -1685,13 +1702,6 @@ str_glue("{fmt_count(linelist, is.na(date_onset))} cases missing onset and not s
 ```
 ## 37323 (45.7%) cases missing onset and not shown
 ```
-
-
---
-
-
-**Legend title**  
-In `labs()`, write the aesthetic (e.g. `fill=`, `color=`) and provide a title.  
 
 
 
@@ -1747,7 +1757,7 @@ Try the argument `base_size = 16` to quickly increase text size.
 
 .pull-left[
 
-Use `theme()` to make micro-adjustments.  
+Make micro-adjustments with `theme()`. See the handbook for tips.  
 
 
 ```r
@@ -1777,7 +1787,7 @@ theme_minimal(base_size = 16) +
 
 .pull-right[
 
-Syntax takes practice - see [this list](https://ggplot2.tidyverse.org/reference/theme.html) of feature-specific arguments.
+The syntax takes practice - see [this list](https://ggplot2.tidyverse.org/reference/theme.html) of feature-specific arguments.
 
 &lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-84-1.png" width="504" /&gt;
 ]
@@ -1909,7 +1919,7 @@ theme(axis.text.x= element_text(angle=30))
 
 class: medium-table
 
-# Bar plot - counts  
+# Bar plot - aggregated counts  
 
 .pull-left[
 
@@ -1934,7 +1944,7 @@ ggplot(linelist_eth) +
     mapping = aes(   
       x = eth_race,    
 *     y = n))+
-theme(axis.text.x= element_text(angle = 30))         
+theme(axis.text.x= element_text(angle= 30))         
 ```
 
 
@@ -1947,34 +1957,6 @@ theme(axis.text.x= element_text(angle = 30))
 
 ]
 
-
----
-
-# Bar plot - a common error 
-
-.pull-left[
-
-If your data look like below (counts) and your plot looks like that (bars of same height), ensure you are using `geom_col()` and not `geom_bar()`!  
-
-
-|eth_race            |     n|
-|:-------------------|-----:|
-|Asian, NH           |  3022|
-|Black, NH           | 34395|
-|White, NH           | 27303|
-|Hispanic, all races |  8600|
-|Other, NH           |  2912|
-|Unknown             |  5525|
-
-]
-
-.pull-right[
-
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-97-1.png" width="504" /&gt;
-
-This plot shows that there is one row per ethnicity/race!  
-
-]
 
 ---
 
@@ -2011,12 +1993,41 @@ theme(axis.text.x= element_text(angle=30))
 
 .pull-right[
 
-&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-100-1.png" width="504" /&gt;
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-98-1.png" width="504" /&gt;
 
 .footnote[See the pivoting page in the Epi R Handbook]
 
 ]
 
+
+
+---
+
+# Bar plot - a common error 
+
+.pull-left[
+
+If your data look like below (counts) and your plot looks like that (bars of same height), ensure you are using `geom_col()` and not `geom_bar()`!  
+
+
+|eth_race            |     n|
+|:-------------------|-----:|
+|Asian, NH           |  3022|
+|Black, NH           | 34395|
+|White, NH           | 27303|
+|Hispanic, all races |  8600|
+|Other, NH           |  2912|
+|Unknown             |  5525|
+
+]
+
+.pull-right[
+
+&lt;img src="slides_ggplot_files/figure-html/unnamed-chunk-100-1.png" width="504" /&gt;
+
+This plot shows that there is one row per ethnicity/race!  
+
+]
 
 
 ---
@@ -2392,7 +2403,7 @@ groups = c(eth_race, gender)
 
 
 ---
-# Epicurve - groups 
+# Epicurve - ggplot2 additions 
 
 
 .pull-left[
@@ -2480,13 +2491,13 @@ For small outbreaks, the style `show_cases = TRUE` may be helpful:
 
 ```r
 small_outbreak &lt;- linelist %&gt;% 
-filter(
- zip == 30024,
- date_report &gt;= as.Date("2020-12-01")) %&gt;% 
-incidence(
-  date_index = date_onset,               
-  interval = "Sunday weeks",             
-  groups = eth_race)
+  filter(
+    zip == 30024,
+    date_report &gt;= as.Date("2020-12-01")) %&gt;% 
+  incidence(
+    date_index = date_onset,               
+    interval = "Sunday weeks",             
+    groups = eth_race)
 ```
 
 
@@ -2716,7 +2727,6 @@ Further modifications:
 
 .pull-left[
 
-You can stack the bars by another variable with `stack_by=`  
 
 
 ```r
@@ -2731,6 +2741,8 @@ age_pyramid(
          "yellow", "orange"))
 ```
 
+You can stack the bars by another variable with `stack_by=`  
+
 ]
 
 .pull-right[
@@ -2743,7 +2755,6 @@ age_pyramid(
 ---
 # Demographic pyramids
 
-You can add further ggplot commands 
 
 .pull-left[
 
@@ -2765,6 +2776,8 @@ age_pyramid(
 *  fill = "Gender",
 *  caption = "Caption here")
 ```
+
+You can add further ggplot commands.  
 
 ]
 
@@ -2860,7 +2873,7 @@ age_pyramid(
   split_by = "gender",
   proportional = TRUE,
   show_midpoint = FALSE) +
-theme_minimal(base_size = 16) +
+theme_minimal(base_size = 10) +
 labs(
   title = "Age and Gender",
 * subtitle = str_glue(
@@ -2920,9 +2933,7 @@ race_CFR_age &lt;- linelist %&gt;%
     deaths = sum(died_covid == "Yes",
                  na.rm=T),
     CFR = deaths/cases,
-    med_age = median(age, na.rm=T),
-    med_dur = median(days_hosp, na.rm=T)
-  )
+    med_age = median(age, na.rm=T)  )
 ```
 
 ]
@@ -2930,13 +2941,13 @@ race_CFR_age &lt;- linelist %&gt;%
 .pull-right[
 
 
-|eth_race            | cases| deaths|       CFR| med_age| med_dur|
-|:-------------------|-----:|------:|---------:|-------:|-------:|
-|Asian, NH           |  3022|     23| 0.0076109|      34|     5.5|
-|Black, NH           | 34395|    833| 0.0242186|      39|     5.0|
-|White, NH           | 27303|    417| 0.0152730|      36|     5.0|
-|Hispanic, all races |  8600|     55| 0.0063953|      34|     4.0|
-|Other, NH           |  2912|      6| 0.0020604|      32|     3.0|
+|eth_race            | cases| deaths|       CFR| med_age|
+|:-------------------|-----:|------:|---------:|-------:|
+|Asian, NH           |  3022|     23| 0.0076109|      34|
+|Black, NH           | 34395|    833| 0.0242186|      39|
+|White, NH           | 27303|    417| 0.0152730|      36|
+|Hispanic, all races |  8600|     55| 0.0063953|      34|
+|Other, NH           |  2912|      6| 0.0020604|      32|
 ]
 
 
@@ -3044,7 +3055,7 @@ ggplot(
     y = CFR,
     size = cases,
 *   label = str_glue(
-      "{eth_race}\n{cases} cases"))) +
+*     "{eth_race}\n{cases} cases"))) +
 geom_point() +
 geom_label_repel(
     size = 5,
@@ -3082,7 +3093,7 @@ ggplot(
     y = CFR,
     size = cases,
 *   label = str_glue(
-      "{eth_race}\n{comma(cases)} cases"))) +
+*     "{eth_race}\n{comma(cases)} cases"))) +
 geom_point() +
 geom_label_repel(
     size = 4,
@@ -3164,13 +3175,13 @@ plot1 &lt;- plot2 &lt;- linelist %&gt;%
   geom_histogram()+
   theme_minimal()+
   scale_y_continuous(expand = c(0,0))+
-  scale_x_date(
-    expand = c(0,0),
+* scale_x_date(
 *   limits = c(
 *     as.Date("2020-03-01"),
 *     max(linelist$date_report, na.rm=T)),
     date_breaks = "months",
-    labels = scales::label_date_short())
+    labels = scales::label_date_short(),
+    expand = c(0,0))
 ```
 ]
 
@@ -3201,18 +3212,18 @@ ggplot(
     ymax = upr))+
 geom_ribbon(alpha = 0.5, fill = "green", color = "green")+
 geom_line(size = 2, color = "darkgreen")+
-scale_x_date(
+*scale_x_date(
 *  limits = c(
 *    as.Date("2020-03-01"),
 *    max(linelist$date_report, na.rm=T)),
-  expand = c(0,0),
   date_breaks = "months",
-  labels = scales::label_date_short())+
-  coord_cartesian(ylim = c(30, 60))+
-  theme_minimal()+
-  labs(
-    y = "Weekly mean age (95%CI)",
-    x = "Month")
+  labels = scales::label_date_short(),
+  expand = c(0,0))+
+coord_cartesian(ylim = c(30, 60))+
+theme_minimal()+
+labs(
+  y = "Weekly mean age (95%CI)",
+  x = "Month")
 ```
 
 ]
@@ -3257,7 +3268,7 @@ plot1 &lt;- ggplot(
 geom_histogram(color = "grey",
                alpha = 0.5) +
 *theme_cowplot() +
-scale_x_date(
+*scale_x_date(
 * limits = c(
 *   as.Date("2020-03-01"),
 *   max(linelist$date_report, na.rm = TRUE)),  
@@ -3301,7 +3312,7 @@ ggplot(
     limits = c(0, 0.2),
     expand = c(0,0),
     name = "Weekly CFR")+
-  scale_x_date(
+* scale_x_date(
 *   limits = c(
 *     as.Date("2020-03-01"),
 *     max(linelist$date_report, na.rm=T)),  
@@ -3352,8 +3363,8 @@ Use `ggplotly()` from the **plotly** package to easily make most ggplots interac
 plotly::ggplotly(bar_plot)
 ```
 
-<div id="htmlwidget-dba02793122ea2c49b77" style="width:648px;height:432px;" class="plotly html-widget"></div>
-<script type="application/json" data-for="htmlwidget-dba02793122ea2c49b77">{"x":{"data":[{"orientation":"v","width":[0.9,0.9,0.9,0.9,0.9],"base":[2992,33358,26747,8532,2902],"x":[1,2,3,4,5],"y":[30,1037,556,68,10],"text":["count:    30<br />eth_race: Asian, NH<br />died: Yes","count:  1037<br />eth_race: Black, NH<br />died: Yes","count:   556<br />eth_race: White, NH<br />died: Yes","count:    68<br />eth_race: Hispanic, all races<br />died: Yes","count:    10<br />eth_race: Other, NH<br />died: Yes"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(248,118,109,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Yes","legendgroup":"Yes","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.9,0.9,0.9,0.9,0.9,0.9],"base":[1190,14154,11877,3303,1771,4513],"x":[1,2,3,4,5,6],"y":[1802,19204,14870,5229,1131,1012],"text":["count:  1802<br />eth_race: Asian, NH<br />died: No","count: 19204<br />eth_race: Black, NH<br />died: No","count: 14870<br />eth_race: White, NH<br />died: No","count:  5229<br />eth_race: Hispanic, all races<br />died: No","count:  1131<br />eth_race: Other, NH<br />died: No","count:  1012<br />eth_race: Unknown<br />died: No"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(0,186,56,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"No","legendgroup":"No","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.9,0.9,0.9,0.9,0.9,0.9],"base":[0,0,0,0,0,0],"x":[1,2,3,4,5,6],"y":[1190,14154,11877,3303,1771,4513],"text":["count:  1190<br />eth_race: Asian, NH<br />died: Unknown","count: 14154<br />eth_race: Black, NH<br />died: Unknown","count: 11877<br />eth_race: White, NH<br />died: Unknown","count:  3303<br />eth_race: Hispanic, all races<br />died: Unknown","count:  1771<br />eth_race: Other, NH<br />died: Unknown","count:  4513<br />eth_race: Unknown<br />died: Unknown"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(97,156,255,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Unknown","legendgroup":"Unknown","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":26.958904109589,"r":7.30593607305936,"b":40.9132420091324,"l":54.7945205479452},"plot_bgcolor":"rgba(235,235,235,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[0.4,6.6],"tickmode":"array","ticktext":["Asian, NH","Black, NH","White, NH","Hispanic, all races","Other, NH","Unknown"],"tickvals":[1,2,3,4,5,6],"categoryorder":"array","categoryarray":["Asian, NH","Black, NH","White, NH","Hispanic, all races","Other, NH","Unknown"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.65296803652968,"tickwidth":0.66417600664176,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.689497716895},"tickangle":-30,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.66417600664176,"zeroline":false,"anchor":"y","title":{"text":"eth_race","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-1719.75,36114.75],"tickmode":"array","ticktext":["0","10000","20000","30000"],"tickvals":[0,10000,20000,30000],"categoryorder":"array","categoryarray":["0","10000","20000","30000"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.65296803652968,"tickwidth":0.66417600664176,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.689497716895},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.66417600664176,"zeroline":false,"anchor":"x","title":{"text":"count","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":1.88976377952756,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.689497716895},"y":0.97594050743657},"annotations":[{"text":"died","x":1.02,"y":1,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187},"xref":"paper","yref":"paper","textangle":-0,"xanchor":"left","yanchor":"bottom","legendTitle":true}],"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","showSendToCloud":false},"source":"A","attrs":{"5b9c70da147d":{"x":{},"fill":{},"type":"bar"}},"cur_data":"5b9c70da147d","visdat":{"5b9c70da147d":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-57c98eb29845e146ede9" style="width:648px;height:432px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-57c98eb29845e146ede9">{"x":{"data":[{"orientation":"v","width":[0.9,0.9,0.9,0.9,0.9],"base":[2992,33358,26747,8532,2902],"x":[1,2,3,4,5],"y":[30,1037,556,68,10],"text":["count:    30<br />eth_race: Asian, NH<br />died: Yes","count:  1037<br />eth_race: Black, NH<br />died: Yes","count:   556<br />eth_race: White, NH<br />died: Yes","count:    68<br />eth_race: Hispanic, all races<br />died: Yes","count:    10<br />eth_race: Other, NH<br />died: Yes"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(248,118,109,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Yes","legendgroup":"Yes","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.9,0.9,0.9,0.9,0.9,0.9],"base":[1190,14154,11877,3303,1771,4513],"x":[1,2,3,4,5,6],"y":[1802,19204,14870,5229,1131,1012],"text":["count:  1802<br />eth_race: Asian, NH<br />died: No","count: 19204<br />eth_race: Black, NH<br />died: No","count: 14870<br />eth_race: White, NH<br />died: No","count:  5229<br />eth_race: Hispanic, all races<br />died: No","count:  1131<br />eth_race: Other, NH<br />died: No","count:  1012<br />eth_race: Unknown<br />died: No"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(0,186,56,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"No","legendgroup":"No","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.9,0.9,0.9,0.9,0.9,0.9],"base":[0,0,0,0,0,0],"x":[1,2,3,4,5,6],"y":[1190,14154,11877,3303,1771,4513],"text":["count:  1190<br />eth_race: Asian, NH<br />died: Unknown","count: 14154<br />eth_race: Black, NH<br />died: Unknown","count: 11877<br />eth_race: White, NH<br />died: Unknown","count:  3303<br />eth_race: Hispanic, all races<br />died: Unknown","count:  1771<br />eth_race: Other, NH<br />died: Unknown","count:  4513<br />eth_race: Unknown<br />died: Unknown"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(97,156,255,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Unknown","legendgroup":"Unknown","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":26.958904109589,"r":7.30593607305936,"b":40.9132420091324,"l":54.7945205479452},"plot_bgcolor":"rgba(235,235,235,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[0.4,6.6],"tickmode":"array","ticktext":["Asian, NH","Black, NH","White, NH","Hispanic, all races","Other, NH","Unknown"],"tickvals":[1,2,3,4,5,6],"categoryorder":"array","categoryarray":["Asian, NH","Black, NH","White, NH","Hispanic, all races","Other, NH","Unknown"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.65296803652968,"tickwidth":0.66417600664176,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.689497716895},"tickangle":-30,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.66417600664176,"zeroline":false,"anchor":"y","title":{"text":"eth_race","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-1719.75,36114.75],"tickmode":"array","ticktext":["0","10000","20000","30000"],"tickvals":[0,10000,20000,30000],"categoryorder":"array","categoryarray":["0","10000","20000","30000"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.65296803652968,"tickwidth":0.66417600664176,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.689497716895},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.66417600664176,"zeroline":false,"anchor":"x","title":{"text":"count","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":1.88976377952756,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.689497716895},"y":0.97594050743657},"annotations":[{"text":"died","x":1.02,"y":1,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187},"xref":"paper","yref":"paper","textangle":-0,"xanchor":"left","yanchor":"bottom","legendTitle":true}],"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","showSendToCloud":false},"source":"A","attrs":{"3bf0472a5b52":{"x":{},"fill":{},"type":"bar"}},"cur_data":"3bf0472a5b52","visdat":{"3bf0472a5b52":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
 
 
 

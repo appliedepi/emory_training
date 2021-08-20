@@ -83,10 +83,12 @@ pacman::p_load(
   lubridate,  # working with dates
   incidence2, # epidemic curves
   ggrepel,    # smart labels
-  ggExtra,
-  esquisse,
+  ggExtra,    # extras
+  esquisse,   # point-and-click for simple ggplots
   apyramid,   # age pyramids
   scales,     # formatting of scales
+  plotly,     # interactive plots
+  cowplot,    # combine plots
   tidyverse,  # data management and visualization
   xaringanthemer  # for styling presentation 
 )
@@ -191,13 +193,16 @@ Our objectives today are to:
 
 
 ???
-- There will be a LOT of content and we will move quickly.  
-- The objective is not that you understand completely now, but that you understand the core syntax and are exposed to the potential universe of adjustments  
+- 1 - core syntax and 2 - exposure
+- Ready yourself because today will be a whirlwind.
+- There will be a LOT of content and we will move quickly.
+- Type questions in the chat, or hold them to the end.  
+- We will do understanding checks throughout  
 
 
 
 ---
-# Directory structure  
+# Resources for you  
 
 Today's work is within an R project, which can be [downloaded as a zipped file](https://minhaskamal.github.io/DownGit/#/home?url=https://github.com/appliedepi/emory_training/tree/master/case_study).  
 
@@ -215,31 +220,40 @@ R project file (`case_study.Rproj`)
   * `ggplot_demo.Rmd` (R markdown script)  
 
 
+???
+- Do NOT download and try it now. Too distracting.  
+- Today will move fast, but just like last time the REAL opportunity for you is to review at your own pace.  
+- We've spent a lot of time developing materials for you.  
+- SHOW SCRIPT AND OUTPUT IN FOLDER  
+
 
 
 ---
 # Load packages and import data  
 
-Load packages, as covered in previous demonstration.  
-**ggplot2** is included within [**tidyverse**](https://www.tidyverse.org/).  
+Load packages (**ggplot2** is within [**tidyverse**](https://www.tidyverse.org/)) and import the cleaned (fake) dataset from [last session](https://github.com/appliedepi/emory_training/blob/master/case_study/weekly_report.Rmd).  
 
-```{r, eval = FALSE, echo=TRUE}
+```{r, eval=F, echo=T}
+## install and load necessary packages 
 pacman::p_load(
-  rio,            # import/export
-  here,           # file locator
-  lubridate,      # working with dates
-  epikit,         # age categories, helper functions
-  incidence2,     # epidemic curves
-  apyramid,       # demographic pyramids
-  gghighlight,    # specialized highlight plots
-  ggrepel,        # smart labels
-  ggExtra,        # marginal distributions and other extras
-  esquisse,       # point-and-click ggplot2
-* tidyverse       # mega-package for data management and visualization
-  )
+  rio,        # importing data  
+  here,       # relative file pathways  
+  skimr,      # review data
+  DT,         # visualize data frame
+  janitor,    # data cleaning and tables
+  epikit,     # age categories
+  lubridate,  # working with dates
+  incidence2, # epidemic curves
+  ggrepel,    # smart labels
+  ggExtra,    # extras
+  esquisse,   # point-and-click for simple ggplots
+  apyramid,   # age pyramids
+  scales,     # formatting of scales
+  plotly,     # interactive plots
+  cowplot,    # combine plots
+* tidyverse   # ggplot2 & data management
+)
 ```
-
-For today's purposes, we import the cleaned linelist of *fake* example data, produced from the [last demonstration](https://github.com/appliedepi/emory_training/blob/master/case_study/weekly_report.Rmd).  
 
 ```{r echo=FALSE, eval=TRUE}
 # This actually runs but is not displayed
@@ -324,7 +338,7 @@ See the [R graph gallery](https://www.r-graph-gallery.com/ggplot2-package.html) 
 
 --
 
-- This whole approach is colloquially known as “ggploting”  
+- This whole approach is colloquially known as “ggplotting”  
 
 --
 
@@ -371,7 +385,7 @@ The order of layers will usually look like this:
 
 --
 
-5) **Add design elements** such as axis labels, title, caption, fonts, text sizes, background themes, or axes rotation  
+5) **Add "theme" plot design elements** such as axis labels, title, caption, fonts, text sizes, background themes, or axes rotation  
 
 --
 
@@ -485,10 +499,10 @@ These commands are "added" with a `+` to the `ggplot()` command.
 ggplot(
   data = linelist,
   mapping = aes(
-    x = age,
-    y = days_hosp)) +
-geom_point() +
-  theme_grey(base_size = 16)
+   x = age,
+   y = days_hosp)) +
+geom_point() + 
+theme_grey(base_size = 16)
 ```
 
 ]
@@ -834,7 +848,7 @@ Argument        |Controls
 `fill`       |The *interior* color (e.g of bar or boxplot)  
 `color`      |The *exterior* or bar, boxplot - OR point color  
 `size`       |Line thickness, point size...
-`alpha`      |Transparency (1 = opaque, 0 = invisible)
+`alpha`      |Transparency: 0 (invisible) to 1 (opaque) 
 `width`      |Width of "bar plot" bars
 `linetype`   |Either solid, dashed, dotted, etc.  
 `binwidth`   |Width of histogram bins  
@@ -1095,7 +1109,7 @@ theme_grey(base_size = 16)
 
 
 ---
-# Multiple aesthetics - example  
+# Static and dynamic  
 
 .pull-left[
 
@@ -1115,6 +1129,7 @@ geom_point(
 Above, `size = 7` and `alpha = 0.7` are static aesthetics defined outside any `aes()` and apply to `geom_point()`.  
 
 `color=` is within an `aes()`, and maps to values in column `died`.  
+
 
 ]
 
@@ -1145,9 +1160,9 @@ As there is only one geom, all aesthetics can be written in `ggplot()`, or in `g
 ---
 # Aesthetic mapping placement  
 
-* Dynamic mappings in the initial `ggplot()` call will apply to subsequent geoms, *unless otherwise indicated*  
-* Static aesthetics (e.g. `color = "blue"`) are not inherited by subsequent geoms  
-* Mappings written within one geom apply only to that geom  
+1) Dynamic mappings in the initial `ggplot()` call will apply to subsequent geoms, *unless otherwise indicated*  
+2) Static aesthetics (e.g. `color = "blue"`) are not inherited by subsequent geoms  
+3) Mappings written within one geom apply only to that geom  
 
 .pull-left[
 ```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
@@ -1167,9 +1182,11 @@ geom_smooth(
 # smoothed mean of entire dataset
 geom_smooth(color = "black")
 ```
+
 ]
 
 .pull-right[
+
 ```{r, echo = F, eval = T, tidy = FALSE}
 ggplot(                
   data = linelist,      
@@ -1192,10 +1209,8 @@ theme_minimal(base_size = 16)
 
 
 ???
-- Which is cleaner and easier to read?
-- When would you want to assign different dynamic aesthetics for different layers? E.g. Points colored by outcome, but geom_text in black only. 
-- Explain why you might use one or the other  
-- Note that aesthetics written outside will not automatically be inherited. 
+- Three rules to remember as you decide where to place aesthetic mappings
+- This is rather complex example, but serves to demonstrate the above guidelines.  
 
 
 
@@ -1351,11 +1366,12 @@ Place a "~" before the column name.
 .pull-right[
 
 ```{r }
-ggplot(data = linelist,
-       mapping = aes(x = date_onset)) +
-  geom_histogram() +
-  facet_wrap(~ eth_race)+
-  theme_grey(base_size = 16)
+ggplot(
+  data = linelist,
+  mapping = aes(x = date_onset)) +
+geom_histogram() +
+facet_wrap(~ eth_race)+
+theme_grey(base_size = 16)
 ```
 
 ]
@@ -1792,7 +1808,7 @@ theme_gray(base_size = 18)
 
 
 ---
-# Scales - "Floating plots" 
+# Scales - Start axes at 0 
 
 .pull-left[
 
@@ -2113,6 +2129,7 @@ geom_point(
   alpha = 0.3) +
 *labs(
 *  title = "Duration of admission",
+*  subtitle = "Fulton County, GA",
 *  x = "Age (years)",
 *  y = "Duration (days)",
 *  caption = "Fictional COVID-19 data",
@@ -2120,7 +2137,10 @@ geom_point(
 )
 ```
 
-Use `lab()` to edit title, subtitle, caption, axes labels, and legend title  
+
+Use `labs()` as above. 
+
+Note: to edit legend title, use the aesthetic that created the legend (e.g. `color=`).  
 
 ]
 
@@ -2136,6 +2156,7 @@ geom_point(
   alpha = 0.3) +
 labs(
   title = "Duration of admission",
+  subtitle = "Fulton County, GA",
   x = "Age (years)",
   y = "Duration (days)",
   caption = "Fictional COVID-19 data",
@@ -2163,7 +2184,7 @@ str_wrap("This is a really long title", 30) # wrap at 30 characters
 --
 
 
-**Dynamic labels** - Imbed code in `str_glue()` that updates with the data  
+**Dynamic labels** - Embed code in `str_glue()` that updates with the data  
 
 ```{r, eval=T, echo=T}
 str_glue("Data as of {Sys.Date()}")
@@ -2172,13 +2193,6 @@ str_glue("Data as of {Sys.Date()}")
 ```{r, eval=T, echo=T}
 str_glue("{fmt_count(linelist, is.na(date_onset))} cases missing onset and not shown")
 ```
-
-
---
-
-
-**Legend title**  
-In `labs()`, write the aesthetic (e.g. `fill=`, `color=`) and provide a title.  
 
 
 
@@ -2325,7 +2339,7 @@ themes_plots
 
 .pull-left[
 
-Use `theme()` to make micro-adjustments.  
+Make micro-adjustments with `theme()`. See the handbook for tips.  
 
 ```{r, echo = TRUE, eval = FALSE, tidy = FALSE}
 ggplot(
@@ -2354,7 +2368,7 @@ theme_minimal(base_size = 16) +
 
 .pull-right[
 
-Syntax takes practice - see [this list](https://ggplot2.tidyverse.org/reference/theme.html) of feature-specific arguments.
+The syntax takes practice - see [this list](https://ggplot2.tidyverse.org/reference/theme.html) of feature-specific arguments.
 
 ```{r , echo = FALSE, eval = TRUE, tidy = FALSE}
 ggplot(data = linelist,
@@ -2500,7 +2514,7 @@ ggplot(
   mapping = aes(
       x = eth_race,   
       fill = died)) +             
-geom_bar()+   # stack bars by column "died"  
+geom_bar()+     
 theme_grey(base_size = 16)+
 theme(axis.text.x= element_text(angle = 30))
 ```
@@ -2512,7 +2526,7 @@ theme(axis.text.x= element_text(angle = 30))
 
 class: medium-table
 
-# Bar plot - counts  
+# Bar plot - aggregated counts  
 
 .pull-left[
 
@@ -2535,7 +2549,7 @@ ggplot(linelist_eth) +
     mapping = aes(   
       x = eth_race,    
 *     y = n))+
-theme(axis.text.x= element_text(angle = 30))         
+theme(axis.text.x= element_text(angle= 30))         
 ```
 
 
@@ -2544,11 +2558,11 @@ theme(axis.text.x= element_text(angle = 30))
 .pull-right[
 
 ```{r, eval=T, echo=F}
-ggplot(linelist) +             
-  geom_bar(              
-    mapping = aes(
-      x = eth_race))+
-theme_grey(base_size = 16)+
+ggplot(linelist_eth) +             
+ geom_col(           
+    mapping = aes(   
+      x = eth_race,    
+      y = n))+
 theme(axis.text.x= element_text(angle = 30))
   
 ```
@@ -2556,37 +2570,6 @@ theme(axis.text.x= element_text(angle = 30))
 
 ]
 
-
----
-
-# Bar plot - a common error 
-
-.pull-left[
-
-If your data look like below (counts) and your plot looks like that (bars of same height), ensure you are using `geom_col()` and not `geom_bar()`!  
-
-```{r, echo=F, eval=T}
-linelist %>% 
-  count(eth_race) %>% 
-  knitr::kable()
-```
-
-]
-
-.pull-right[
-
-```{r, echo=F, eval=T}
-linelist %>% 
-  count(eth_race) %>% 
-  ggplot()+
-  geom_bar(
-    mapping = aes(x = eth_race))+
-  theme_grey(base_size = 16)
-```
-
-This plot shows that there is one row per ethnicity/race!  
-
-]
 
 ---
 
@@ -2636,6 +2619,38 @@ theme(axis.text.x= element_text(angle = 30))
 
 ]
 
+
+
+---
+
+# Bar plot - a common error 
+
+.pull-left[
+
+If your data look like below (counts) and your plot looks like that (bars of same height), ensure you are using `geom_col()` and not `geom_bar()`!  
+
+```{r, echo=F, eval=T}
+linelist %>% 
+  count(eth_race) %>% 
+  knitr::kable()
+```
+
+]
+
+.pull-right[
+
+```{r, echo=F, eval=T}
+linelist %>% 
+  count(eth_race) %>% 
+  ggplot()+
+  geom_bar(
+    mapping = aes(x = eth_race))+
+  theme_grey(base_size = 16)
+```
+
+This plot shows that there is one row per ethnicity/race!  
+
+]
 
 
 ---
@@ -3079,7 +3094,7 @@ plot(weekly,
 
 
 ---
-# Epicurve - groups 
+# Epicurve - ggplot2 additions 
 
 
 .pull-left[
@@ -3186,13 +3201,13 @@ For small outbreaks, the style `show_cases = TRUE` may be helpful:
 
 ```{r, eval=F, echo=T, warning=F, message=F}
 small_outbreak <- linelist %>% 
-filter(
- zip == 30024,
- date_report >= as.Date("2020-12-01")) %>% 
-incidence(
-  date_index = date_onset,               
-  interval = "Sunday weeks",             
-  groups = eth_race)
+  filter(
+    zip == 30024,
+    date_report >= as.Date("2020-12-01")) %>% 
+  incidence(
+    date_index = date_onset,               
+    interval = "Sunday weeks",             
+    groups = eth_race)
 ```
 
 ```{r , echo = TRUE, eval = FALSE, tidy = FALSE}
@@ -3468,7 +3483,6 @@ theme_minimal(base_size = 10)
 
 .pull-left[
 
-You can stack the bars by another variable with `stack_by=`  
 
 ```{r, echo=T, eval=F}
 age_pyramid(
@@ -3481,6 +3495,8 @@ age_pyramid(
  pal = c("darkgreen", "brown",
          "yellow", "orange"))
 ```
+
+You can stack the bars by another variable with `stack_by=`  
 
 ]
 
@@ -3506,7 +3522,6 @@ theme_minimal(base_size = 10)
 ---
 # Demographic pyramids
 
-You can add further ggplot commands 
 
 .pull-left[
 
@@ -3527,6 +3542,8 @@ age_pyramid(
 *  fill = "Gender",
 *  caption = "Caption here")
 ```
+
+You can add further ggplot commands.  
 
 ]
 
@@ -3623,7 +3640,7 @@ age_pyramid(
   split_by = "gender",
   proportional = TRUE,
   show_midpoint = FALSE) +
-theme_minimal(base_size = 16) +
+theme_minimal(base_size = 10) +
 labs(
   title = "Age and Gender",
 * subtitle = str_glue(
@@ -3660,7 +3677,7 @@ age_pyramid(
   split_by = "gender",
   proportional = TRUE,
   show_midpoint = FALSE)+
-theme_minimal(base_size = 16)+
+theme_minimal(base_size = 10)+
 labs(
   title = "Age and Gender",
   subtitle = str_glue(
@@ -3713,9 +3730,7 @@ race_CFR_age <- linelist %>%
     deaths = sum(died_covid == "Yes",
                  na.rm=T),
     CFR = deaths/cases,
-    med_age = median(age, na.rm=T),
-    med_dur = median(days_hosp, na.rm=T)
-  )
+    med_age = median(age, na.rm=T)  )
 ```
 
 ]
@@ -3852,7 +3867,7 @@ ggplot(
     y = CFR,
     size = cases,
 *   label = str_glue(
-      "{eth_race}\n{cases} cases"))) +
+*     "{eth_race}\n{cases} cases"))) +
 geom_point() +
 geom_label_repel(
     size = 5,
@@ -3902,7 +3917,7 @@ ggplot(
     y = CFR,
     size = cases,
 *   label = str_glue(
-      "{eth_race}\n{comma(cases)} cases"))) +
+*     "{eth_race}\n{comma(cases)} cases"))) +
 geom_point() +
 geom_label_repel(
     size = 4,
@@ -4010,13 +4025,13 @@ plot1 <- plot2 <- linelist %>%
   geom_histogram()+
   theme_minimal()+
   scale_y_continuous(expand = c(0,0))+
-  scale_x_date(
-    expand = c(0,0),
+* scale_x_date(
 *   limits = c(
 *     as.Date("2020-03-01"),
 *     max(linelist$date_report, na.rm=T)),
     date_breaks = "months",
-    labels = scales::label_date_short())
+    labels = scales::label_date_short(),
+    expand = c(0,0))
 ```
 ]
 
@@ -4062,18 +4077,18 @@ ggplot(
     ymax = upr))+
 geom_ribbon(alpha = 0.5, fill = "green", color = "green")+
 geom_line(size = 2, color = "darkgreen")+
-scale_x_date(
+*scale_x_date(
 *  limits = c(
 *    as.Date("2020-03-01"),
 *    max(linelist$date_report, na.rm=T)),
-  expand = c(0,0),
   date_breaks = "months",
-  labels = scales::label_date_short())+
-  coord_cartesian(ylim = c(30, 60))+
-  theme_minimal()+
-  labs(
-    y = "Weekly mean age (95%CI)",
-    x = "Month")
+  labels = scales::label_date_short(),
+  expand = c(0,0))+
+coord_cartesian(ylim = c(30, 60))+
+theme_minimal()+
+labs(
+  y = "Weekly mean age (95%CI)",
+  x = "Month")
 ```
 
 ]
@@ -4083,8 +4098,6 @@ scale_x_date(
 
 ```{r, echo = F, eval=T, warning=F, message=F}
 plot2 <- linelist %>% 
-  # filter(date_report >= as.Date("2020-03-01"),
-  #        date_report < as.Date("2021-04-01")) %>% 
   group_by(week = floor_date(date_report, "week")) %>% 
   summarise(ci = list(mean_cl_normal(age) %>% rename(mean=y, lwr=ymin, upr=ymax))) %>% 
   unnest() %>%  
@@ -4143,7 +4156,7 @@ plot1 <- ggplot(
 geom_histogram(color = "grey",
                alpha = 0.5) +
 *theme_cowplot() +
-scale_x_date(
+*scale_x_date(
 * limits = c(
 *   as.Date("2020-03-01"),
 *   max(linelist$date_report, na.rm = TRUE)),  
@@ -4205,7 +4218,7 @@ ggplot(
     limits = c(0, 0.2),
     expand = c(0,0),
     name = "Weekly CFR")+
-  scale_x_date(
+* scale_x_date(
 *   limits = c(
 *     as.Date("2020-03-01"),
 *     max(linelist$date_report, na.rm=T)),  
