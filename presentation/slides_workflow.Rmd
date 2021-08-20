@@ -383,6 +383,7 @@ R project file (`case_study.Rproj`)
   * `data/` folder  
     * `covid_example_data/` folder 
         * `covid_example_data.xlsx`  
+        * `linelist_cleaned.rds`  
         * `covid_shapefile/` folder  
           - `FultonCountryZipCode.shp`...
     * `map_tiles/` folder 
