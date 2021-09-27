@@ -13,6 +13,8 @@ training materials for the R demonstrations first delivered by **Applied
 Epi** to 40 Rollins COVID-19 Epidemiology fellows and colleagues from
 the [Emory COVID-19 Response
 Collaborative](https://emorycovidcollaborative.org/) in August 2021.
+Links to the video recordings are available below and on our \[YouTube
+channel\]
 
 # Applied Epi
 
@@ -57,7 +59,6 @@ for more detail:
 Session 1: Case study walk-through - data cleaning and analytic workflow
 in an R markdown report
 
--   [Video recording of the webinar](#vids1)
 -   [Analytical workflow presentation
     slides](https://appliedepi.github.io/emory_training/presentation/slides_workflow.html)
 -   [Case study R project (zip download of example data and R markdown
@@ -65,7 +66,6 @@ in an R markdown report
 
 Session 2: Data visualization with **ggplot2**
 
--   [Video recording of the webinar](#vids2)
 -   [Data visualization presentation
     slides](https://appliedepi.github.io/emory_training/presentation/slides_ggplot.html)
 -   [R markdown
@@ -79,11 +79,13 @@ scrambled.
 
 ## **Session 1**: Data cleaning and analytic workflow in R markdown (13<sup>th</sup> August 2021)
 
-![](https://www.youtube.com/watch?v=nxBTDfJ_neE)
+<iframe width="560" height="315" src="https://www.youtube.com/embed/nxBTDfJ_neE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen>
+</iframe>
 
 ## **Session 2**: Data visualization with *ggplot* in R markdowwn (20<sup>th</sup> August 2021)
 
-![](https://www.youtube.com/watch?v=caMOUUG2joo)
+<iframe width="560" height="315" src="https://www.youtube.com/embed/caMOUUG2joo" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen>
+</iframe>
 
 # Acknowledgements
 

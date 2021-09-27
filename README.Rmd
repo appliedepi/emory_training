@@ -22,6 +22,7 @@ knitr::opts_chunk$set(
 
 
 [This website](https://appliedepi.github.io/emory_training) hosts training materials for the R demonstrations first delivered by **Applied Epi** to 40 Rollins COVID-19 Epidemiology fellows and colleagues from the [Emory COVID-19 Response Collaborative](https://emorycovidcollaborative.org/) in August 2021. 
+Links to the video recordings are available below and on our [YouTube channel]
 
 
 # Applied Epi  
@@ -52,13 +53,11 @@ The links below contain all of the materials used for the course. See our [Githu
 
 Session 1: Case study walk-through - data cleaning and analytic workflow in an R markdown report 
 
--   [Video recording of the webinar](#vids1)
 -   [Analytical workflow presentation slides](https://appliedepi.github.io/emory_training/presentation/slides_workflow.html)
 -   [Case study R project (zip download of example data and R markdown script)](https://minhaskamal.github.io/DownGit/#/home?url=https://github.com/appliedepi/emory_training/tree/master/case_study)
 
 Session 2: Data visualization with **ggplot2**  
 
--   [Video recording of the webinar](#vids2)
 -   [Data visualization presentation slides](https://appliedepi.github.io/emory_training/presentation/slides_ggplot.html)
 -   [R markdown script](https://github.com/appliedepi/emory_training/blob/master/case_study/ggplot_demo.Rmd)
 
@@ -67,13 +66,12 @@ Please note that all these training materials use *fake example data* in which n
 
 # Video recordings 
 
-## **Session 1**: Data cleaning and analytic workflow in R markdown (13^th^ August 2021) {#vids1}
-![](https://www.youtube.com/watch?v=nxBTDfJ_neE) 
+## **Session 1**: Data cleaning and analytic workflow in R markdown (13^th^ August 2021)
+<iframe width="560" height="315" src="https://www.youtube.com/embed/nxBTDfJ_neE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
   
   
-## **Session 2**: Data visualization with *ggplot* in R markdowwn (20^th^ August 2021) {#vids2}
-![](https://www.youtube.com/watch?v=caMOUUG2joo) 
-
+## **Session 2**: Data visualization with *ggplot* in R markdowwn (20^th^ August 2021)
+<iframe width="560" height="315" src="https://www.youtube.com/embed/caMOUUG2joo" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 # Acknowledgements  
 
