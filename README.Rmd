@@ -50,18 +50,29 @@ The links below contain all of the materials used for the course. See our [Githu
 
 -   [Agenda](https://appliedepi.github.io/emory_training/timetable/timetable.pdf)
 
-Session 1: Case study walk-through - data cleaning and analytic workflow in an R markdown report  
+Session 1: Case study walk-through - data cleaning and analytic workflow in an R markdown report 
 
+-   [Video recording of the webinar](#vids1)
 -   [Analytical workflow presentation slides](https://appliedepi.github.io/emory_training/presentation/slides_workflow.html)
 -   [Case study R project (zip download of example data and R markdown script)](https://minhaskamal.github.io/DownGit/#/home?url=https://github.com/appliedepi/emory_training/tree/master/case_study)
 
 Session 2: Data visualization with **ggplot2**  
 
+-   [Video recording of the webinar](#vids2)
 -   [Data visualization presentation slides](https://appliedepi.github.io/emory_training/presentation/slides_ggplot.html)
 -   [R markdown script](https://github.com/appliedepi/emory_training/blob/master/case_study/ggplot_demo.Rmd)
 
 
 Please note that all these training materials use *fake example data* in which no person is identifiable and the actual values have been scrambled.  
+
+# Video recordings 
+
+## **Session 1**: Data cleaning and analytic workflow in R markdown (13^th^ August 2021) {#vids1}
+![](https://www.youtube.com/watch?v=nxBTDfJ_neE) 
+  
+  
+## **Session 2**: Data visualization with *ggplot* in R markdowwn (20^th^ August 2021) {#vids2}
+![](https://www.youtube.com/watch?v=caMOUUG2joo) 
 
 
 # Acknowledgements  

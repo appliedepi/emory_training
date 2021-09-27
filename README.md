@@ -57,6 +57,7 @@ for more detail:
 Session 1: Case study walk-through - data cleaning and analytic workflow
 in an R markdown report
 
+-   [Video recording of the webinar](#vids1)
 -   [Analytical workflow presentation
     slides](https://appliedepi.github.io/emory_training/presentation/slides_workflow.html)
 -   [Case study R project (zip download of example data and R markdown
@@ -64,6 +65,7 @@ in an R markdown report
 
 Session 2: Data visualization with **ggplot2**
 
+-   [Video recording of the webinar](#vids2)
 -   [Data visualization presentation
     slides](https://appliedepi.github.io/emory_training/presentation/slides_ggplot.html)
 -   [R markdown
@@ -72,6 +74,16 @@ Session 2: Data visualization with **ggplot2**
 Please note that all these training materials use *fake example data* in
 which no person is identifiable and the actual values have been
 scrambled.
+
+# Video recordings
+
+## **Session 1**: Data cleaning and analytic workflow in R markdown (13<sup>th</sup> August 2021)
+
+![](https://www.youtube.com/watch?v=nxBTDfJ_neE)
+
+## **Session 2**: Data visualization with *ggplot* in R markdowwn (20<sup>th</sup> August 2021)
+
+![](https://www.youtube.com/watch?v=caMOUUG2joo)
 
 # Acknowledgements
 
