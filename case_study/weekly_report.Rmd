@@ -311,9 +311,9 @@ linelist <- linelist_raw %>%
     race                = case_race,
     eth                 = case_eth,
     zip                 = case_zip,
-    county              = case_county,
-    district            = case_district,
-    state               = case_state,
+    # county              = case_county,
+    # district            = case_district,
+    # state               = case_state,
     contact_id          = Contact_id, 
     date_onset          = sym_startdt_FALSE,
     sym_fever,
@@ -537,12 +537,12 @@ linelist <- linelist %>%
           TRUE                                                ~ "Unknown"
      )) %>% 
      
-     # change from upper-case to lower case (with leading capital)
-     mutate(across(
-       .cols = c(county, state),
-       .fns = str_to_title
-     )) %>% 
-     
+     ## change from upper-case to lower case (with leading capital)
+     # mutate(across(
+     #   .cols = c(county, state),
+     #   .fns = str_to_title
+     # )) %>% 
+     # 
      
      # recode with searching for string patterns
      # (from "No-Asymptomatic"/"Yes-Symptomatic"/"Unknown")
@@ -574,8 +574,8 @@ linelist <- linelist %>%
   
      # replace missing with "Unknown" where relevant 
      mutate(across(
-       .cols = c(gender, race, eth, zip, 
-                 county, contact_id, contact_hh, 
+       .cols = c(gender, race, eth, zip,
+                 contact_id, contact_hh, 
                  hospitalized, died, died_covid, confirmed_case,
                  contains("sym_"), age_group),
        .fns  = ~fct_explicit_na(.x, na_level = "Unknown")
