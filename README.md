@@ -77,12 +77,12 @@ scrambled.
 
 # Video recordings
 
-## **Session 1**: Data cleaning and analytic workflow in R markdown (13<sup>th</sup> August 2021)
+## **Session 1**: Data cleaning and analytic workflow (13<sup>th</sup> August 2021)
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/nxBTDfJ_neE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen>
 </iframe>
 
-## **Session 2**: Data visualization with *ggplot* in R markdowwn (20<sup>th</sup> August 2021)
+## **Session 2**: Data visualization with *ggplot* (20<sup>th</sup> August 2021)
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/caMOUUG2joo" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen>
 </iframe>
