@@ -12,9 +12,9 @@
 training materials for the R demonstrations first delivered by **Applied
 Epi** to 40 Rollins COVID-19 Epidemiology fellows and colleagues from
 the [Emory COVID-19 Response
-Collaborative](https://emorycovidcollaborative.org/) in August 2021.
-Links to the video recordings are available below and on our \[YouTube
-channel\]
+Collaborative](https://emorycovidcollaborative.org/) in August 2021.  
+Links to the video recordings are available below and on our [YouTube
+channel](https://www.youtube.com/channel/UCgXBQIFJ_Rmq3UhWL_yrkxQ/featured).
 
 # Applied Epi
 
