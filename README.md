@@ -1,4 +1,15 @@
 
+<head>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-TK5RN58695"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-TK5RN58695');
+</script>
+</head>
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 <img src = "https://github.com/appliedepi/epiRhandbook_eng/raw/master/images/Epi%20R%20Handbook%20Banner%20Beige%201500x500.png" width = "800" height="300">
