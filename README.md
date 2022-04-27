@@ -16,7 +16,6 @@
 
 # R Demonstration for Emory COVID-19 Response Collaborative
 
-hello hello hello 
 <!-- badges: start -->
 <!-- badges: end -->
 
@@ -37,7 +36,7 @@ channel](https://www.youtube.com/channel/UCgXBQIFJ_Rmq3UhWL_yrkxQ/featured).
 manual for applied epidemiology and public health which has been used by
 50,000 people around the world.
 
-Contact **<epiRhandbook@gmail.com>** to schedule R demonstrations,
+Contact **<contact@appliedepi.org>** to schedule R demonstrations,
 interactive training sessions, Intro-to-R workshops, or to subscribe to
 “help desk” support services from R experts who know applied epi!
 
@@ -129,7 +128,7 @@ License</a>.
 
 Academic courses and epidemiologist training programs are welcome to use
 this material with their students. If you have questions about your
-intended use, email **<epirhandbook@gmail.com>**.
+intended use, email **<contact@appliedepi.org>**.
 
 # Contribution
 
